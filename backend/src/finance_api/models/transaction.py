@@ -1,0 +1,108 @@
+from sqlalchemy import (
+    Integer,
+    String,
+    Float,
+    ForeignKey,
+    Boolean,
+    Date,
+    DateTime,
+    JSON,
+    func,
+)
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from finance_api.models.db import Base
+from typing import Optional, TYPE_CHECKING, List
+from datetime import datetime, timezone
+
+if TYPE_CHECKING:
+    from finance_api.models.account import (
+        SimpleFinAccount,
+    )
+    from finance_api.models.budget import Budget
+
+
+class SimpleFinTransaction(Base):
+    __tablename__ = "simplefin_transaction"
+
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, index=True, autoincrement=True
+    )
+
+    transaction_id: Mapped[str] = mapped_column(
+        String, unique=True, index=True, server_default=None, nullable=False
+    )
+
+    posted: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    amount: Mapped[float] = mapped_column(
+        Float, nullable=False, server_default="0.0", default=0.0
+    )
+    description: Mapped[Optional[str]] = mapped_column(
+        String, nullable=False, server_default="", default=""
+    )
+    payee: Mapped[Optional[str]] = mapped_column(
+        String, nullable=True, server_default=None, default=None
+    )
+    memo: Mapped[Optional[str]] = mapped_column(
+        String, nullable=True, server_default=None, default=None
+    )
+    transacted_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+    pending: Mapped[bool] = mapped_column(
+        Boolean, nullable=True, server_default="false", default=False
+    )
+    extra: Mapped[Optional[dict]] = mapped_column(
+        JSON, nullable=True, server_default=None, default=None
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    # If this transaction has been split into line items
+    is_split: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, server_default="false")
+    
+    budget_id: Mapped[Optional[int]] = mapped_column(ForeignKey("budget.id"), nullable=True)
+    account_id: Mapped[str] = mapped_column(String, ForeignKey("simplefin_account.account_id"), nullable=False)
+    
+    account: Mapped["SimpleFinAccount"] = relationship(back_populates="transactions")
+    budget: Mapped[Optional["Budget"]] = relationship(back_populates="transactions")
+    
+    # NEW: Relationship to line items
+    line_items: Mapped[List["TransactionLineItem"]] = relationship(
+        back_populates="parent_transaction", cascade="all, delete-orphan"
+    )
+
+class TransactionLineItem(Base):
+    """Individual items within a transaction (e.g., products in a store receipt)"""
+    __tablename__ = "transaction_line_item"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    parent_transaction_id: Mapped[int] = mapped_column(
+        ForeignKey("simplefin_transaction.id"), nullable=False, index=True
+    )
+    
+    # Line item details
+    description: Mapped[str] = mapped_column(String, nullable=False)
+    amount: Mapped[float] = mapped_column(Float, nullable=False)
+    quantity: Mapped[Optional[float]] = mapped_column(Float, nullable=True, default=1.0)
+    unit_price: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    category: Mapped[Optional[str]] = mapped_column(String, nullable=True)  # e.g., "groceries", "tax"
+    notes: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    
+    # Each line item can be assigned to a different budget
+    budget_id: Mapped[Optional[int]] = mapped_column(ForeignKey("budget.id"), nullable=True)
+    
+    # Metadata
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    parent_transaction: Mapped["SimpleFinTransaction"] = relationship(back_populates="line_items")
+    budget: Mapped[Optional["Budget"]] = relationship()

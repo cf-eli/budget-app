@@ -1,0 +1,35 @@
+[project]
+name = "finance_api"
+version = "0.0.0"
+description = ""
+authors = [{ name = "Eli", email = "eli@appiversehub.com" }]
+requires-python = ">=3.12"
+dependencies = [
+    "aiohttp>=3.13.0",
+    "alembic>=1.16.5",
+    "asyncpg>=0.30.0",
+    "litestar>=2.16.0",
+    "psycopg2-binary>=2.9.11",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.11.0",
+    "pyjwt>=2.10.1",
+    "requests>=2.32.4",
+    "sqlalchemy>=2.0.43",
+    "uvicorn>=0.35.0",
+]
+
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.uv.sources]
+finance-api = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "finance-api",
+]
