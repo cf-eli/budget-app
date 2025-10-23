@@ -10,7 +10,7 @@ db_user = os.environ.get('DB_USER', 'admin')
 db_password = os.environ.get('DB_PASSWORD', 'admin')
 db_host = os.environ.get('DB_HOST', 'localhost')
 db_port = os.environ.get('DB_PORT', '5432')
-db_name = os.environ.get('DB_NAME', 'finance')
+db_name = os.environ.get('FINANCE_DB_NAME', 'finance')
 
 
 
