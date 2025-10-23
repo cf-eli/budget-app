@@ -1,57 +1,85 @@
-FROM python:3.12
+# ---------- Build stage ----------
+FROM python:3.12-slim AS builder
 
+# Set up environment variables
+ENV HOME=/home/appuser
+ENV PATH="$HOME/.local/bin:$PATH"
+
+# Install build dependencies
 RUN apt-get update -qqy \
-  && apt-get -qqy --no-install-recommends install \
+    && apt-get install -qqy --no-install-recommends \
     curl \
     libpq-dev \
-    tesseract-ocr \                
-    tesseract-ocr-eng \            
-    libtesseract-dev \             
-  && pip install --no-cache-dir setuptools \
-    wheel \
-  && pip install --no-cache-dir \
-    "poetry>=1.0,<2.0"
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
+# Install uv globally
+RUN python -m pip install --upgrade pip \
+    && pip install --no-cache-dir uv
 
-ENV HOME=/home/appuser
-ENV PATH=$HOME/.local/bin:$PATH
-RUN mkdir -p $HOME/.local/bin \
+# Create non-root user
+RUN mkdir -p $HOME \
     && groupadd -g 1000 appuser \
     && useradd -r -u 1000 -g appuser appuser \
     && chown -R appuser $HOME
+
 USER appuser
 WORKDIR $HOME
 
+# Copy dependency files
+COPY --chown=appuser:appuser pyproject.toml uv.lock ./
 
+# Install dependencies into a local .venv
+RUN uv sync --frozen --no-dev --no-editable || \
+    (mkdir -p src && uv sync --frozen --no-dev)
 
-RUN pip install --user pbr
+# ---------- Runtime stage ----------
+FROM python:3.12-slim AS runtime
 
-# Install the poetry-plugin-export to ensure future compatibility
-RUN poetry self add poetry-plugin-export
-
-# Copy only requirements to cache them in docker layer
-RUN mkdir -p build/src/
-COPY --chown=appuser:appuser pyproject.toml poetry.lock build/
-COPY --chown=appuser:appuser src/ build/src/
-
-RUN cd build/ \
-    && poetry export --without-hashes -o requirements.txt \
-    && cd ..
-
-
-# Install all requirements globally from build as index
-RUN pip install --user -r build/requirements.txt build/\
-    && rm -rf build/
-
-    COPY --chown=appuser:appuser asgi.py entrypoint.sh ./
-RUN chmod +x entrypoint.sh
-
+# Set up environment variables
+ENV HOME=/home/appuser
+ENV PATH="$HOME/.local/bin:$PATH"
+ENV PYTHONPATH=/home/appuser/src
 ARG PORT=8085
-
 ENV HOST=0.0.0.0
 ENV PORT=${PORT}
 
+# Install runtime system dependencies only (lighter than builder)
+RUN apt-get update -qqy \
+    && apt-get install -qqy --no-install-recommends \
+    curl \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN mkdir -p $HOME \
+    && groupadd -g 1000 appuser \
+    && useradd -r -u 1000 -g appuser appuser \
+    && chown -R appuser $HOME
+
+USER appuser
+WORKDIR $HOME
+
+# Copy virtual environment from builder
+COPY --from=builder --chown=appuser:appuser $HOME/.venv $HOME/.venv
+
+# Ensure venv is used by default
+ENV VIRTUAL_ENV=$HOME/.venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Copy application code
+COPY --chown=appuser:appuser src/ ./src/
+COPY --chown=appuser:appuser asgi.py entrypoint.sh alembic.ini ./
+
+# Make entrypoint executable
+RUN chmod +x entrypoint.sh
+
+# Health check (optional)
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+#     CMD curl -f http://localhost:$PORT/health || exit 1
+
+# Entrypoint
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["serve"]
-
 EXPOSE ${PORT}
