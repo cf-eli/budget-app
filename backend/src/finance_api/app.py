@@ -76,7 +76,7 @@ def get_middlewares() -> list[Middleware]:
                 JWTUserMiddleware,
                 secret=settings.homelab_client_secret,
                 jwt_algorithm=settings.jwt_algorithm,
-                jwt_audience=settings.test_jwt_aud,
+                jwt_audience=settings.finance_jwt_aud,
             )
         )
     return middlewares

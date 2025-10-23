@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     db_user: str = "admin"
     db_password: str  = "admin"
     homelab_client_secret: str = ""
+    finance_jwt_aud: str = "finance-api"
 
     class Config:
         env_file = ".env"
