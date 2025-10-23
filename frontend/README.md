@@ -1,46 +1,32 @@
-# Quasar App (client)
+## Starting the Frontend Server
 
-A Quasar Project
-
-## Install the dependencies
+### 1. CD into Frontend Directory
 
 ```bash
-yarn
-# or
+cd frontend
+```
+
+### 2. Install Node.js Dependencies
+```bash
 npm install
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+### 3. Configure Environment Variables
+Create a `.env` file in the `frontend` directory with the following content:
 
 ```bash
-quasar dev
+VITE_API_BASE_URL=http://localhost:8082
 ```
 
-### Lint the files
+### 4. Start the Development Server
 
 ```bash
-yarn lint
-# or
-npm run lint
+npm run dev
 ```
 
-### Format the files
 
-```bash
-yarn format
-# or
-npm run format
-```
 
-### Build the app for production
 
-```bash
-quasar build
-```
 
-### Customize the configuration
 
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
 
-poetry run uvicorn "asgi:app" --port 8000 --reload
-quasar dev

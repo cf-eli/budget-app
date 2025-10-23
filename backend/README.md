@@ -1,24 +1,56 @@
-poetry env use $(pyenv which python3.12)
+## Starting the backend Server
 
-
-
-docker run --name postgres_ffxiv --network test_network -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=ffxiv -p 5432:5432 postgres
-
-
-docker run --rm --network test_network -v $(pwd)/src/toolbox_api/migrations:/flyway/sql flyway/flyway -url=jdbc:postgresql://postgres_ffxiv:5432/ffxiv -user=admin -password=admin -locations=filesystem:/flyway/sql migrate
-
-
-## Installation
+### 1. CD into Backend Directory
 
 ```bash
-# Install package
+cd backend
+```
+
+### 2. Set Up Python Environment
+
+```bash
 uv sync
 ```
 
-## Database migrations 
+### 3. Set Up PostgreSQL Database
+```bash
+docker run --name db -e POSTGRES_DB=finance -d postgres -p 5432:5432
+```
+
+### 4. Configure Environment Variables
+
+Create a `.env` file in the backend directory:
 
 ```bash
-uv run alembic revision --autogenerate -m "initial migration"
+# Database
+DB='localhost'
+DB_PORT='5432'
+DB_USER='postgres'
+DB_PASSWORD='postgres'
+FINANCE_DB_NAME='finance'
 
-uv run alembic upgrade head
+# Authentication (optional)
+ENABLE_AUTH='false'
 ```
+
+### 5. Run Database Migrations
+
+```bash
+alembic upgrade head
+```
+
+### 6. Start the Development Server
+
+```bash
+# Run the API server
+uv run uvicorn asgi:app --reload --port 8082 --log-level debug
+```
+
+The API will be available at `http://localhost:8082/`
+
+### 7. Access API Documentation
+
+Once running, visit:
+- **OpenAPI Specs**: `http://localhost:8082/openapi.json`
+- **Redoc**: `http://localhost:8082/redoc`
+- **Swagger UI**: `http://localhost:8082/docs`
