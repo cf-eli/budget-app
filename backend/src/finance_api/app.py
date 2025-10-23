@@ -45,7 +45,7 @@ class JWTUserMiddleware(AbstractMiddleware):
                     )
                     # Attach user to scope
                     scope["user"] = {
-                        "id": payload.get("sid"),
+                        "id": payload.get("sub"),
                         "name": payload.get("name"),
                         "first_name": payload.get("given_name"),
                         "last_name": payload.get("family_name"),
