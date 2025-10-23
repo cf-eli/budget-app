@@ -25,7 +25,7 @@ function submitForm() {
   const budget: BudgetRequest = {
     name: formData.value.name,
     flexible: true, // Mark as flexible
-    budget_type: 'flexible',
+    budget_type: 'expense',
     expected_amount: formData.value.expected_amount,
     min: formData.value.fixed ? null : formData.value.min,
     max: formData.value.fixed ? null : formData.value.max,

@@ -34,16 +34,45 @@ export type TransactionLineItemResponse = {
 };
 
 /**
- * TokenRequest
+ * TransactionTypeEnum
+ *
+ * Valid transaction types
  */
-export type TokenRequest = {
-    token: string;
+export type TransactionTypeEnum = 'transfer' | 'credit_payment' | 'loan_payment';
+
+/**
+ * TransactionResponse
+ */
+export type TransactionResponse = {
+    id: number;
+    transaction_id: string;
+    amount: number;
+    description?: string | null;
+    payee?: string | null;
+    transacted_at: string;
+    pending: boolean;
+    is_split: boolean;
+    transaction_type?: string | null;
+    exclude_from_budget: boolean;
+    budget?: TransactionBudget | null;
+    account: TransactionAccount;
 };
 
 /**
- * SimpleFinAccountSchema
+ * AccountOrg
  */
-export type SimpleFinAccountSchema = {
+export type AccountOrg = {
+    id: number;
+    domain: string;
+    sfin_url: string;
+    url?: string;
+    name?: string;
+};
+
+/**
+ * TransactionAccount
+ */
+export type TransactionAccount = {
     id: number;
     account_id: string;
     name: string;
@@ -56,6 +85,30 @@ export type SimpleFinAccountSchema = {
         [key: string]: unknown;
     } | null;
     updated_at: string;
+    org: AccountOrg;
+};
+
+/**
+ * TransactionBudget
+ */
+export type TransactionBudget = {
+    id: number;
+    name: string;
+};
+
+/**
+ * TokenRequest
+ */
+export type TokenRequest = {
+    token: string;
+};
+
+/**
+ * MarkTransactionTypeRequest
+ */
+export type MarkTransactionTypeRequest = {
+    transaction_type?: TransactionTypeEnum | null;
+    exclude_from_budget?: boolean;
 };
 
 /**
@@ -73,43 +126,6 @@ export type IncomeBudgetResponse = {
     name: string;
     transaction_sum: number;
     amount_after_transactions: number;
-};
-
-/**
- * GetTransactionsListResponse
- */
-export type GetTransactionsListResponse = {
-    transactions: Array<GetTransactionResponse>;
-};
-
-/**
- * BudgetSchema
- */
-export type BudgetSchema = {
-    id: number;
-    name: string;
-};
-
-/**
- * GetTransactionResponse
- */
-export type GetTransactionResponse = {
-    id: number;
-    transaction_id: string;
-    posted?: string | null;
-    amount: number;
-    description?: string | null;
-    payee?: string | null;
-    memo?: string | null;
-    transacted_at: string;
-    pending: boolean;
-    extra?: {
-        [key: string]: unknown;
-    } | null;
-    updated_at: string;
-    account: SimpleFinAccountSchema;
-    budget?: BudgetSchema | null;
-    is_split: boolean;
 };
 
 /**
@@ -228,6 +244,8 @@ export type ApiFinanceV1TransactionsGetTransactionsData = {
         descending: boolean;
         sort_by: string;
         rows_per_page: number;
+        include_excluded?: boolean;
+        transaction_type?: string | null;
     };
     url: '/api/finance/v1/transactions';
 };
@@ -251,7 +269,7 @@ export type ApiFinanceV1TransactionsGetTransactionsResponses = {
     /**
      * Request fulfilled, document follows
      */
-    200: GetTransactionsListResponse;
+    200: Array<TransactionResponse>;
 };
 
 export type ApiFinanceV1TransactionsGetTransactionsResponse = ApiFinanceV1TransactionsGetTransactionsResponses[keyof ApiFinanceV1TransactionsGetTransactionsResponses];
@@ -405,6 +423,39 @@ export type ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointRes
 };
 
 export type ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponse = ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses[keyof ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses];
+
+export type ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeData = {
+    body: MarkTransactionTypeRequest;
+    path: {
+        transaction_id: number;
+    };
+    query?: never;
+    url: '/api/finance/v1/transactions/{transaction_id}/type';
+};
+
+export type ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeError = ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeErrors[keyof ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeErrors];
+
+export type ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: TransactionResponse;
+};
+
+export type ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeResponse = ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeResponses[keyof ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeResponses];
 
 export type ApiFinanceV1BudgetsCreateCreateBudgetData = {
     body: BudgetRequest;

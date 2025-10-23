@@ -12,14 +12,68 @@
 // to match your app's branding.
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
 
-$primary: #383a3a;
-$secondary: #26a69a;
-$accent: #9c27b0;
+// Quasar Variables
+$primary: #3b82f6;
+$secondary: #8b5cf6;
+$accent: #f59e0b;
+$dark: #1e2027;
+$dark-page: #16171d;
+$positive: #10b981;
+$negative: #ef4444;
+$info: #06b6d4;
+$warning: #f59e0b;
 
-$dark: #1d1d1d;
-$dark-page: #121212;
+// Custom dark theme colors
+$grey-1: #2a2d35;
+$grey-2: #3a3d45;
+$grey-3: #4a4d55;
+$grey-4: #9ca3af;
+$grey-5: #6b7280;
 
-$positive: #21ba45;
-$negative: #c10015;
-$info: #31ccec;
-$warning: #f2c037;
+// Apply dark background globally
+body {
+  background: $dark-page;
+  color: #ffffff;
+}
+
+// Dark theme for Quasar table
+.q-table {
+  background: $grey-1;
+  color: #ffffff;
+
+  &__top,
+  &__bottom,
+  thead tr,
+  tbody tr {
+    background: $grey-1;
+  }
+
+  th {
+    color: $grey-4;
+    font-weight: 600;
+  }
+
+  td {
+    color: #ffffff;
+  }
+
+  tbody tr:hover {
+    background: $grey-2;
+  }
+
+  &__card {
+    background: $grey-1;
+    box-shadow: none;
+  }
+}
+
+// Dark theme for Quasar cards
+.q-card {
+  background: $grey-1;
+  color: #ffffff;
+}
+
+// Dark theme for dialogs
+.q-dialog__backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}

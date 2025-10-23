@@ -30,7 +30,7 @@ async def update_access_url_endpoint(request: Request, data: TokenRequest) -> Di
     try:
         request_user = request.user
     except ImproperlyConfiguredException:
-        request_user = {"id": "A user"}  # For testing purposes when auth is disabled
+        request_user = {"id": "adb59b2f-826e-4b0a-82e5-09d69ba0e615"}  # For testing purposes when auth is disabled
     print("here2")
     user: User = await ensure_user(request_user["id"])
     if not user:

@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
-// import { useBudgets } from 'src/modules/finance/presentation/composables/useBudgets';
+import { onMounted, ref } from 'vue';
 import IncomeCard from 'src/modules/finance/presentation/components/budget/income/IncomeCard.vue';
 import ExpenseCard from 'src/modules/finance/presentation/components/budget/expense/ExpenseCard.vue';
 import FlexibleCard from 'src/modules/finance/presentation/components/budget/flexible/FlexibleCard.vue';
 import FundCard from 'src/modules/finance/presentation/components/budget/fund/FundCard.vue';
-import { ref } from 'vue';
-import { 
-  apiFinanceV1BudgetsAllGetAllBudgets, 
+import BudgetSummary from 'src/modules/finance/presentation/components/budget/BudgetSummary.vue';
+import {
+  apiFinanceV1BudgetsAllGetAllBudgets,
   apiFinanceV1BudgetsCreateCreateBudget,
   type IncomeBudgetResponse,
   type ExpenseBudgetResponse,
@@ -15,50 +14,51 @@ import {
   type FundBudgetResponse,
   type BudgetRequest
 } from 'src/api';
+import { useBudgetStore } from 'src/modules/finance/presentation/stores/budgetStore';
 
+const budgetStore = useBudgetStore();
 
-// function useBudgets() {
-  const incomes = ref<IncomeBudgetResponse[]>([]);
-  const expenses = ref<ExpenseBudgetResponse[]>([]);
-  const flexibles = ref<FlexibleBudgetResponse[]>([]);
-  const funds = ref<FundBudgetResponse[]>([]);
-  const loading = ref(false);
+const incomes = ref<IncomeBudgetResponse[]>([]);
+const expenses = ref<ExpenseBudgetResponse[]>([]);
+const flexibles = ref<FlexibleBudgetResponse[]>([]);
+const funds = ref<FundBudgetResponse[]>([]);
+const loading = ref(false);
 
-  async function fetchBudgets() {
-    loading.value = true;
-    try {
-      const response = await apiFinanceV1BudgetsAllGetAllBudgets();
+async function fetchBudgets() {
+  loading.value = true;
+  try {
+    const response = await apiFinanceV1BudgetsAllGetAllBudgets();
 
-      if (response.data) {
-        incomes.value = response.data.incomes || [];
-        expenses.value = response.data.expenses || [];
-        flexibles.value = response.data.flexibles || [];
-        funds.value = response.data.funds || [];
-      }
-    } catch (error) {
-      console.error('Error fetching budgets:', error);
-    } finally {
-      loading.value = false;
+    if (response.data) {
+      incomes.value = response.data.incomes || [];
+      expenses.value = response.data.expenses || [];
+      flexibles.value = response.data.flexibles || [];
+      funds.value = response.data.funds || [];
     }
+  } catch (error) {
+    console.error('Error fetching budgets:', error);
+  } finally {
+    loading.value = false;
   }
+}
 
-  async function createBudget(budget: BudgetRequest) {
-    try {
-      const response = await apiFinanceV1BudgetsCreateCreateBudget({
-        body: budget
-      });
+async function createBudget(budget: BudgetRequest) {
+  try {
+    const response = await apiFinanceV1BudgetsCreateCreateBudget({
+      body: budget
+    });
 
-      if (response.data) {
-        // Refresh budgets after creation
-        await fetchBudgets();
-        return { success: true, data: response.data };
-      }
-    } catch (error) {
-      console.error('Error creating budget:', error);
-      return { success: false, error };
+    if (response.data) {
+      await fetchBudgets();
+      budgetStore.clearCache();
+      await budgetStore.fetchBudgets(true);
+      return { success: true, data: response.data };
     }
+  } catch (error) {
+    console.error('Error creating budget:', error);
+    return { success: false, error };
   }
-// const { incomes, expenses, flexibles, funds, loading, fetchBudgets, createBudget } = useBudgets();
+}
 
 onMounted(() => {
   fetchBudgets();
@@ -66,10 +66,16 @@ onMounted(() => {
 </script>
 
 <template>
-  <q-page class="q-pa-lg bg-grey-1">
+  <q-page class="budget-page q-pa-lg">
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
+
+    <budget-summary 
+      :incomes="incomes"
+      :expenses="expenses"
+      :flexibles="flexibles"
+    />
 
     <income-card :incomes="incomes" @refresh="fetchBudgets" @create="createBudget" />
     <expense-card :expenses="expenses" @refresh="fetchBudgets" @create="createBudget" />
@@ -77,3 +83,10 @@ onMounted(() => {
     <fund-card :funds="funds" @refresh="fetchBudgets" @create="createBudget" />
   </q-page>
 </template>
+
+<style scoped>
+.budget-page {
+  background: #16171d;
+  min-height: 100vh;
+}
+</style>

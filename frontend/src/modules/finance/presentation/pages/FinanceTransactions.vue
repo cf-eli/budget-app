@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { apiFinanceV1TransactionsGetTransactions, type GetTransactionResponse } from 'src/api';
+import { apiFinanceV1TransactionsGetTransactions, type TransactionResponse } from 'src/api';
 import TransactionTable from 'src/modules/finance/presentation/components/TransactionTable.vue';
 
-const transactions = ref<GetTransactionResponse[]>([]);
+const transactions = ref<TransactionResponse[]>([]);
 const loading = ref(false);
 
 const pagination = ref({
@@ -16,7 +16,6 @@ const pagination = ref({
 
 async function fetchTransactions() {
   loading.value = true;
-  console.log('Fetching transactions with pagination:', pagination.value);
   try {
     const response = await apiFinanceV1TransactionsGetTransactions({
       query: {
@@ -26,14 +25,13 @@ async function fetchTransactions() {
         rows_per_page: pagination.value.rowsPerPage
       }
     });
-    
-    // Adjust based on your actual API response structure
+   
     if (response.data) {
-      transactions.value = Array.isArray(response.data) 
-        ? response.data 
+      transactions.value = Array.isArray(response.data)
+        ? response.data
         : response.data.transactions || [];
-
-      pagination.value.rowsNumber = transactions.value.length;//response.data.total || transactions.value.length;
+      
+      pagination.value.rowsNumber = response.data.total || transactions.value.length;
     }
   } catch (error) {
     console.error('Failed to fetch transactions:', error);
@@ -57,14 +55,20 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <q-separator />
-    <transaction-table 
-      :transactions="transactions" 
+  <q-page class="transactions-page q-pa-lg">
+    <transaction-table
+      :transactions="transactions"
       :pagination="pagination"
       :loading="loading"
       @update:pagination="handlePaginationUpdate"
       @refresh="handleRefresh"
     />
-  </div>
+  </q-page>
 </template>
+
+<style scoped>
+.transactions-page {
+  background: #16171d;
+  min-height: 100vh;
+}
+</style>

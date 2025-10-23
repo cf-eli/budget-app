@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ApiFinanceV1BudgetsAllGetAllBudgetsData, ApiFinanceV1BudgetsAllGetAllBudgetsResponses, ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData, ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors, ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses, ApiFinanceV1BudgetsCreateCreateBudgetData, ApiFinanceV1BudgetsCreateCreateBudgetErrors, ApiFinanceV1BudgetsCreateCreateBudgetResponses, ApiFinanceV1BudgetsNamesGetBudgetsNamesData, ApiFinanceV1BudgetsNamesGetBudgetsNamesResponses, ApiFinanceV1TransactionsGetTransactionsData, ApiFinanceV1TransactionsGetTransactionsErrors, ApiFinanceV1TransactionsGetTransactionsResponses, ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointData, ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors, ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses, ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointData, ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors, ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses, ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownData, ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownErrors, ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownResponses, ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownData, ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownErrors, ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownResponses, ApiFinanceV1TransactionsUpdateUpdateTransactionsData, ApiFinanceV1TransactionsUpdateUpdateTransactionsResponses, ApiFinanceV1UserTokenUpdateAccessUrlEndpointData, ApiFinanceV1UserTokenUpdateAccessUrlEndpointErrors, ApiFinanceV1UserTokenUpdateAccessUrlEndpointResponses } from './types.gen';
+import type { ApiFinanceV1BudgetsAllGetAllBudgetsData, ApiFinanceV1BudgetsAllGetAllBudgetsResponses, ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData, ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors, ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses, ApiFinanceV1BudgetsCreateCreateBudgetData, ApiFinanceV1BudgetsCreateCreateBudgetErrors, ApiFinanceV1BudgetsCreateCreateBudgetResponses, ApiFinanceV1BudgetsNamesGetBudgetsNamesData, ApiFinanceV1BudgetsNamesGetBudgetsNamesResponses, ApiFinanceV1TransactionsGetTransactionsData, ApiFinanceV1TransactionsGetTransactionsErrors, ApiFinanceV1TransactionsGetTransactionsResponses, ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointData, ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors, ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses, ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointData, ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors, ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses, ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownData, ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownErrors, ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownResponses, ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownData, ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownErrors, ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownResponses, ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeData, ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeErrors, ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeResponses, ApiFinanceV1TransactionsUpdateUpdateTransactionsData, ApiFinanceV1TransactionsUpdateUpdateTransactionsResponses, ApiFinanceV1UserTokenUpdateAccessUrlEndpointData, ApiFinanceV1UserTokenUpdateAccessUrlEndpointErrors, ApiFinanceV1UserTokenUpdateAccessUrlEndpointResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -126,6 +126,28 @@ export const apiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpoint =
             }
         ],
         url: '/api/finance/v1/transactions/line-items/{line_item_id}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Update transaction type (gateway)
+ *
+ * Forwards a request to update the type of a transaction on the finance microservice.
+ */
+export const apiFinanceV1TransactionsTransactionIdTypeUpdateTransactionType = <ThrowOnError extends boolean = false>(options: Options<ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeData, ThrowOnError>) => {
+    return (options.client ?? client).patch<ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeResponses, ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/transactions/{transaction_id}/type',
         ...options,
         headers: {
             'Content-Type': 'application/json',

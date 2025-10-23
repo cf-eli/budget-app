@@ -68,7 +68,20 @@ class SimpleFinTransaction(Base):
 
     # If this transaction has been split into line items
     is_split: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, server_default="false")
-    
+    # Transaction type for filtering
+    transaction_type: Mapped[Optional[str]] = mapped_column(
+        String, 
+        nullable=True, 
+        default=None
+    )  # Values: 'transfer', 'credit_payment', 'loan_payment', None (regular transaction)
+    exclude_from_budget: Mapped[bool] = mapped_column(
+        Boolean, 
+        default=False, 
+        nullable=False,
+        server_default="false",
+    )  # If True, exclude from budget calculations
+
+
     budget_id: Mapped[Optional[int]] = mapped_column(ForeignKey("budget.id"), nullable=True)
     account_id: Mapped[str] = mapped_column(String, ForeignKey("simplefin_account.account_id"), nullable=False)
     

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { apiFinanceV1BudgetsNamesGetBudgetsNames } from 'src/api';
-
+import { useBudgetStore } from '../../stores/budgetStore';
 
 const loading = ref(false);
 const budgetOptions = ref<BudgetOption[]>([]);
@@ -53,6 +53,8 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
+const budgetStore = useBudgetStore();
+
 const formData = ref<LineItem>({
   description: '',
   amount: 0,
@@ -97,9 +99,10 @@ function resetForm() {
 }
 
 onMounted(() => {
-  fetchBudgets();
+  budgetStore.fetchBudgets();
 });
 </script>
+
 <template>
   <q-card flat bordered class="q-mt-md">
     <q-card-section>
@@ -167,7 +170,8 @@ onMounted(() => {
               clearable
               emit-value
               map-options
-              :options="budgetOptions"
+              :options="budgetStore.budgetOptions"
+              :loading="budgetStore.loading"
             />
           </div>
 

@@ -22,18 +22,15 @@ class JWTUserMiddleware(AbstractMiddleware):
         jwt_audience: str = "test-dev",
     ):
         super().__init__(app)
-        print("initing middleware")
         self.secret = secret
         self.jwt_algorithm = jwt_algorithm
         self.jwt_audience = jwt_audience
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        print("here")
         if scope["type"] == "http":
             # Get headers from scope
             headers = dict(scope.get("headers", []))
             auth_header = headers.get(b"authorization", b"").decode()
-
             if auth_header and auth_header.startswith("Bearer "):
                 token = auth_header.split(" ")[1]
                 try:
@@ -70,7 +67,6 @@ def get_middlewares() -> list[Middleware]:
 
     middlewares = []
     if settings.enable_auth:
-        print("enabling auth middleware")
         middlewares.append(
             DefineMiddleware(
                 JWTUserMiddleware,

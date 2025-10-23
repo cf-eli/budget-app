@@ -60,44 +60,57 @@ async def save_transactions(
 
 async def get_transactions(
     user_id: int,
-    start_date: datetime | None = None,
-    end_date: datetime | None = None,
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
+    include_excluded: bool = False,
+    transaction_types: Optional[list[str]] = None,
+    sort_desc: bool = True,
     limit: int = 100,
     offset: int = 0,
-    sort_desc: bool = True
-) -> List[SimpleFinTransaction]:
-    """Get transactions for an user within an optional date range.
+) -> list[SimpleFinTransaction]:
+    """
+    Get transactions with filtering options.
+    
     Args:
-        user: User object
-        start_date: Start date for filtering transactions (inclusive)
-        end_date: End date for filtering transactions (inclusive)
-        limit: Maximum number of transactions to return
-        offset: Number of transactions to skip (for pagination)
-        sort_desc: Whether to sort transactions in descending order by transacted_at
-    Returns:
-        List of SimpleFinTransaction objects
+        user_id: User ID
+        start_date: Filter transactions after this date
+        end_date: Filter transactions before this date
+        include_excluded: If False (default), exclude transactions marked as exclude_from_budget
+        transaction_types: Filter by specific transaction types. If None, shows all types
+        sort_desc: Sort by date descending
+        limit: Max results
+        offset: Pagination offset
     """
     async with AsyncSession(engine) as session:
-        stmt = select(SimpleFinTransaction).join(SimpleFinAccount).where(
-            SimpleFinAccount.user_id == user_id
-        ).options(
-            selectinload(SimpleFinTransaction.account),
-            selectinload(SimpleFinTransaction.budget)
+        stmt = (
+            select(SimpleFinTransaction)
+            .join(SimpleFinAccount)
+            .where(SimpleFinAccount.user_id == user_id)
+            .options(selectinload(SimpleFinTransaction.budget))
+            .options(selectinload(SimpleFinTransaction.account).selectinload(SimpleFinAccount.org))
         )
-
+        
+        # Filter out excluded transactions by default
+        if not include_excluded:
+            stmt = stmt.where(SimpleFinTransaction.exclude_from_budget == False)
+        
+        # Filter by transaction types if specified
+        if transaction_types is not None:
+            stmt = stmt.where(SimpleFinTransaction.transaction_type.in_(transaction_types))
+        
         if start_date:
             stmt = stmt.where(SimpleFinTransaction.transacted_at >= start_date)
         if end_date:
             stmt = stmt.where(SimpleFinTransaction.transacted_at <= end_date)
+        
         if sort_desc:
             stmt = stmt.order_by(desc(SimpleFinTransaction.transacted_at))
         else:
             stmt = stmt.order_by(asc(SimpleFinTransaction.transacted_at))
-
+        
         stmt = stmt.limit(limit).offset(offset)
         result = await session.execute(stmt)
-        transactions = result.scalars().all()
-        return list(transactions)
+        return list(result.scalars().all())
 
 async def assign_transaction_to_budget(
     transaction_id: int, budget_id: int
@@ -245,27 +258,68 @@ async def delete_line_item(line_item_id: int) -> None:
         await session.delete(line_item)
         await session.commit()
 
-async def get_budget_sum_with_line_items(budget_id: int) -> float:
+async def mark_transaction_type(
+    transaction_id: int,
+    transaction_type: Optional[str] = None,
+    exclude_from_budget: bool = False,
+) -> SimpleFinTransaction:
     """
-    Get budget sum including line items.
-    If a transaction is split, use line items; otherwise use parent transaction.
+    Mark a transaction with a specific type and/or exclude it from budgets.
+    
+    Args:
+        transaction_id: The transaction ID
+        transaction_type: One of: 'transfer', 'credit_payment', 'loan_payment', or None
+        exclude_from_budget: If True, exclude from all budget calculations
+    
+    Valid transaction types:
+        - 'transfer': Money moving between your own accounts
+        - 'credit_payment': Paying off a credit card
+        - 'loan_payment': Paying off a loan
+        - None: Regular transaction (default)
     """
+    valid_types = ['transfer', 'credit_payment', 'loan_payment', None]
+    if transaction_type not in valid_types:
+        raise ValueError(f"Invalid transaction type. Must be one of: {valid_types}")
+    
     async with AsyncSession(engine) as session:
-        # Sum from transactions that aren't split
-        unsplit_query = (
-            select(func.sum(SimpleFinTransaction.amount))
-            .where(SimpleFinTransaction.budget_id == budget_id)
-            .where(SimpleFinTransaction.is_split == False)
-        )
-        unsplit_result = await session.execute(unsplit_query)
-        unsplit_sum = unsplit_result.scalar() or 0.0
+        transaction = await session.get(SimpleFinTransaction, transaction_id)
+        if not transaction:
+            raise ValueError(f"Transaction {transaction_id} not found")
         
-        # Sum from line items where parent is split
-        split_query = (
-            select(func.sum(TransactionLineItem.amount))
-            .where(TransactionLineItem.budget_id == budget_id)
-        )
-        split_result = await session.execute(split_query)
-        split_sum = split_result.scalar() or 0.0
+        transaction.transaction_type = transaction_type
+        transaction.exclude_from_budget = exclude_from_budget
         
-        return unsplit_sum + split_sum
+        await session.commit()
+        await session.refresh(transaction)
+        return transaction
+
+
+
+
+# Currently not used, but may be useful for future reporting features
+async def get_excluded_transactions(
+    user_id: int,
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
+    limit: int = 100,
+    offset: int = 0,
+) -> list[SimpleFinTransaction]:
+    """Get only excluded transactions (transfers, payments, etc)."""
+    async with AsyncSession(engine) as session:
+        stmt = (
+            select(SimpleFinTransaction)
+            .join(SimpleFinAccount)
+            .where(SimpleFinAccount.user_id == user_id)
+            .where(SimpleFinTransaction.exclude_from_budget == True)
+            .options(selectinload(SimpleFinTransaction.account))
+        )
+        
+        if start_date:
+            stmt = stmt.where(SimpleFinTransaction.transacted_at >= start_date)
+        if end_date:
+            stmt = stmt.where(SimpleFinTransaction.transacted_at <= end_date)
+        
+        stmt = stmt.order_by(desc(SimpleFinTransaction.transacted_at))
+        stmt = stmt.limit(limit).offset(offset)
+        result = await session.execute(stmt)
+        return list(result.scalars().all())

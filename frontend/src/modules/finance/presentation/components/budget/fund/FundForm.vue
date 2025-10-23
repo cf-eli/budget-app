@@ -29,7 +29,7 @@ function submitForm() {
     budget_type: 'fund',
     current_amount: formData.value.current_amount,
     increment: formData.value.increment,
-    priority: formData.value.priority || null,
+    priority: formData.value.priority || 0,
     max: haveMax.value ? formData.value.max : null,
     month: currentMonth,
     year: currentYear,
