@@ -38,6 +38,8 @@ async def get_transactions(
     rows_per_page: int,  # noqa: ARG001
     include_excluded: bool = False,  # noqa: ARG001
     transaction_type: str | None = None,  # noqa: ARG001
+    month: int | None = None,
+    year: int | None = None,
 ) -> list[TransactionResponse]:
     """
     Get transactions with optional filtering.
@@ -50,6 +52,8 @@ async def get_transactions(
         rows_per_page: Number of rows per page
         include_excluded: Whether to include excluded transactions
         transaction_type: Optional filter by transaction type
+        month: Optional month filter (1-12). If not provided, uses current month
+        year: Optional year filter (e.g., 2024). If not provided, uses current year
 
     Returns:
         A list of transactions matching the criteria
@@ -66,7 +70,7 @@ async def get_transactions(
         msg = "User not found"
         raise FinanceServerError(msg)
     # TODO(cf-eli): #004 Change to proper exception handling
-    transactions = await trans_crud.get_transactions(user.id)
+    transactions = await trans_crud.get_transactions(user.id, month=month, year=year)
     return [TransactionResponse.model_validate(txn) for txn in transactions]
 
 

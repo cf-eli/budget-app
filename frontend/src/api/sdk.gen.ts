@@ -4,6 +4,7 @@ import type { Client, Options as Options2, TDataShape } from './client'
 import { client } from './client.gen'
 import type {
   ApiV1BudgetsAllGetAllBudgetsData,
+  ApiV1BudgetsAllGetAllBudgetsErrors,
   ApiV1BudgetsAllGetAllBudgetsResponses,
   ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData,
   ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors,
@@ -12,6 +13,7 @@ import type {
   ApiV1BudgetsCreateCreateBudgetErrors,
   ApiV1BudgetsCreateCreateBudgetResponses,
   ApiV1BudgetsNamesGetBudgetsNamesData,
+  ApiV1BudgetsNamesGetBudgetsNamesErrors,
   ApiV1BudgetsNamesGetBudgetsNamesResponses,
   ApiV1HealthHealthCheckData,
   ApiV1HealthHealthCheckResponses,
@@ -152,7 +154,7 @@ export const apiV1BudgetsAllGetAllBudgets = <ThrowOnError extends boolean = fals
 ) => {
   return (options?.client ?? client).get<
     ApiV1BudgetsAllGetAllBudgetsResponses,
-    unknown,
+    ApiV1BudgetsAllGetAllBudgetsErrors,
     ThrowOnError
   >({
     security: [
@@ -176,7 +178,7 @@ export const apiV1BudgetsNamesGetBudgetsNames = <ThrowOnError extends boolean = 
 ) => {
   return (options?.client ?? client).get<
     ApiV1BudgetsNamesGetBudgetsNamesResponses,
-    unknown,
+    ApiV1BudgetsNamesGetBudgetsNamesErrors,
     ThrowOnError
   >({
     security: [

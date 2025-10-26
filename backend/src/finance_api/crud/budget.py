@@ -1,5 +1,6 @@
 """Budget CRUD operations."""
 
+from calendar import monthrange
 from datetime import UTC, datetime
 
 from sqlalchemy import func, insert, select
@@ -107,14 +108,39 @@ async def create_fund(
         await sess.commit()
 
 
-async def get_budgets(user_id: int, session: AsyncSession | None = None) -> dict:
-    """Get all budgets for a user with transaction sums (accounting for line items)."""
+async def get_budgets(
+    user_id: int,
+    month: int | None = None,
+    year: int | None = None,
+    session: AsyncSession | None = None,
+) -> dict:
+    """
+    Get all budgets for a user with transaction sums (accounting for line items).
+
+    Args:
+        user_id: User ID
+        month: Optional month filter (1-12). If not provided, uses current month
+        year: Optional year filter (e.g., 2024). If not provided, uses current year
+        session: Optional database session. If None, creates a new session.
+
+    """
     income_alias = aliased(Income)
     expense_alias = aliased(Expense)
     fund_alias = aliased(Fund)
 
+    # Use current month/year if not provided
+    now = datetime.now(UTC)
+    if month is None:
+        month = now.month
+    if year is None:
+        year = now.year
+
     # Get all budget sums at once (optimized, includes line items)
-    budget_sums = await get_all_budget_sums_with_line_items(session=session)
+    budget_sums = await get_all_budget_sums_with_line_items(
+        month=month,
+        year=year,
+        session=session,
+    )
 
     query = (
         select(
@@ -141,6 +167,8 @@ async def get_budgets(user_id: int, session: AsyncSession | None = None) -> dict
             fund_alias.max.label("fund_max"),
         )
         .where(Budget.user_id == user_id)
+        .where(Budget.month == month)
+        .where(Budget.year == year)
         .outerjoin(income_alias, Budget.id == income_alias.id)
         .outerjoin(expense_alias, Budget.id == expense_alias.id)
         .outerjoin(fund_alias, Budget.id == fund_alias.id)
@@ -281,9 +309,35 @@ async def get_fund_sum(user_id: int, session: AsyncSession | None = None) -> flo
         return result.scalar() or 0.0
 
 
-async def get_budgets_name(session: AsyncSession | None = None) -> list[dict]:
-    """Get all budget IDs and names."""
-    query = select(Budget.id, Budget.name)
+async def get_budgets_name(
+    user_id: int,
+    month: int | None = None,
+    year: int | None = None,
+    session: AsyncSession | None = None,
+) -> list[dict]:
+    """
+    Get all budget IDs and names for a specific user.
+
+    Args:
+        user_id: User ID
+        month: Optional month filter (1-12). If not provided, uses current month
+        year: Optional year filter (e.g., 2024). If not provided, uses current year
+        session: Optional database session. If None, creates a new session.
+
+    """
+    # Use current month/year if not provided
+    now = datetime.now(UTC)
+    if month is None:
+        month = now.month
+    if year is None:
+        year = now.year
+
+    query = (
+        select(Budget.id, Budget.name)
+        .where(Budget.user_id == user_id)
+        .where(Budget.month == month)
+        .where(Budget.year == year)
+    )
 
     async with get_session(session) as sess:
         result = await sess.execute(query)
@@ -320,14 +374,34 @@ async def get_budget_sum_with_line_items(
 
 
 async def get_all_budget_sums_with_line_items(
+    month: int | None = None,
+    year: int | None = None,
     session: AsyncSession | None = None,
 ) -> dict[int, float]:
     """
     Get all budget sums at once (optimized for get_budgets query).
 
     Returns dict of {budget_id: total_amount}.
+
+    Args:
+        month: Optional month filter (1-12). If not provided, uses current month
+        year: Optional year filter (e.g., 2024). If not provided, uses current year
+        session: Optional database session. If None, creates a new session.
+
     """
     async with get_session(session) as sess:
+        # Use current month/year if not provided
+        now = datetime.now(UTC)
+        if month is None:
+            month = now.month
+        if year is None:
+            year = now.year
+
+        # Calculate start and end dates for the month/year
+        month_start = datetime(year, month, 1, tzinfo=UTC)
+        last_day = monthrange(year, month)[1]
+        month_end = datetime(year, month, last_day, 23, 59, 59, 999999, tzinfo=UTC)
+
         # Sum unsplit transactions grouped by budget
         unsplit_query = (
             select(
@@ -336,18 +410,27 @@ async def get_all_budget_sums_with_line_items(
             )
             .where(SimpleFinTransaction.budget_id.isnot(None))
             .where(~SimpleFinTransaction.is_split)
+            .where(SimpleFinTransaction.transacted_at >= month_start)
+            .where(SimpleFinTransaction.transacted_at <= month_end)
             .group_by(SimpleFinTransaction.budget_id)
         )
         unsplit_result = await sess.execute(unsplit_query)
         unsplit_sums = {row.budget_id: row.total for row in unsplit_result}
 
         # Sum line items grouped by budget
+        # (need to join with parent transaction for date)
         split_query = (
             select(
                 TransactionLineItem.budget_id,
                 func.sum(TransactionLineItem.amount).label("total"),
             )
+            .join(
+                SimpleFinTransaction,
+                TransactionLineItem.parent_transaction_id == SimpleFinTransaction.id,
+            )
             .where(TransactionLineItem.budget_id.isnot(None))
+            .where(SimpleFinTransaction.transacted_at >= month_start)
+            .where(SimpleFinTransaction.transacted_at <= month_end)
             .group_by(TransactionLineItem.budget_id)
         )
         split_result = await sess.execute(split_query)

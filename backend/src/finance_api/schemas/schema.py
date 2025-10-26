@@ -21,6 +21,7 @@ def kebab_to_snake(name: str) -> str:
     """Convert kebab-case to snake_case."""
     return name.replace("_", "-")
 
+
 def convert_to_float(value: None | float) -> float | None:
     """Convert value to float, handling None."""
     if value is None:
@@ -32,6 +33,7 @@ def convert_to_float(value: None | float) -> float | None:
         raise ValueError(
             msg,
         ) from e
+
 
 class BaseSchema(BaseModel):
     """Base schema with common configuration for kebab-case to snake_case conversion."""

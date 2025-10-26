@@ -97,11 +97,20 @@ async def add_transaction_to_budget(
 
 
 @get("/all", response=AllBudgetsResponse, status_code=status_codes.HTTP_200_OK)
-async def get_all_budgets(request: Request) -> AllBudgetsResponse:
+async def get_all_budgets(
+    request: Request,
+    month: int | None = None,
+    year: int | None = None,
+) -> AllBudgetsResponse:
     """
     Get all budgets for the authenticated user.
 
     This endpoint retrieves all budgets associated with the authenticated user.
+
+    Args:
+        request: The HTTP request object
+        month: Optional month filter (1-12). If not provided, uses current month
+        year: Optional year filter (e.g., 2024). If not provided, uses current year
 
     Returns:
         A dictionary containing all budgets for the user.
@@ -118,17 +127,26 @@ async def get_all_budgets(request: Request) -> AllBudgetsResponse:
         msg = "User not found"
         raise FinanceServerError(msg)
         # TODO(cf-eli): #004 Change to proper exception handling
-    budgets = await budget_crud.get_budgets(user.id)
+    budgets = await budget_crud.get_budgets(user.id, month=month, year=year)
     return AllBudgetsResponse.model_validate(budgets)
 
 
 @get("/names", response=list[BudgetNameResponse], status_code=status_codes.HTTP_200_OK)
-async def get_budgets_names(request: Request) -> list[BudgetNameResponse]:
+async def get_budgets_names(
+    request: Request,
+    month: int | None = None,
+    year: int | None = None,
+) -> list[BudgetNameResponse]:
     """
     Get all budget IDs and names for the authenticated user.
 
     This endpoint retrieves all budget IDs and names associated
       with the authenticated user.
+
+    Args:
+        request: The HTTP request object
+        month: Optional month filter (1-12). If not provided, uses current month
+        year: Optional year filter (e.g., 2024). If not provided, uses current year
 
     Returns:
         A list of dictionaries containing budget IDs and names.
@@ -145,7 +163,11 @@ async def get_budgets_names(request: Request) -> list[BudgetNameResponse]:
         msg = "User not found"
         # TODO(cf-eli): #004 Change to proper exception handling
         raise FinanceServerError(msg)
-    budgets = await budget_crud.get_budgets_name()
+    budgets = await budget_crud.get_budgets_name(
+        user_id=user.id,
+        month=month,
+        year=year,
+    )
     return [BudgetNameResponse.model_validate(b) for b in budgets]
 
 

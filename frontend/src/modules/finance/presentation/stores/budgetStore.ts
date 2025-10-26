@@ -12,8 +12,17 @@ export const useBudgetStore = defineStore('budget', () => {
   const loading = ref(false)
   const lastFetched = ref<Date | null>(null)
   const fetchPromise = ref<Promise<void> | null>(null)
+  const currentMonth = ref<number | undefined>(undefined)
+  const currentYear = ref<number | undefined>(undefined)
 
-  async function fetchBudgets(force = false) {
+  async function fetchBudgets(force = false, month?: number, year?: number) {
+    // If month/year changed, force refresh
+    if (month !== currentMonth.value || year !== currentYear.value) {
+      force = true
+      currentMonth.value = month
+      currentYear.value = year
+    }
+
     // If already cached and not forcing refresh, use cache
     if (budgetOptions.value.length > 0 && !force) {
       return
@@ -28,7 +37,12 @@ export const useBudgetStore = defineStore('budget', () => {
     loading.value = true
     fetchPromise.value = (async () => {
       try {
-        const response = await apiV1BudgetsNamesGetBudgetsNames()
+        const response = await apiV1BudgetsNamesGetBudgetsNames({
+          query: {
+            month: currentMonth.value,
+            year: currentYear.value,
+          },
+        })
 
         if (response.data) {
           budgetOptions.value = [
@@ -67,6 +81,8 @@ export const useBudgetStore = defineStore('budget', () => {
     budgetOptions,
     loading,
     lastFetched,
+    currentMonth,
+    currentYear,
     fetchBudgets,
     clearCache,
     getBudgetNameById,

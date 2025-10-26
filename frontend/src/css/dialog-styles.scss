@@ -307,6 +307,8 @@
 
 // Additional specific styling for dropdowns
 .q-select__dropdown {
+  background: #2a2d35 !important;
+
   .q-item {
     color: #ffffff !important;
 
@@ -325,5 +327,45 @@
     &:hover {
       background: rgba(255, 255, 255, 0.08) !important;
     }
+  }
+}
+
+// Mobile-specific overrides for all dropdown menus
+@media (max-width: 599px) {
+  .q-menu,
+  .q-dialog .q-menu,
+  body .q-menu {
+    background: #2a2d35 !important;
+
+    .q-list,
+    .q-virtual-scroll,
+    .q-virtual-scroll__content {
+      background: #2a2d35 !important;
+    }
+
+    .q-item,
+    .q-item__label,
+    .q-item__section {
+      color: #ffffff !important;
+    }
+
+    .q-item {
+      background: transparent !important;
+
+      &:hover,
+      &.q-manual-focusable--focused {
+        background: rgba(255, 255, 255, 0.08) !important;
+      }
+
+      &.q-item--active {
+        background: rgba(59, 130, 246, 0.2) !important;
+        color: #3b82f6 !important;
+      }
+    }
+  }
+
+  // Ensure the dropdown panel itself has dark background
+  .q-menu__dropdown-panel {
+    background: #2a2d35 !important;
   }
 }

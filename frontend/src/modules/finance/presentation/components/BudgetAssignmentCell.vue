@@ -53,8 +53,13 @@ async function onBeforeShow() {
   originalBudgetId.value = getCurrentBudgetId()
   editedBudgetId.value = getCurrentBudgetId()
 
-  // Fetch budgets only when opening the popup
-  await budgetStore.fetchBudgets()
+  // Get month/year from transaction date
+  const transactionDate = new Date(props.transaction.transacted_at)
+  const month = transactionDate.getMonth() + 1
+  const year = transactionDate.getFullYear()
+
+  // Fetch budgets for the transaction's month/year
+  await budgetStore.fetchBudgets(false, month, year)
 
   console.log('Current budget ID:', editedBudgetId.value)
 }

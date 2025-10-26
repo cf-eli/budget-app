@@ -1,10 +1,24 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { apiV1TransactionsGetTransactions, type TransactionResponse } from 'src/api'
 import TransactionTable from 'src/modules/finance/presentation/components/TransactionTable.vue'
+import MonthYearSelector from 'src/modules/finance/presentation/components/MonthYearSelector.vue'
+import { useDateSelectionStore } from 'src/modules/finance/presentation/stores/dateSelectionStore'
+
+const dateStore = useDateSelectionStore()
 
 const transactions = ref<TransactionResponse[]>([])
 const loading = ref(false)
+
+const selectedMonthYear = computed({
+  get: () => ({
+    month: dateStore.selectedMonth,
+    year: dateStore.selectedYear,
+  }),
+  set: (value) => {
+    dateStore.setMonthYear(value.month, value.year)
+  },
+})
 
 const pagination = ref({
   page: 1,
@@ -23,6 +37,8 @@ async function fetchTransactions() {
         descending: pagination.value.descending,
         sort_by: pagination.value.sortBy,
         rows_per_page: pagination.value.rowsPerPage,
+        month: dateStore.selectedMonth,
+        year: dateStore.selectedYear,
       },
     })
 
@@ -49,6 +65,21 @@ function handleRefresh() {
   fetchTransactions()
 }
 
+function handleMonthYearChange() {
+  // Reset to first page when changing month/year
+  pagination.value.page = 1
+  fetchTransactions()
+}
+
+// Watch for external changes to the date store
+watch(
+  () => [dateStore.selectedMonth, dateStore.selectedYear],
+  () => {
+    pagination.value.page = 1
+    fetchTransactions()
+  }
+)
+
 onMounted(() => {
   fetchTransactions()
 })
@@ -56,6 +87,11 @@ onMounted(() => {
 
 <template>
   <q-page class="transactions-page q-pa-lg">
+    <div class="row items-center justify-between q-mb-md">
+      <div class="text-h5 text-white">Transactions</div>
+      <month-year-selector v-model="selectedMonthYear" @update:model-value="handleMonthYearChange" />
+    </div>
+
     <transaction-table
       :transactions="transactions"
       :pagination="pagination"

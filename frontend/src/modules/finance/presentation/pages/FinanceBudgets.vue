@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 import IncomeCard from 'src/modules/finance/presentation/components/budget/income/IncomeCard.vue'
 import ExpenseCard from 'src/modules/finance/presentation/components/budget/expense/ExpenseCard.vue'
 import FlexibleCard from 'src/modules/finance/presentation/components/budget/flexible/FlexibleCard.vue'
 import FundCard from 'src/modules/finance/presentation/components/budget/fund/FundCard.vue'
 import BudgetSummary from 'src/modules/finance/presentation/components/budget/BudgetSummary.vue'
+import MonthYearSelector from 'src/modules/finance/presentation/components/MonthYearSelector.vue'
 import {
   apiV1BudgetsAllGetAllBudgets,
   apiV1BudgetsCreateCreateBudget,
@@ -15,8 +16,10 @@ import {
   type BudgetRequest,
 } from 'src/api'
 import { useBudgetStore } from 'src/modules/finance/presentation/stores/budgetStore'
+import { useDateSelectionStore } from 'src/modules/finance/presentation/stores/dateSelectionStore'
 
 const budgetStore = useBudgetStore()
+const dateStore = useDateSelectionStore()
 
 const incomes = ref<IncomeBudgetResponse[]>([])
 const expenses = ref<ExpenseBudgetResponse[]>([])
@@ -24,10 +27,25 @@ const flexibles = ref<FlexibleBudgetResponse[]>([])
 const funds = ref<FundBudgetResponse[]>([])
 const loading = ref(false)
 
+const selectedMonthYear = computed({
+  get: () => ({
+    month: dateStore.selectedMonth,
+    year: dateStore.selectedYear,
+  }),
+  set: (value) => {
+    dateStore.setMonthYear(value.month, value.year)
+  },
+})
+
 async function fetchBudgets() {
   loading.value = true
   try {
-    const response = await apiV1BudgetsAllGetAllBudgets()
+    const response = await apiV1BudgetsAllGetAllBudgets({
+      query: {
+        month: dateStore.selectedMonth,
+        year: dateStore.selectedYear,
+      },
+    })
 
     if (response.data) {
       incomes.value = response.data.incomes || []
@@ -60,6 +78,21 @@ async function createBudget(budget: BudgetRequest) {
   }
 }
 
+function handleMonthYearChange() {
+  fetchBudgets()
+  // Update budget store to use the selected month/year
+  budgetStore.clearCache()
+}
+
+// Watch for external changes to the date store
+watch(
+  () => [dateStore.selectedMonth, dateStore.selectedYear],
+  () => {
+    fetchBudgets()
+    budgetStore.clearCache()
+  }
+)
+
 onMounted(() => {
   fetchBudgets()
 })
@@ -70,6 +103,11 @@ onMounted(() => {
     <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
     </q-inner-loading>
+
+    <div class="row items-center justify-between q-mb-md">
+      <div class="text-h5 text-white">Budgets</div>
+      <month-year-selector v-model="selectedMonthYear" @update:model-value="handleMonthYearChange" />
+    </div>
 
     <budget-summary :incomes="incomes" :expenses="expenses" :flexibles="flexibles" />
 

@@ -1,5 +1,6 @@
 """Transaction CRUD operations."""
 
+from calendar import monthrange
 from datetime import UTC, datetime
 from logging import getLogger
 
@@ -82,6 +83,8 @@ async def get_transactions(
     sort_desc: bool = True,
     limit: int = 100,
     offset: int = 0,
+    month: int | None = None,
+    year: int | None = None,
     session: AsyncSession | None = None,
 ) -> list[SimpleFinTransaction]:
     """
@@ -98,10 +101,26 @@ async def get_transactions(
         sort_desc: Sort by date descending
         limit: Max results
         offset: Pagination offset
+        month: Filter by month (1-12). If provided with year,
+          filters transactions to that month/year. Defaults to current month
+        year: Filter by year (e.g., 2024). If provided with month,
+          filters transactions to that month/year. Defaults to current year
         session: Optional database session. If None, creates a new session.
 
     """
     async with get_session(session) as sess:
+        # Use current month/year if not provided
+        now = datetime.now(UTC)
+        if month is None:
+            month = now.month
+        if year is None:
+            year = now.year
+
+        # Calculate start and end dates for the month/year
+        month_start = datetime(year, month, 1, tzinfo=UTC)
+        last_day = monthrange(year, month)[1]
+        month_end = datetime(year, month, last_day, 23, 59, 59, 999999, tzinfo=UTC)
+
         stmt = (
             select(SimpleFinTransaction)
             .join(SimpleFinAccount)
@@ -124,6 +143,11 @@ async def get_transactions(
                 SimpleFinTransaction.transaction_type.in_(transaction_types),
             )
 
+        # Apply month/year filtering
+        stmt = stmt.where(SimpleFinTransaction.transacted_at >= month_start)
+        stmt = stmt.where(SimpleFinTransaction.transacted_at <= month_end)
+
+        # Additional date filtering if specified
         if start_date:
             stmt = stmt.where(SimpleFinTransaction.transacted_at >= start_date)
         if end_date:

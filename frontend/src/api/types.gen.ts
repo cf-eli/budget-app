@@ -323,8 +323,8 @@ export type ApiV1BudgetsCreateCreateBudgetResponse =
 export type ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData = {
   body?: never
   path: {
-    budget_id: number
     transaction_id: number
+    budget_id: number
   }
   query?: never
   url: '/api/finance/v1/budgets/{budget_id}/transactions/{transaction_id}'
@@ -362,9 +362,31 @@ export type ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetR
 export type ApiV1BudgetsAllGetAllBudgetsData = {
   body?: never
   path?: never
-  query?: never
+  query?: {
+    month?: number | null
+    year?: number | null
+  }
   url: '/api/finance/v1/budgets/all'
 }
+
+export type ApiV1BudgetsAllGetAllBudgetsErrors = {
+  /**
+   * Validation Exception
+   */
+  400: {
+    status_code: number
+    detail: string
+    extra?:
+      | null
+      | {
+          [key: string]: unknown
+        }
+      | Array<unknown>
+  }
+}
+
+export type ApiV1BudgetsAllGetAllBudgetsError =
+  ApiV1BudgetsAllGetAllBudgetsErrors[keyof ApiV1BudgetsAllGetAllBudgetsErrors]
 
 export type ApiV1BudgetsAllGetAllBudgetsResponses = {
   /**
@@ -379,9 +401,31 @@ export type ApiV1BudgetsAllGetAllBudgetsResponse =
 export type ApiV1BudgetsNamesGetBudgetsNamesData = {
   body?: never
   path?: never
-  query?: never
+  query?: {
+    month?: number | null
+    year?: number | null
+  }
   url: '/api/finance/v1/budgets/names'
 }
+
+export type ApiV1BudgetsNamesGetBudgetsNamesErrors = {
+  /**
+   * Validation Exception
+   */
+  400: {
+    status_code: number
+    detail: string
+    extra?:
+      | null
+      | {
+          [key: string]: unknown
+        }
+      | Array<unknown>
+  }
+}
+
+export type ApiV1BudgetsNamesGetBudgetsNamesError =
+  ApiV1BudgetsNamesGetBudgetsNamesErrors[keyof ApiV1BudgetsNamesGetBudgetsNamesErrors]
 
 export type ApiV1BudgetsNamesGetBudgetsNamesResponses = {
   /**
@@ -402,7 +446,9 @@ export type ApiV1TransactionsGetTransactionsData = {
     sort_by: string
     rows_per_page: number
     include_excluded?: boolean
-    transaction_type?: string | null
+    transaction_type?: number | null
+    month?: number | null
+    year?: number | null
   }
   url: '/api/finance/v1/transactions'
 }
