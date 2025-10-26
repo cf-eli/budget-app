@@ -1,8 +1,4 @@
 {
   "extends": "./.quasar/tsconfig.json",
-  "exclude": [
-    "node_modules",
-    "dist",
-    "src/api/**/*.gen.ts"
-  ]
+  "exclude": ["node_modules", "dist", "src/api/**/*.gen.ts"]
 }
