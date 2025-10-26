@@ -1,0 +1,1 @@
+"""Schemas for finance API."""

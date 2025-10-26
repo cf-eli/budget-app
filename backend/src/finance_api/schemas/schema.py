@@ -1,18 +1,41 @@
-from pydantic import BaseModel, ConfigDict, Field, field_validator, BeforeValidator, model_validator
-from typing import List, Optional, Union, Dict
-from datetime import datetime, timezone
-from enum import Enum
+"""Data schemas for the finance API."""
+
+from datetime import UTC, datetime
 from typing import Annotated
 
+from pydantic import (
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    Field,
+    model_validator,
+)
+
+
 def timestamp_to_utc(ts: float) -> datetime:
-    return datetime.fromtimestamp(ts, tz=timezone.utc)
+    """Convert Unix timestamp to UTC datetime."""
+    return datetime.fromtimestamp(ts, tz=UTC)
 
 
 def kebab_to_snake(name: str) -> str:
+    """Convert kebab-case to snake_case."""
     return name.replace("_", "-")
 
+def convert_to_float(value: None | float) -> float | None:
+    """Convert value to float, handling None."""
+    if value is None:
+        return value
+    try:
+        return float(value)
+    except (TypeError, ValueError) as e:
+        msg = f"Expected a number for {value}, got {type(value).__name__}"
+        raise ValueError(
+            msg,
+        ) from e
 
 class BaseSchema(BaseModel):
+    """Base schema with common configuration for kebab-case to snake_case conversion."""
+
     model_config = ConfigDict(
         alias_generator=kebab_to_snake,
         populate_by_name=True,
@@ -20,8 +43,9 @@ class BaseSchema(BaseModel):
     )
 
 
-
 class Organization(BaseSchema):
+    """Schema for financial organization data."""
+
     id: str
     domain: str
     sfin_url: str
@@ -29,35 +53,25 @@ class Organization(BaseSchema):
     name: str = ""
 
 
-
-
 class Transaction(BaseSchema):
+    """Schema for financial transaction data."""
+
     id: str
     posted: Annotated[datetime, BeforeValidator(timestamp_to_utc)]
-    amount: float
+    amount: Annotated[float, BeforeValidator(convert_to_float)]
     description: str
     payee: str
     memo: str
-    transacted_at: Annotated[datetime, BeforeValidator(timestamp_to_utc)]
-    pending: Optional[bool] = False
-
-    @field_validator("amount", mode='before') # TODO: two seperate instance of this function doing same thing, combine into one
-    def convert_to_float(cls, value):
-        if value is None:
-            return value
-        try:
-            return float(value)
-        except (TypeError, ValueError):
-            raise ValueError(f"Expected a number for {value}, got {type(value).__name__}")
-
+    transacted_at: Annotated[datetime | float, BeforeValidator(timestamp_to_utc)]
+    pending: bool | None = False
 
 
 class Holding(BaseSchema):
     """Holding data."""
 
     id: str
-    created: Annotated[datetime, BeforeValidator(timestamp_to_utc)]
-    currency: Optional[str]
+    created: Annotated[datetime | float, BeforeValidator(timestamp_to_utc)]
+    currency: str | None
     cost_basis: str
     description: str
     market_value: str
@@ -65,43 +79,29 @@ class Holding(BaseSchema):
     shares: str
     symbol: str
 
-    # @field_validator("created", mode='before')
-    # def convert_timestamp(cls, value):
-    #     if isinstance(value, (int, float)):
-    #         return timestamp_to_utc(value)
-    #     return value
-
 
 class Account(BaseSchema):
+    """Schema for financial account data with transactions and holdings."""
+
     org: Organization
     id: str
     name: str
     currency: str
-    balance: float
-    available_balance: Optional[float]
+    balance: Annotated[float, BeforeValidator(convert_to_float)]
+    available_balance: Annotated[float | None, BeforeValidator(convert_to_float)]
     balance_date: Annotated[datetime, BeforeValidator(timestamp_to_utc)]
-    transactions: List[Transaction]
-    holdings: List[Holding] = Field(default_factory=list)
-    extra: Optional[Dict] = None
+    transactions: list[Transaction]
+    holdings: list[Holding] = Field(default_factory=list)
+    extra: dict | None = None
     possible_error: bool = False
-
-    @field_validator("balance", "available_balance", mode='before')
-    def convert_to_float(cls, value):
-        if value is None:
-            return value
-        try:
-            return float(value)
-        except (TypeError, ValueError):
-            raise ValueError(f"Expected a number for {value}, got {type(value).__name__}")
-
 
 
 class FinancialData(BaseSchema):
     """Financial Data."""
 
-    errors: List[str]
-    x_api_message: List[str] = Field(default_factory=list)
-    accounts: List[Account] = Field(default_factory=list)
+    errors: list[str]
+    x_api_message: list[str] = Field(default_factory=list)
+    accounts: list[Account] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def set_possible_errors(self) -> "FinancialData":
@@ -119,4 +119,18 @@ class FinancialData(BaseSchema):
 
 
 class TokenRequest(BaseModel):
+    """Request schema for authentication token."""
+
     token: str
+
+
+class MessageResponse(BaseModel):
+    """Response schema for simple message responses."""
+
+    message: str
+
+
+class HealthResponse(BaseModel):
+    """Health check response schema."""
+
+    status: str

@@ -1,26 +1,40 @@
-from litestar import post, status_codes, Request, Router, get
-from typing import Dict
-from finance_api.crud.user import ensure_user
+"""Budget management endpoints."""
+
+from litestar import Request, Router, get, post, status_codes
 from litestar.exceptions.http_exceptions import ImproperlyConfiguredException
-from finance_api.schemas.budget import BudgetRequest, BudgetNameResponse, AllBudgetsResponse
+
+from finance_api.config import settings
 from finance_api.crud import budget as budget_crud
 from finance_api.crud.transaction import assign_transaction_to_budget
+from finance_api.crud.user import ensure_user
+from finance_api.schemas.budget import (
+    AllBudgetsResponse,
+    BudgetNameResponse,
+    BudgetRequest,
+)
+from finance_api.schemas.exceptions import FinanceServerError
+from finance_api.schemas.schema import MessageResponse
 
-@post("/create", response=dict, status_code=status_codes.HTTP_201_CREATED)
-async def create_budget(request: Request, data: BudgetRequest) -> Dict[str, str]:
-    """Create a new budget.
+
+@post("/create", response=MessageResponse, status_code=status_codes.HTTP_201_CREATED)
+async def create_budget(request: Request, data: BudgetRequest) -> MessageResponse:
+    """
+    Create a new budget.
 
     This endpoint creates a new budget based on the provided details.
-    It accepts a JSON payload with the budget details and returns the ID of the created budget.
+    It accepts a JSON payload with the budget details and returns the
+      ID of the created budget.
 
     Returns:
         A dictionary containing the ID of the created budget.
-    """
 
+    """
     try:
         request_user = request.user
     except ImproperlyConfiguredException:
-        request_user = {"id": "A user"}  # For testing purposes when auth is disabled
+        request_user = {
+            "id": settings.dev_default_user_id,
+        }  # For testing purposes when auth is disabled
     user = await ensure_user(request_user["id"])
 
     if data.budget_type == "income":
@@ -51,37 +65,44 @@ async def create_budget(request: Request, data: BudgetRequest) -> Dict[str, str]
             max_amount=data.max,
         )
     else:
-        raise ValueError("Invalid budget type")  # TODO better exception handler
-    return {"message": "Budget created successfully"}
+        msg = "Invalid budget type"
+        raise ValueError(msg)  # TODO(cf-eli): #004 better exception handler
+    return MessageResponse(message="Budget created successfully")
 
 
 @post(
     "/{budget_id:int}/transactions/{transaction_id:int}",
-    response=dict,
+    response=MessageResponse,
     status_code=status_codes.HTTP_200_OK,
 )
 async def add_transaction_to_budget(
-    request: Request, budget_id: int, transaction_id: int
-) -> Dict[str, str]:
-    """Add a transaction to a budget.
+    budget_id: int,
+    transaction_id: int,
+) -> MessageResponse:
+    """
+    Add a transaction to a budget.
 
     This endpoint adds a transaction to the specified budget.
+
     Args:
-        budget_id (str): The ID of the budget.
-        transaction_id (str): The ID of the transaction to add.
+        budget_id: The ID of the budget.
+        transaction_id: The ID of the transaction to add.
+
     Returns:
         A dictionary confirming the addition of the transaction to the budget.
+
     """
-
     await assign_transaction_to_budget(transaction_id, budget_id)
-    return {"message": "Transaction added to budget"}
+    return MessageResponse(message="Transaction added to budget")
 
 
-@get("/all", response=dict, status_code=status_codes.HTTP_200_OK)
+@get("/all", response=AllBudgetsResponse, status_code=status_codes.HTTP_200_OK)
 async def get_all_budgets(request: Request) -> AllBudgetsResponse:
-    """Get all budgets for the authenticated user.
+    """
+    Get all budgets for the authenticated user.
 
     This endpoint retrieves all budgets associated with the authenticated user.
+
     Returns:
         A dictionary containing all budgets for the user.
 
@@ -89,20 +110,26 @@ async def get_all_budgets(request: Request) -> AllBudgetsResponse:
     try:
         request_user = request.user
     except ImproperlyConfiguredException:
-        request_user = {"id": "A user"}  # For testing purposes when auth is disabled
+        request_user = {
+            "id": settings.dev_default_user_id,
+        }  # For testing purposes when auth is disabled
     user = await ensure_user(request_user["id"])
     if not user:
-        raise Exception("User not found")  # TODO Change to proper exception handling
+        msg = "User not found"
+        raise FinanceServerError(msg)
+        # TODO(cf-eli): #004 Change to proper exception handling
     budgets = await budget_crud.get_budgets(user.id)
-    budgets = AllBudgetsResponse.model_validate(budgets)
-    return budgets
+    return AllBudgetsResponse.model_validate(budgets)
 
 
 @get("/names", response=list[BudgetNameResponse], status_code=status_codes.HTTP_200_OK)
 async def get_budgets_names(request: Request) -> list[BudgetNameResponse]:
-    """Get all budget IDs and names for the authenticated user.
+    """
+    Get all budget IDs and names for the authenticated user.
 
-    This endpoint retrieves all budget IDs and names associated with the authenticated user.
+    This endpoint retrieves all budget IDs and names associated
+      with the authenticated user.
+
     Returns:
         A list of dictionaries containing budget IDs and names.
 
@@ -110,15 +137,16 @@ async def get_budgets_names(request: Request) -> list[BudgetNameResponse]:
     try:
         request_user = request.user
     except ImproperlyConfiguredException:
-        request_user = {"id": "A user"}  # For testing purposes when auth is disabled
+        request_user = {
+            "id": settings.dev_default_user_id,
+        }  # For testing purposes when auth is disabled
     user = await ensure_user(request_user["id"])
     if not user:
-        raise Exception("User not found")  # TODO Change to proper exception handling
+        msg = "User not found"
+        # TODO(cf-eli): #004 Change to proper exception handling
+        raise FinanceServerError(msg)
     budgets = await budget_crud.get_budgets_name()
-    budgets = [BudgetNameResponse.model_validate(b) for b in budgets]
-    return budgets
-
-
+    return [BudgetNameResponse.model_validate(b) for b in budgets]
 
 
 budget_router = Router(
@@ -131,7 +159,3 @@ budget_router = Router(
     ],
     tags=["Budget"],
 )
-# @plaid_route.post("/budgets/add_transaction")
-# async def create_budget_transaction_post(request: AddTransaction):
-#     create_budget_transaction(request.budget_id, request.transaction_id)
-#     return {"message": "Transaction added to budget"}

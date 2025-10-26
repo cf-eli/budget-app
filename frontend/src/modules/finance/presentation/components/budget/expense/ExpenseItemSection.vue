@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { ExpenseBudgetResponse } from 'src/api';
+import type { ExpenseBudgetResponse } from 'src/api'
 
 interface Props {
-  expense: ExpenseBudgetResponse;
+  expense: ExpenseBudgetResponse
 }
 
-defineProps<Props>();
+defineProps<Props>()
 
-const formatCurrency = (value: number | null | undefined) => 
-  value !== null && value !== undefined ? `$${value.toLocaleString()}` : 'N/A';
+const formatCurrency = (value: number | null | undefined) =>
+  value !== null && value !== undefined ? `$${value.toLocaleString()}` : 'N/A'
 </script>
 
 <template>
@@ -16,10 +16,7 @@ const formatCurrency = (value: number | null | undefined) =>
     <q-card-section class="q-pa-md">
       <div class="row items-center justify-between q-mb-md">
         <div class="text-h6 text-white">{{ expense.name }}</div>
-        <q-badge 
-          :color="expense.fixed ? 'blue-grey-8' : 'orange-8'" 
-          text-color="white"
-        >
+        <q-badge :color="expense.fixed ? 'blue-grey-8' : 'orange-8'" text-color="white">
           {{ expense.fixed ? 'Fixed' : 'Flexible' }}
         </q-badge>
       </div>
@@ -51,7 +48,7 @@ const formatCurrency = (value: number | null | undefined) =>
         </div>
 
         <div class="col-auto text-right">
-          <div 
+          <div
             class="text-h4 text-weight-bold q-mb-xs"
             :class="expense.transaction_sum < 0 ? 'text-negative' : 'text-positive'"
           >

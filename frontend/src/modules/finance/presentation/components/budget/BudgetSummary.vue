@@ -1,54 +1,50 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { 
-  IncomeBudgetResponse, 
-  ExpenseBudgetResponse, 
-  FlexibleBudgetResponse 
-} from 'src/api';
+import { computed } from 'vue'
+import type { IncomeBudgetResponse, ExpenseBudgetResponse, FlexibleBudgetResponse } from 'src/api'
 
 interface Props {
-  incomes: IncomeBudgetResponse[];
-  expenses: ExpenseBudgetResponse[];
-  flexibles: FlexibleBudgetResponse[];
+  incomes: IncomeBudgetResponse[]
+  expenses: ExpenseBudgetResponse[]
+  flexibles: FlexibleBudgetResponse[]
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
-const formatCurrency = (value: number) => `$${value.toLocaleString()}`;
+const formatCurrency = (value: number) => `$${value.toLocaleString()}`
 
 // Expected calculations
-const totalExpectedIncome = computed(() => 
-  props.incomes.reduce((sum, i) => sum + (i.expected_amount || 0), 0)
-);
+const totalExpectedIncome = computed(() =>
+  props.incomes.reduce((sum, i) => sum + (i.expected_amount || 0), 0),
+)
 
-const totalExpectedExpenses = computed(() => 
-  props.expenses.reduce((sum, e) => sum + (e.expected_amount || 0), 0)
-);
+const totalExpectedExpenses = computed(() =>
+  props.expenses.reduce((sum, e) => sum + (e.expected_amount || 0), 0),
+)
 
-const totalExpectedFlexibles = computed(() => 
-  props.flexibles.reduce((sum, f) => sum + (f.expected_amount || 0), 0)
-);
+const totalExpectedFlexibles = computed(() =>
+  props.flexibles.reduce((sum, f) => sum + (f.expected_amount || 0), 0),
+)
 
-const expectedBalance = computed(() => 
-  totalExpectedIncome.value - totalExpectedExpenses.value - totalExpectedFlexibles.value
-);
+const expectedBalance = computed(
+  () => totalExpectedIncome.value - totalExpectedExpenses.value - totalExpectedFlexibles.value,
+)
 
 // Current (actual transactions) calculations
-const totalCurrentIncome = computed(() => 
-  props.incomes.reduce((sum, i) => sum + Math.abs(i.transaction_sum), 0)
-);
+const totalCurrentIncome = computed(() =>
+  props.incomes.reduce((sum, i) => sum + Math.abs(i.transaction_sum), 0),
+)
 
-const totalCurrentExpenses = computed(() => 
-  props.expenses.reduce((sum, e) => sum + Math.abs(e.transaction_sum), 0)
-);
+const totalCurrentExpenses = computed(() =>
+  props.expenses.reduce((sum, e) => sum + Math.abs(e.transaction_sum), 0),
+)
 
-const totalCurrentFlexibles = computed(() => 
-  props.flexibles.reduce((sum, f) => sum + Math.abs(f.transaction_sum), 0)
-);
+const totalCurrentFlexibles = computed(() =>
+  props.flexibles.reduce((sum, f) => sum + Math.abs(f.transaction_sum), 0),
+)
 
-const currentBalance = computed(() => 
-  totalCurrentIncome.value - totalCurrentExpenses.value - totalCurrentFlexibles.value
-);
+const currentBalance = computed(
+  () => totalCurrentIncome.value - totalCurrentExpenses.value - totalCurrentFlexibles.value,
+)
 </script>
 
 <template>
@@ -67,21 +63,27 @@ const currentBalance = computed(() =>
               <q-item class="q-px-none q-py-xs">
                 <q-item-section>
                   <q-item-label caption class="text-grey-5">Income</q-item-label>
-                  <q-item-label class="text-positive">{{ formatCurrency(totalExpectedIncome) }}</q-item-label>
+                  <q-item-label class="text-positive">{{
+                    formatCurrency(totalExpectedIncome)
+                  }}</q-item-label>
                 </q-item-section>
               </q-item>
 
               <q-item class="q-px-none q-py-xs">
                 <q-item-section>
                   <q-item-label caption class="text-grey-5">Expenses</q-item-label>
-                  <q-item-label class="text-negative">-{{ formatCurrency(totalExpectedExpenses) }}</q-item-label>
+                  <q-item-label class="text-negative"
+                    >-{{ formatCurrency(totalExpectedExpenses) }}</q-item-label
+                  >
                 </q-item-section>
               </q-item>
 
               <q-item class="q-px-none q-py-xs">
                 <q-item-section>
                   <q-item-label caption class="text-grey-5">Flexible Expenses</q-item-label>
-                  <q-item-label class="text-amber">-{{ formatCurrency(totalExpectedFlexibles) }}</q-item-label>
+                  <q-item-label class="text-amber"
+                    >-{{ formatCurrency(totalExpectedFlexibles) }}</q-item-label
+                  >
                 </q-item-section>
               </q-item>
 
@@ -90,7 +92,7 @@ const currentBalance = computed(() =>
               <q-item class="q-px-none q-py-xs">
                 <q-item-section>
                   <q-item-label caption class="text-grey-5">Balance</q-item-label>
-                  <q-item-label 
+                  <q-item-label
                     class="text-h6 text-weight-bold"
                     :class="expectedBalance >= 0 ? 'text-positive' : 'text-negative'"
                   >
@@ -114,21 +116,27 @@ const currentBalance = computed(() =>
               <q-item class="q-px-none q-py-xs">
                 <q-item-section>
                   <q-item-label caption class="text-grey-5">Income</q-item-label>
-                  <q-item-label class="text-positive">{{ formatCurrency(totalCurrentIncome) }}</q-item-label>
+                  <q-item-label class="text-positive">{{
+                    formatCurrency(totalCurrentIncome)
+                  }}</q-item-label>
                 </q-item-section>
               </q-item>
 
               <q-item class="q-px-none q-py-xs">
                 <q-item-section>
                   <q-item-label caption class="text-grey-5">Expenses</q-item-label>
-                  <q-item-label class="text-negative">-{{ formatCurrency(totalCurrentExpenses) }}</q-item-label>
+                  <q-item-label class="text-negative"
+                    >-{{ formatCurrency(totalCurrentExpenses) }}</q-item-label
+                  >
                 </q-item-section>
               </q-item>
 
               <q-item class="q-px-none q-py-xs">
                 <q-item-section>
                   <q-item-label caption class="text-grey-5">Flexible Expenses</q-item-label>
-                  <q-item-label class="text-amber">-{{ formatCurrency(totalCurrentFlexibles) }}</q-item-label>
+                  <q-item-label class="text-amber"
+                    >-{{ formatCurrency(totalCurrentFlexibles) }}</q-item-label
+                  >
                 </q-item-section>
               </q-item>
 
@@ -137,7 +145,7 @@ const currentBalance = computed(() =>
               <q-item class="q-px-none q-py-xs">
                 <q-item-section>
                   <q-item-label caption class="text-grey-5">Balance</q-item-label>
-                  <q-item-label 
+                  <q-item-label
                     class="text-h6 text-weight-bold"
                     :class="currentBalance >= 0 ? 'text-positive' : 'text-negative'"
                   >

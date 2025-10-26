@@ -18,6 +18,39 @@ dependencies = [
     "uvicorn>=0.35.0",
 ]
 
+[tool.ruff]
+line-length = 88
+extend-exclude = ["src/finance_api/alembic"]
+
+[tool.ruff.lint]
+# Select specific rule sets instead of ALL
+select = ["ALL"]
+
+ignore = [
+    'FIX002',
+    'PLR0913',
+    'FBT001',
+    'FBT002',
+    'D203',
+    'D212',
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Allow print statements and less strict rules in scripts
+"scripts/**" = ["T201", "S311", "PLR0915", "C901", "PLR0912"]
+# Test files can have longer functions and magic values
+"tests/**.py" = [
+    "PLR2004",
+    "S101",
+    "D100",
+    "D103",
+    "D104",
+    "S105",
+    "SLF001",
+    "ARG001",
+    "SIM117",
+]
+
 
 [build-system]
 requires = ["setuptools>=68.0"]
@@ -32,4 +65,33 @@ finance-api = { workspace = true }
 [dependency-groups]
 dev = [
     "finance-api",
+    "ruff>=0.14.2",
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=6.0.0",
+    "pytest-mock>=3.14.0",
+    "httpx>=0.28.0",
+    "aiosqlite>=0.21.0",
+    "pytest-xdist>=3.8.0",
+    "filelock>=3.16.0",
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--cov=src/finance_api/controllers",
+    "--cov=src/finance_api/crud",
+    "--cov=src/finance_api/services",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+
+

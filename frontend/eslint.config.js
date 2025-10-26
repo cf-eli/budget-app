@@ -9,6 +9,18 @@ import tsParser from '@typescript-eslint/parser' // Import the parser explicitly
 import vueParser from 'vue-eslint-parser' // Import the Vue parser
 
 export default [
+  // Ignore auto-generated files and node_modules
+  {
+    ignores: [
+      'node_modules/**',
+      'src/api/**/*.gen.ts',
+      'src/api/client.gen.ts',
+      'src/api/core/**/*.gen.ts',
+      'dist/**',
+      '.quasar/**',
+    ],
+  },
+
   // Base configuration for JavaScript
   js.configs.recommended,
   ...pluginQuasar.configs.recommended(),
@@ -34,7 +46,13 @@ export default [
     },
     rules: {
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
-      '@typescript-eslint/no-unused-vars': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
     },
   },
 
@@ -57,6 +75,13 @@ export default [
     },
     rules: {
       'vue/no-unused-vars': 'error',
+      'no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
     },
   },
 

@@ -1,59 +1,31 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
-import { apiFinanceV1BudgetsNamesGetBudgetsNames } from 'src/api';
-import { useBudgetStore } from '../../stores/budgetStore';
-
-const loading = ref(false);
-const budgetOptions = ref<BudgetOption[]>([]);
-interface BudgetOption {
-  label: string;
-  value: number | null;
-}
-async function fetchBudgets() {
-  loading.value = true;
-  try {
-    const response = await apiFinanceV1BudgetsNamesGetBudgetsNames();
-   
-    if (response.data) {
-      budgetOptions.value = [
-        { label: 'None', value: null },
-        ...response.data.map((budget) => ({
-          label: budget.name,
-          value: budget.id,
-        }))
-      ];
-    }
-  } catch (error) {
-    console.error('Error fetching budgets:', error);
-  } finally {
-    loading.value = false;
-  }
-}
+import { ref, watch, onMounted } from 'vue'
+import { useBudgetStore } from '../../stores/budgetStore'
 
 interface LineItem {
-  description: string;
-  amount: number;
-  quantity?: number;
-  unit_price?: number;
-  category?: string;
-  budget_id?: number;
-  notes?: string;
+  description: string
+  amount: number
+  quantity?: number
+  unit_price?: number
+  category?: string
+  budget_id?: number
+  notes?: string
 }
 
 interface Props {
-  item?: LineItem | null;
-  maxAmount: number;
+  item?: LineItem | null
+  maxAmount: number
 }
 
 interface Emits {
-  (e: 'submit', item: LineItem): void;
-  (e: 'cancel'): void;
+  (_event: 'submit', _item: LineItem): void
+  (_event: 'cancel'): void
 }
 
-const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
 
-const budgetStore = useBudgetStore();
+const budgetStore = useBudgetStore()
 
 const formData = ref<LineItem>({
   description: '',
@@ -61,31 +33,35 @@ const formData = ref<LineItem>({
   quantity: 1,
   category: '',
   notes: '',
-});
+})
 
-const autoCalculate = ref(true);
+const autoCalculate = ref(true)
 
-watch(() => props.item, (newItem) => {
-  if (newItem) {
-    formData.value = { ...newItem };
-  }
-}, { immediate: true });
+watch(
+  () => props.item,
+  (newItem) => {
+    if (newItem) {
+      formData.value = { ...newItem }
+    }
+  },
+  { immediate: true },
+)
 
 // Auto-calculate amount from quantity × unit_price
 watch([() => formData.value.quantity, () => formData.value.unit_price], () => {
   if (autoCalculate.value && formData.value.quantity && formData.value.unit_price) {
-    formData.value.amount = formData.value.quantity * formData.value.unit_price;
+    formData.value.amount = formData.value.quantity * formData.value.unit_price
   }
-});
+})
 
 function submit() {
-  emit('submit', { ...formData.value });
-  resetForm();
+  emit('submit', { ...formData.value })
+  resetForm()
 }
 
 function cancel() {
-  emit('cancel');
-  resetForm();
+  emit('cancel')
+  resetForm()
 }
 
 function resetForm() {
@@ -95,12 +71,12 @@ function resetForm() {
     quantity: 1,
     category: '',
     notes: '',
-  };
+  }
 }
 
 onMounted(() => {
-  budgetStore.fetchBudgets();
-});
+  budgetStore.fetchBudgets()
+})
 </script>
 
 <template>
@@ -113,7 +89,7 @@ onMounted(() => {
               v-model="formData.description"
               label="Description *"
               filled
-              :rules="[val => !!val || 'Description is required']"
+              :rules="[(val) => !!val || 'Description is required']"
             />
           </div>
 
@@ -147,19 +123,15 @@ onMounted(() => {
               prefix="$"
               step="0.01"
               :rules="[
-                val => !!val || 'Amount is required',
-                val => val > 0 || 'Must be positive',
-                val => val <= maxAmount || `Cannot exceed $${maxAmount.toFixed(2)}`
+                (val) => !!val || 'Amount is required',
+                (val) => val > 0 || 'Must be positive',
+                (val) => val <= maxAmount || `Cannot exceed $${maxAmount.toFixed(2)}`,
               ]"
             />
           </div>
 
           <div class="col-6">
-            <q-input
-              v-model="formData.category"
-              label="Category"
-              filled
-            />
+            <q-input v-model="formData.category" label="Category" filled />
           </div>
 
           <div class="col-6">
@@ -176,13 +148,7 @@ onMounted(() => {
           </div>
 
           <div class="col-12">
-            <q-input
-              v-model="formData.notes"
-              label="Notes"
-              filled
-              type="textarea"
-              rows="2"
-            />
+            <q-input v-model="formData.notes" label="Notes" filled type="textarea" rows="2" />
           </div>
         </div>
 

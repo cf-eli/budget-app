@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { FundBudgetResponse } from 'src/api';
+import type { FundBudgetResponse } from 'src/api'
 
 interface Props {
-  fund: FundBudgetResponse;
+  fund: FundBudgetResponse
 }
 
-defineProps<Props>();
+defineProps<Props>()
 
-const formatCurrency = (value: number | null | undefined) => 
-  value !== null && value !== undefined ? `$${value.toLocaleString()}` : 'N/A';
+const formatCurrency = (value: number | null | undefined) =>
+  value !== null && value !== undefined ? `$${value.toLocaleString()}` : 'N/A'
 </script>
 
 <template>
@@ -16,11 +16,7 @@ const formatCurrency = (value: number | null | undefined) =>
     <q-card-section class="q-pa-md">
       <div class="row items-center justify-between q-mb-md">
         <div class="text-h6 text-white">{{ fund.name }}</div>
-        <q-badge 
-          v-if="fund.priority !== null"
-          color="teal-8" 
-          text-color="white"
-        >
+        <q-badge v-if="fund.priority !== null" color="teal-8" text-color="white">
           Priority: {{ fund.priority }}
         </q-badge>
       </div>
@@ -52,7 +48,7 @@ const formatCurrency = (value: number | null | undefined) =>
             <q-item class="q-px-none q-py-xs">
               <q-item-section>
                 <q-item-label caption class="text-grey-5">Transaction Total</q-item-label>
-                <q-item-label 
+                <q-item-label
                   :class="fund.transaction_sum >= 0 ? 'text-positive' : 'text-negative'"
                 >
                   {{ formatCurrency(fund.transaction_sum) }}
@@ -63,21 +59,17 @@ const formatCurrency = (value: number | null | undefined) =>
         </div>
 
         <div class="col-auto text-right">
-          <div 
+          <div
             class="text-h4 text-weight-bold q-mb-xs"
             :class="fund.amount_after_transactions >= 0 ? 'text-teal' : 'text-negative'"
           >
             {{ formatCurrency(Math.abs(fund.amount_after_transactions)) }}
           </div>
-          <div class="text-caption text-grey-5">
-            Amount After Transactions
-          </div>
+          <div class="text-caption text-grey-5">Amount After Transactions</div>
         </div>
       </div>
 
-      <q-badge v-if="!fund.enable" color="grey" class="q-mt-sm">
-        Disabled
-      </q-badge>
+      <q-badge v-if="!fund.enable" color="grey" class="q-mt-sm"> Disabled </q-badge>
     </q-card-section>
   </q-card>
 </template>

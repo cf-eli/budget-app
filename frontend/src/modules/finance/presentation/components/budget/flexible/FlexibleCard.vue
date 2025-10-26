@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { FlexibleBudgetResponse, BudgetRequest } from 'src/api';
-import FlexibleItemSection from './FlexibleItemSection.vue';
-import FlexibleForm from './FlexibleForm.vue';
+import { ref } from 'vue'
+import type { FlexibleBudgetResponse, BudgetRequest } from 'src/api'
+import FlexibleItemSection from './FlexibleItemSection.vue'
+import FlexibleForm from './FlexibleForm.vue'
 
 interface Props {
-  flexibles: FlexibleBudgetResponse[];
+  flexibles: FlexibleBudgetResponse[]
 }
 
 interface Emits {
-  (e: 'refresh'): void;
-  (e: 'create', budget: BudgetRequest): void;
+  (_event: 'refresh'): void
+  (_event: 'create', _budget: BudgetRequest): void
 }
 
-defineProps<Props>();
-const emit = defineEmits<Emits>();
+defineProps<Props>()
+const emit = defineEmits<Emits>()
 
-const formVisible = ref(false);
+const formVisible = ref(false)
 
 function openForm() {
-  formVisible.value = true;
+  formVisible.value = true
 }
 
 function showDetails(id: number) {
-  console.log('Show details for flexible:', id);
+  console.log('Show details for flexible:', id)
 }
 
 async function handleFormSubmit(formData: BudgetRequest) {
-  await emit('create', formData);
-  formVisible.value = false;
+  await emit('create', formData)
+  formVisible.value = false
 }
 </script>
 
@@ -39,14 +39,7 @@ async function handleFormSubmit(formData: BudgetRequest) {
         <q-icon name="event" size="28px" color="amber" />
         <span class="text-h5 text-white">Flexibles</span>
       </div>
-      <q-btn
-        flat
-        round
-        icon="add"
-        color="positive"
-        size="md"
-        @click="openForm"
-      >
+      <q-btn flat round icon="add" color="positive" size="md" @click="openForm">
         <q-tooltip>Add Flexible Expense</q-tooltip>
       </q-btn>
     </q-card-section>
@@ -55,8 +48,8 @@ async function handleFormSubmit(formData: BudgetRequest) {
 
     <q-card-section class="category-items-section">
       <q-list separator class="q-pa-none">
-        <q-item 
-          v-for="flexible in flexibles" 
+        <q-item
+          v-for="flexible in flexibles"
           :key="flexible.id"
           clickable
           class="q-pa-none"

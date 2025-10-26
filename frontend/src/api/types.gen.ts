@@ -35,8 +35,6 @@ export type TransactionLineItemResponse = {
 
 /**
  * TransactionTypeEnum
- *
- * Valid transaction types
  */
 export type TransactionTypeEnum = 'transfer' | 'credit_payment' | 'loan_payment';
 
@@ -104,6 +102,13 @@ export type TokenRequest = {
 };
 
 /**
+ * MessageResponse
+ */
+export type MessageResponse = {
+    message: string;
+};
+
+/**
  * MarkTransactionTypeRequest
  */
 export type MarkTransactionTypeRequest = {
@@ -126,6 +131,13 @@ export type IncomeBudgetResponse = {
     name: string;
     transaction_sum: number;
     amount_after_transactions: number;
+};
+
+/**
+ * HealthResponse
+ */
+export type HealthResponse = {
+    status: string;
 };
 
 /**
@@ -236,7 +248,135 @@ export type AllBudgetsResponse = {
     funds?: Array<FundBudgetResponse>;
 };
 
-export type ApiFinanceV1TransactionsGetTransactionsData = {
+export type ApiV1UserTokenUpdateAccessUrlEndpointData = {
+    body: TokenRequest;
+    path?: never;
+    query?: never;
+    url: '/api/finance/v1/user/token';
+};
+
+export type ApiV1UserTokenUpdateAccessUrlEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1UserTokenUpdateAccessUrlEndpointError = ApiV1UserTokenUpdateAccessUrlEndpointErrors[keyof ApiV1UserTokenUpdateAccessUrlEndpointErrors];
+
+export type ApiV1UserTokenUpdateAccessUrlEndpointResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: MessageResponse;
+};
+
+export type ApiV1UserTokenUpdateAccessUrlEndpointResponse = ApiV1UserTokenUpdateAccessUrlEndpointResponses[keyof ApiV1UserTokenUpdateAccessUrlEndpointResponses];
+
+export type ApiV1BudgetsCreateCreateBudgetData = {
+    body: BudgetRequest;
+    path?: never;
+    query?: never;
+    url: '/api/finance/v1/budgets/create';
+};
+
+export type ApiV1BudgetsCreateCreateBudgetErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1BudgetsCreateCreateBudgetError = ApiV1BudgetsCreateCreateBudgetErrors[keyof ApiV1BudgetsCreateCreateBudgetErrors];
+
+export type ApiV1BudgetsCreateCreateBudgetResponses = {
+    /**
+     * Document created, URL follows
+     */
+    201: MessageResponse;
+};
+
+export type ApiV1BudgetsCreateCreateBudgetResponse = ApiV1BudgetsCreateCreateBudgetResponses[keyof ApiV1BudgetsCreateCreateBudgetResponses];
+
+export type ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData = {
+    body?: never;
+    path: {
+        transaction_id: number;
+        budget_id: number;
+    };
+    query?: never;
+    url: '/api/finance/v1/budgets/{budget_id}/transactions/{transaction_id}';
+};
+
+export type ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetError = ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors[keyof ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors];
+
+export type ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: MessageResponse;
+};
+
+export type ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponse = ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses[keyof ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses];
+
+export type ApiV1BudgetsAllGetAllBudgetsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/finance/v1/budgets/all';
+};
+
+export type ApiV1BudgetsAllGetAllBudgetsResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: AllBudgetsResponse;
+};
+
+export type ApiV1BudgetsAllGetAllBudgetsResponse = ApiV1BudgetsAllGetAllBudgetsResponses[keyof ApiV1BudgetsAllGetAllBudgetsResponses];
+
+export type ApiV1BudgetsNamesGetBudgetsNamesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/finance/v1/budgets/names';
+};
+
+export type ApiV1BudgetsNamesGetBudgetsNamesResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: Array<BudgetNameResponse>;
+};
+
+export type ApiV1BudgetsNamesGetBudgetsNamesResponse = ApiV1BudgetsNamesGetBudgetsNamesResponses[keyof ApiV1BudgetsNamesGetBudgetsNamesResponses];
+
+export type ApiV1TransactionsGetTransactionsData = {
     body?: never;
     path?: never;
     query: {
@@ -250,7 +390,7 @@ export type ApiFinanceV1TransactionsGetTransactionsData = {
     url: '/api/finance/v1/transactions';
 };
 
-export type ApiFinanceV1TransactionsGetTransactionsErrors = {
+export type ApiV1TransactionsGetTransactionsErrors = {
     /**
      * Validation Exception
      */
@@ -263,36 +403,34 @@ export type ApiFinanceV1TransactionsGetTransactionsErrors = {
     };
 };
 
-export type ApiFinanceV1TransactionsGetTransactionsError = ApiFinanceV1TransactionsGetTransactionsErrors[keyof ApiFinanceV1TransactionsGetTransactionsErrors];
+export type ApiV1TransactionsGetTransactionsError = ApiV1TransactionsGetTransactionsErrors[keyof ApiV1TransactionsGetTransactionsErrors];
 
-export type ApiFinanceV1TransactionsGetTransactionsResponses = {
+export type ApiV1TransactionsGetTransactionsResponses = {
     /**
      * Request fulfilled, document follows
      */
     200: Array<TransactionResponse>;
 };
 
-export type ApiFinanceV1TransactionsGetTransactionsResponse = ApiFinanceV1TransactionsGetTransactionsResponses[keyof ApiFinanceV1TransactionsGetTransactionsResponses];
+export type ApiV1TransactionsGetTransactionsResponse = ApiV1TransactionsGetTransactionsResponses[keyof ApiV1TransactionsGetTransactionsResponses];
 
-export type ApiFinanceV1TransactionsUpdateUpdateTransactionsData = {
+export type ApiV1TransactionsUpdateUpdateTransactionsData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/finance/v1/transactions/update';
 };
 
-export type ApiFinanceV1TransactionsUpdateUpdateTransactionsResponses = {
+export type ApiV1TransactionsUpdateUpdateTransactionsResponses = {
     /**
      * Document created, URL follows
      */
-    201: {
-        [key: string]: string;
-    };
+    201: MessageResponse;
 };
 
-export type ApiFinanceV1TransactionsUpdateUpdateTransactionsResponse = ApiFinanceV1TransactionsUpdateUpdateTransactionsResponses[keyof ApiFinanceV1TransactionsUpdateUpdateTransactionsResponses];
+export type ApiV1TransactionsUpdateUpdateTransactionsResponse = ApiV1TransactionsUpdateUpdateTransactionsResponses[keyof ApiV1TransactionsUpdateUpdateTransactionsResponses];
 
-export type ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownData = {
+export type ApiV1TransactionsTransactionIdBreakdownGetBreakdownData = {
     body?: never;
     path: {
         transaction_id: number;
@@ -301,7 +439,7 @@ export type ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownData = {
     url: '/api/finance/v1/transactions/{transaction_id}/breakdown';
 };
 
-export type ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownErrors = {
+export type ApiV1TransactionsTransactionIdBreakdownGetBreakdownErrors = {
     /**
      * Validation Exception
      */
@@ -314,18 +452,18 @@ export type ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownErrors = {
     };
 };
 
-export type ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownError = ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownErrors[keyof ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownErrors];
+export type ApiV1TransactionsTransactionIdBreakdownGetBreakdownError = ApiV1TransactionsTransactionIdBreakdownGetBreakdownErrors[keyof ApiV1TransactionsTransactionIdBreakdownGetBreakdownErrors];
 
-export type ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownResponses = {
+export type ApiV1TransactionsTransactionIdBreakdownGetBreakdownResponses = {
     /**
      * Request fulfilled, document follows
      */
     200: TransactionWithBreakdownResponse;
 };
 
-export type ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownResponse = ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownResponses[keyof ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownResponses];
+export type ApiV1TransactionsTransactionIdBreakdownGetBreakdownResponse = ApiV1TransactionsTransactionIdBreakdownGetBreakdownResponses[keyof ApiV1TransactionsTransactionIdBreakdownGetBreakdownResponses];
 
-export type ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownData = {
+export type ApiV1TransactionsTransactionIdBreakdownCreateBreakdownData = {
     body: CreateBreakdownRequest;
     path: {
         transaction_id: number;
@@ -334,7 +472,7 @@ export type ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownData = 
     url: '/api/finance/v1/transactions/{transaction_id}/breakdown';
 };
 
-export type ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownErrors = {
+export type ApiV1TransactionsTransactionIdBreakdownCreateBreakdownErrors = {
     /**
      * Validation Exception
      */
@@ -347,18 +485,18 @@ export type ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownErrors 
     };
 };
 
-export type ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownError = ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownErrors[keyof ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownErrors];
+export type ApiV1TransactionsTransactionIdBreakdownCreateBreakdownError = ApiV1TransactionsTransactionIdBreakdownCreateBreakdownErrors[keyof ApiV1TransactionsTransactionIdBreakdownCreateBreakdownErrors];
 
-export type ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownResponses = {
+export type ApiV1TransactionsTransactionIdBreakdownCreateBreakdownResponses = {
     /**
      * Document created, URL follows
      */
     201: TransactionWithBreakdownResponse;
 };
 
-export type ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownResponse = ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownResponses[keyof ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownResponses];
+export type ApiV1TransactionsTransactionIdBreakdownCreateBreakdownResponse = ApiV1TransactionsTransactionIdBreakdownCreateBreakdownResponses[keyof ApiV1TransactionsTransactionIdBreakdownCreateBreakdownResponses];
 
-export type ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointData = {
+export type ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointData = {
     body?: never;
     path: {
         line_item_id: number;
@@ -367,7 +505,7 @@ export type ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointDat
     url: '/api/finance/v1/transactions/line-items/{line_item_id}';
 };
 
-export type ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors = {
+export type ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors = {
     /**
      * Validation Exception
      */
@@ -380,18 +518,18 @@ export type ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErr
     };
 };
 
-export type ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointError = ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors[keyof ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors];
+export type ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointError = ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors[keyof ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors];
 
-export type ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses = {
+export type ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses = {
     /**
-     * Request fulfilled, nothing follows
+     * Request fulfilled, document follows
      */
-    204: void;
+    200: MessageResponse;
 };
 
-export type ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponse = ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses[keyof ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses];
+export type ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponse = ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses[keyof ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses];
 
-export type ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointData = {
+export type ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointData = {
     body: CreateLineItemRequest;
     path: {
         line_item_id: number;
@@ -400,7 +538,7 @@ export type ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointDat
     url: '/api/finance/v1/transactions/line-items/{line_item_id}';
 };
 
-export type ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors = {
+export type ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors = {
     /**
      * Validation Exception
      */
@@ -413,18 +551,18 @@ export type ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErr
     };
 };
 
-export type ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointError = ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors[keyof ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors];
+export type ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointError = ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors[keyof ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors];
 
-export type ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses = {
+export type ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses = {
     /**
      * Request fulfilled, document follows
      */
     200: TransactionLineItemResponse;
 };
 
-export type ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponse = ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses[keyof ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses];
+export type ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponse = ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses[keyof ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses];
 
-export type ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeData = {
+export type ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointData = {
     body: MarkTransactionTypeRequest;
     path: {
         transaction_id: number;
@@ -433,7 +571,7 @@ export type ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeData =
     url: '/api/finance/v1/transactions/{transaction_id}/type';
 };
 
-export type ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeErrors = {
+export type ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointErrors = {
     /**
      * Validation Exception
      */
@@ -446,147 +584,29 @@ export type ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeErrors
     };
 };
 
-export type ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeError = ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeErrors[keyof ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeErrors];
+export type ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointError = ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointErrors[keyof ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointErrors];
 
-export type ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeResponses = {
+export type ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponses = {
     /**
      * Request fulfilled, document follows
      */
     200: TransactionResponse;
 };
 
-export type ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeResponse = ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeResponses[keyof ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeResponses];
+export type ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponse = ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponses[keyof ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponses];
 
-export type ApiFinanceV1BudgetsCreateCreateBudgetData = {
-    body: BudgetRequest;
-    path?: never;
-    query?: never;
-    url: '/api/finance/v1/budgets/create';
-};
-
-export type ApiFinanceV1BudgetsCreateCreateBudgetErrors = {
-    /**
-     * Validation Exception
-     */
-    400: {
-        status_code: number;
-        detail: string;
-        extra?: null | {
-            [key: string]: unknown;
-        } | Array<unknown>;
-    };
-};
-
-export type ApiFinanceV1BudgetsCreateCreateBudgetError = ApiFinanceV1BudgetsCreateCreateBudgetErrors[keyof ApiFinanceV1BudgetsCreateCreateBudgetErrors];
-
-export type ApiFinanceV1BudgetsCreateCreateBudgetResponses = {
-    /**
-     * Document created, URL follows
-     */
-    201: {
-        [key: string]: string;
-    };
-};
-
-export type ApiFinanceV1BudgetsCreateCreateBudgetResponse = ApiFinanceV1BudgetsCreateCreateBudgetResponses[keyof ApiFinanceV1BudgetsCreateCreateBudgetResponses];
-
-export type ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData = {
-    body?: never;
-    path: {
-        budget_id: number;
-        transaction_id: number;
-    };
-    query?: never;
-    url: '/api/finance/v1/budgets/{budget_id}/transactions/{transaction_id}';
-};
-
-export type ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors = {
-    /**
-     * Validation Exception
-     */
-    400: {
-        status_code: number;
-        detail: string;
-        extra?: null | {
-            [key: string]: unknown;
-        } | Array<unknown>;
-    };
-};
-
-export type ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetError = ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors[keyof ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors];
-
-export type ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses = {
-    /**
-     * Document created, URL follows
-     */
-    201: {
-        [key: string]: string;
-    };
-};
-
-export type ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponse = ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses[keyof ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses];
-
-export type ApiFinanceV1BudgetsAllGetAllBudgetsData = {
+export type ApiV1HealthHealthCheckData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/finance/v1/budgets/all';
+    url: '/api/finance/v1/health';
 };
 
-export type ApiFinanceV1BudgetsAllGetAllBudgetsResponses = {
+export type ApiV1HealthHealthCheckResponses = {
     /**
      * Request fulfilled, document follows
      */
-    200: AllBudgetsResponse;
+    200: HealthResponse;
 };
 
-export type ApiFinanceV1BudgetsAllGetAllBudgetsResponse = ApiFinanceV1BudgetsAllGetAllBudgetsResponses[keyof ApiFinanceV1BudgetsAllGetAllBudgetsResponses];
-
-export type ApiFinanceV1BudgetsNamesGetBudgetsNamesData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/finance/v1/budgets/names';
-};
-
-export type ApiFinanceV1BudgetsNamesGetBudgetsNamesResponses = {
-    /**
-     * Request fulfilled, document follows
-     */
-    200: Array<BudgetNameResponse>;
-};
-
-export type ApiFinanceV1BudgetsNamesGetBudgetsNamesResponse = ApiFinanceV1BudgetsNamesGetBudgetsNamesResponses[keyof ApiFinanceV1BudgetsNamesGetBudgetsNamesResponses];
-
-export type ApiFinanceV1UserTokenUpdateAccessUrlEndpointData = {
-    body: TokenRequest;
-    path?: never;
-    query?: never;
-    url: '/api/finance/v1/user/token';
-};
-
-export type ApiFinanceV1UserTokenUpdateAccessUrlEndpointErrors = {
-    /**
-     * Validation Exception
-     */
-    400: {
-        status_code: number;
-        detail: string;
-        extra?: null | {
-            [key: string]: unknown;
-        } | Array<unknown>;
-    };
-};
-
-export type ApiFinanceV1UserTokenUpdateAccessUrlEndpointError = ApiFinanceV1UserTokenUpdateAccessUrlEndpointErrors[keyof ApiFinanceV1UserTokenUpdateAccessUrlEndpointErrors];
-
-export type ApiFinanceV1UserTokenUpdateAccessUrlEndpointResponses = {
-    /**
-     * Request fulfilled, document follows
-     */
-    200: {
-        [key: string]: string;
-    };
-};
-
-export type ApiFinanceV1UserTokenUpdateAccessUrlEndpointResponse = ApiFinanceV1UserTokenUpdateAccessUrlEndpointResponses[keyof ApiFinanceV1UserTokenUpdateAccessUrlEndpointResponses];
+export type ApiV1HealthHealthCheckResponse = ApiV1HealthHealthCheckResponses[keyof ApiV1HealthHealthCheckResponses];

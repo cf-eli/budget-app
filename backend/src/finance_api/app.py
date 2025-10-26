@@ -1,32 +1,55 @@
-# from finance_api.controllers.controller import plaid_route
-# from finance_api.controllers.budget import plaid_route as budget_route
-from litestar import Router
+"""Litestar application factory and configuration."""
+
+import logging
+import traceback
+from typing import Any
+
+import jwt
+from litestar import Request, Router
+from litestar.app import Litestar
 from litestar.config.cors import CORSConfig
 from litestar.middleware import AbstractMiddleware, DefineMiddleware
 from litestar.openapi.config import OpenAPIConfig
-from litestar.openapi.plugins import OpenAPIRenderPlugin, RedocRenderPlugin, SwaggerRenderPlugin
+from litestar.openapi.plugins import RedocRenderPlugin, SwaggerRenderPlugin
 from litestar.openapi.spec import Components, SecurityScheme
+from litestar.response import Response
+from litestar.status_codes import HTTP_500_INTERNAL_SERVER_ERROR
 from litestar.types import ASGIApp, Middleware, Receive, Scope, Send
-from litestar.app import Litestar
-import jwt
+
 from finance_api.config import settings
-from finance_api.controllers.user import user_router
 from finance_api.controllers.budget import budget_router
+from finance_api.controllers.health import health_router
 from finance_api.controllers.transaction import transactions_router
+from finance_api.controllers.user import user_router
+
+
 class JWTUserMiddleware(AbstractMiddleware):
+    """Middleware for JWT authentication and user context."""
+
     def __init__(
         self,
         app: ASGIApp,
         secret: str,
         jwt_algorithm: str = "HS256",
         jwt_audience: str = "test-dev",
-    ):
+    ) -> None:
+        """
+        Initialize JWT middleware.
+
+        Args:
+            app: The ASGI application
+            secret: JWT secret key
+            jwt_algorithm: JWT algorithm to use
+            jwt_audience: JWT audience
+
+        """
         super().__init__(app)
         self.secret = secret
         self.jwt_algorithm = jwt_algorithm
         self.jwt_audience = jwt_audience
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        """Process the request and add user context."""
         if scope["type"] == "http":
             # Get headers from scope
             headers = dict(scope.get("headers", []))
@@ -53,7 +76,7 @@ class JWTUserMiddleware(AbstractMiddleware):
                     scope["user"] = None
                 except jwt.InvalidAudienceError:
                     scope["user"] = None
-                except jwt.PyJWTError as e:
+                except jwt.PyJWTError:
                     scope["user"] = None
             else:
                 scope["user"] = None
@@ -64,7 +87,6 @@ class JWTUserMiddleware(AbstractMiddleware):
 
 def get_middlewares() -> list[Middleware]:
     """Get list of middlewares based on settings."""
-
     middlewares = []
     if settings.enable_auth:
         middlewares.append(
@@ -73,14 +95,15 @@ def get_middlewares() -> list[Middleware]:
                 secret=settings.homelab_client_secret,
                 jwt_algorithm=settings.jwt_algorithm,
                 jwt_audience=settings.finance_jwt_aud,
-            )
+            ),
         )
     return middlewares
 
 
 def get_openapi_config() -> OpenAPIConfig:
+    """Get OpenAPI configuration for the application."""
     version = "1.0.0"
-    
+
     base_config = {
         "title": "Finance API",
         "version": version,
@@ -88,8 +111,7 @@ def get_openapi_config() -> OpenAPIConfig:
         "path": "/",
         "render_plugins": [SwaggerRenderPlugin(path="/docs"), RedocRenderPlugin()],
     }
-    
-    # if settings.enable_auth: # TODO: controllers should have a wrapper that get user model or return fake if auth is disabled
+
     base_config["components"] = Components(
         security_schemes={
             "bearerAuth": SecurityScheme(
@@ -97,15 +119,16 @@ def get_openapi_config() -> OpenAPIConfig:
                 scheme="bearer",
                 bearer_format="JWT",
                 description="Paste your JWT here",
-            )
-        }
+            ),
+        },
     )
     base_config["security"] = [{"bearerAuth": []}]
-    
+
     return OpenAPIConfig(**base_config)
 
 
 def get_cors_config() -> CORSConfig:
+    """Get CORS configuration for the application."""
     return CORSConfig(
         allow_origins=["*"],
         allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -115,44 +138,42 @@ def get_cors_config() -> CORSConfig:
 
 
 def get_routes() -> list[Router]:
+    """Get list of route handlers for the application."""
     return [
         user_router,
         budget_router,
         transactions_router,
+        health_router,
     ]
 
-import logging
-import traceback
-from litestar.response import Response
-from litestar.status_codes import HTTP_500_INTERNAL_SERVER_ERROR
-from litestar import Request
-from typing import Any
+
 logger = logging.getLogger("API.Errors")
+
 
 def exception_handler(request: Request, exc: Exception) -> Response:
     """Log and handle exceptions."""
-    logger.error(f"Exception in {request.method} {request.url}: {exc}")
+    logger.error("Exception in %s %s: %s", request.method, request.url, exc)
     logger.error(traceback.format_exc())
-    
+
     return Response(
         content={"detail": str(exc), "type": type(exc).__name__},
-        status_code=HTTP_500_INTERNAL_SERVER_ERROR
+        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
     )
 
 
 def create_app() -> Litestar:
     """
     Create and return the Litestar application instance.
+
     This function is used to initialize the app in the ASGI server.
     """
     exception_handlers: dict[int | type[Exception], Any] = {
-        Exception: exception_handler
+        Exception: exception_handler,
     }
-    app = Litestar(
+    return Litestar(
         route_handlers=get_routes(),
         openapi_config=get_openapi_config(),
         cors_config=get_cors_config(),
         middleware=get_middlewares(),
         exception_handlers=exception_handlers,
     )
-    return app

@@ -1,67 +1,68 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { GetTransactionResponse, TransactionTypeEnum } from 'src/api';
-import { apiFinanceV1TransactionsTransactionIdTypeUpdateTransactionType } from 'src/api';
+import { ref } from 'vue'
+import type { TransactionResponse, TransactionTypeEnum } from 'src/api'
+import { apiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpoint } from 'src/api'
 
 interface Props {
-  transaction: GetTransactionResponse | null;
-  visible: boolean;
+  transaction: TransactionResponse | null
+  visible: boolean
 }
 
 interface Emits {
-  (e: 'update:visible', value: boolean): void;
-  (e: 'saved'): void;
+  (_event: 'update:visible', _value: boolean): void
+  (_event: 'saved'): void
 }
 
-const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
-const loading = ref(false);
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+const loading = ref(false)
 
-const transactionTypeOptions: { label: string; value: TransactionTypeEnum; description: string }[] = [
-  { label: 'Transfer', value: 'transfer', description: 'Money moved between accounts' },
-  { label: 'Credit Payment', value: 'credit_payment', description: 'Credit card payment' },
-  { label: 'Loan Payment', value: 'loan_payment', description: 'Loan or mortgage payment' },
-];
-const excludeFromBudget = ref(true);
-const selectedType = ref<TransactionTypeEnum | null>(null);
+const transactionTypeOptions: { label: string; value: TransactionTypeEnum; description: string }[] =
+  [
+    { label: 'Transfer', value: 'transfer', description: 'Money moved between accounts' },
+    { label: 'Credit Payment', value: 'credit_payment', description: 'Credit card payment' },
+    { label: 'Loan Payment', value: 'loan_payment', description: 'Loan or mortgage payment' },
+  ]
+const excludeFromBudget = ref(true)
+const selectedType = ref<TransactionTypeEnum | null>(null)
 
 async function saveType() {
   if (!props.transaction || !selectedType.value) {
-    return;
+    return
   }
 
-  loading.value = true;
+  loading.value = true
   try {
-    await apiFinanceV1TransactionsTransactionIdTypeUpdateTransactionType({
+    await apiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpoint({
       path: {
-        transaction_id: props.transaction.id
+        transaction_id: props.transaction.id,
       },
       body: {
         transaction_type: selectedType.value,
-        exclude_from_budget: excludeFromBudget.value
-      }
-    });
+        exclude_from_budget: excludeFromBudget.value,
+      },
+    })
 
-    emit('saved');
-    emit('update:visible', false);
+    emit('saved')
+    emit('update:visible', false)
   } catch (error) {
-    console.error('Error marking transaction type:', error);
-    alert('Failed to mark transaction type. Please try again.');
+    console.error('Error marking transaction type:', error)
+    alert('Failed to mark transaction type. Please try again.')
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
 function cancel() {
-  emit('update:visible', false);
-  selectedType.value = null;
-  excludeFromBudget.value = true;
+  emit('update:visible', false)
+  selectedType.value = null
+  excludeFromBudget.value = true
 }
 </script>
 
 <template>
   <q-dialog :model-value="visible" @update:model-value="emit('update:visible', $event)">
-    <q-card style="min-width: 400px;">
+    <q-card style="min-width: 400px">
       <q-card-section class="row items-center q-pb-none">
         <div class="text-h6">Mark Transaction Type</div>
         <q-space />
@@ -104,10 +105,7 @@ function cancel() {
 
         <!-- Exclude from Budget Option -->
         <div class="q-mt-md">
-          <q-checkbox
-            v-model="excludeFromBudget"
-            label="Exclude from budget calculations"
-          />
+          <q-checkbox v-model="excludeFromBudget" label="Exclude from budget calculations" />
           <div class="text-caption text-grey-7 q-pl-lg">
             This transaction will be hidden from the transaction list and not counted in budgets.
           </div>

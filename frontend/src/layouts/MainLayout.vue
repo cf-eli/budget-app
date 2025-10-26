@@ -2,34 +2,36 @@
   <q-layout view="lHh Lpr lFf" class="dark-layout">
     <q-header elevated class="header-dark">
       <q-toolbar class="q-py-sm">
-        <q-btn 
-          flat 
-          dense 
-          round 
-          icon="menu" 
-          aria-label="Menu" 
+        <q-btn
+          flat
+          dense
+          round
+          icon="menu"
+          aria-label="Menu"
           @click="toggleLeftDrawer"
           color="white"
         />
-        
+
         <q-toolbar-title class="row items-center q-gutter-sm">
           <q-icon name="account_balance" size="28px" color="primary" />
           <span class="text-h6">Finance Dashboard</span>
         </q-toolbar-title>
 
-        <q-badge color="grey-7" text-color="white" class="q-px-sm">
-          v{{ $q.version }}
-        </q-badge>
+        <q-btn
+          flat
+          dense
+          icon="health_and_safety"
+          label="Health Check"
+          @click="checkHealth"
+          color="white"
+          class="q-mr-md"
+        />
+
+        <q-badge color="grey-7" text-color="white" class="q-px-sm"> v{{ $q.version }} </q-badge>
       </q-toolbar>
     </q-header>
 
-    <q-drawer 
-      v-model="leftDrawerOpen" 
-      show-if-above 
-      bordered
-      class="drawer-dark"
-      dark
-    >
+    <q-drawer v-model="leftDrawerOpen" show-if-above bordered class="drawer-dark" dark>
       <q-scroll-area class="fit">
         <q-list class="q-pa-md">
           <q-item-label header class="text-grey-4 text-weight-medium q-px-md q-mb-sm">
@@ -66,41 +68,71 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from 'vue'
+import { useQuasar } from 'quasar'
+import { apiV1HealthHealthCheck } from 'src/api'
 
 interface NavLink {
-  title: string;
-  caption?: string;
-  icon: string;
-  link: string;
+  title: string
+  caption?: string
+  icon: string
+  link: string
 }
 
-const baseUrl = "";
+const baseUrl = ''
+const $q = useQuasar()
 
 const linksList: NavLink[] = [
   {
     title: 'Connect to SimpleFin',
     icon: 'link',
-    link: '/connect'
+    link: '/connect',
   },
   {
     title: 'Transactions',
     caption: 'View Transaction History',
     icon: 'receipt_long',
-    link: baseUrl + 'transactions'
+    link: baseUrl + 'transactions',
   },
   {
     title: 'Budgets',
     caption: 'Manage your budgets',
     icon: 'account_balance_wallet',
-    link: baseUrl + 'budgets'
+    link: baseUrl + 'budgets',
   },
-];
+]
 
-const leftDrawerOpen = ref(false);
+const leftDrawerOpen = ref(false)
 
 function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
+  leftDrawerOpen.value = !leftDrawerOpen.value
+}
+
+async function checkHealth() {
+  try {
+    // Use generated API client from gateway OpenAPI schema
+    const response = await apiV1HealthHealthCheck()
+
+    if (response.data && response.data.status === 'Ok') {
+      $q.notify({
+        type: 'positive',
+        message: 'Health Check Passed',
+        caption: `API Status: ${response.data.status}`,
+        icon: 'check_circle',
+        position: 'top',
+      })
+    } else {
+      throw new Error(`Expected status 'Ok', received '${response.data?.status || 'unknown'}'`)
+    }
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: 'Health Check Failed',
+      caption: error instanceof Error ? error.message : 'Unknown error',
+      icon: 'error',
+      position: 'top',
+    })
+  }
 }
 </script>
 
@@ -163,5 +195,4 @@ function toggleLeftDrawer() {
 .drawer-dark .text-grey-5 {
   color: #d1d5db !important; /* much lighter gray */
 }
-
 </style>

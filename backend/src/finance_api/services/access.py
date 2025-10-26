@@ -1,6 +1,11 @@
-from jwt import decode
-import time
-from finance_api.config import get_settings
+"""Access control services."""
 
-settings = get_settings()
+from functools import lru_cache
 
+from finance_api.config import Settings, get_settings
+
+
+@lru_cache(maxsize=1)
+def get_access_settings() -> Settings:
+    """Get settings singleton."""
+    return get_settings()

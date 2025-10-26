@@ -1,36 +1,59 @@
 """SimpleFin Class."""
 
-import binascii
 import base64
+import binascii
+import logging
+
 from aiohttp import (
     BasicAuth,
     ClientConnectorError,
     ClientConnectorSSLError,
-    TCPConnector,
     ClientSession,
+    TCPConnector,
 )
+
 from finance_api.schemas.exceptions import (
-    SimpleFinClaimError,
-    SimpleFinInvalidClaimTokenError,
-    SimpleFinInvalidAccountURLError,
-    SimpleFinPaymentRequiredError,
     SimpleFinAuthError,
+    SimpleFinClaimError,
+    SimpleFinInvalidAccountURLError,
+    SimpleFinInvalidClaimTokenError,
+    SimpleFinPaymentRequiredError,
 )
 from finance_api.schemas.schema import FinancialData
 from finance_api.services.mixins import LoggingMixin
-import logging
 
 logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 LOGGER = logging.getLogger(__name__)
+
+# HTTP Status Codes
+HTTP_PAYMENT_REQUIRED = 402
+HTTP_FORBIDDEN = 403
+
+
+def _raise_claim_error() -> None:
+    """Raise SimpleFin claim error."""
+    raise SimpleFinClaimError
+
+
+def _raise_payment_required_error() -> None:
+    """Raise SimpleFin payment required error."""
+    raise SimpleFinPaymentRequiredError
+
+
+def _raise_auth_error() -> None:
+    """Raise SimpleFin auth error."""
+    raise SimpleFinAuthError
 
 
 class SimpleFin(LoggingMixin):
     """SimpleFin Class."""
 
     def decode_claim_token(self, token_string: str) -> str:
-        """Decode a setup token to get the claim URL.
+        """
+        Decode a setup token to get the claim URL.
 
         Args:
             token_string: Base64 encoded setup token
@@ -40,6 +63,7 @@ class SimpleFin(LoggingMixin):
 
         Raises:
             SimpleFinInvalidClaimTokenError: If token is not valid base64
+
         """
         try:
             claim_url = base64.b64decode(token_string).decode("utf-8")
@@ -48,7 +72,8 @@ class SimpleFin(LoggingMixin):
         return claim_url
 
     def decode_access_url(self, access_url: str) -> tuple[str, str, str]:
-        """Parse an access URL into its components.
+        """
+        Parse an access URL into its components.
 
         Args:
             access_url: Access URL (e.g., https://user:pass@bridge.simplefin.org/simplefin)
@@ -58,6 +83,7 @@ class SimpleFin(LoggingMixin):
 
         Raises:
             SimpleFinInvalidAccountURLError: If URL format is invalid
+
         """
         try:
             self.log(f"Decoding access URL: {access_url}", level=logging.DEBUG)
@@ -69,9 +95,14 @@ class SimpleFin(LoggingMixin):
         return scheme, rest, auth
 
     async def claim_setup_token(
-        self, setup_token: str, *, verify_ssl: bool = True, proxy: str | None = None
+        self,
+        setup_token: str,
+        *,
+        verify_ssl: bool = True,
+        proxy: str | None = None,
     ) -> str:
-        """Claim a setup token and return an access URL.
+        """
+        Claim a setup token and return an access URL.
 
         This performs the full claim flow:
         1. Decode setup token (base64) → claim URL
@@ -90,9 +121,11 @@ class SimpleFin(LoggingMixin):
             SimpleFinClaimError: If claim fails (403 response)
             ClientConnectorError: For connection errors
             ClientConnectorSSLError: For SSL connection errors
+
         """
         self.log(
-            f"Claiming access URL with setup token: {setup_token}", level=logging.DEBUG
+            f"Claiming access URL with setup token: {setup_token}",
+            level=logging.DEBUG,
         )
 
         # Step 1: Decode the setup token to get the claim URL
@@ -106,17 +139,17 @@ class SimpleFin(LoggingMixin):
         try:
             async with ClientSession(auth=auth, connector=connector) as session:
                 response = await session.post(claim_url, ssl=verify_ssl, proxy=proxy)
-                if response.status == 403:
-                    raise SimpleFinClaimError()
+                if response.status == HTTP_FORBIDDEN:
+                    _raise_claim_error()
                 access_url: str = await response.text()
                 self.log(f"Received access URL: {access_url}", level=logging.DEBUG)
                 return access_url
         except (ClientConnectorError, ClientConnectorSSLError) as err:
             self.log(f"Connection error during claim: {err}", level=logging.ERROR)
-            raise err
+            raise
         except Exception as e:
             self.log(f"Error claiming token: {e}", level=logging.ERROR)
-            raise e
+            raise
 
     async def fetch_account_data(
         self,
@@ -127,12 +160,15 @@ class SimpleFin(LoggingMixin):
         start_date: int | None = None,
         end_date: int | None = None,
     ) -> FinancialData:
-        """Fetch financial data using an access URL.
+        """
+        Fetch financial data using an access URL.
 
         Args:
             access_url: The access URL (e.g., https://user:pass@bridge.simplefin.org/simplefin)
             verify_ssl: Whether to verify SSL certificates
             proxy: Optional proxy server URL
+            start_date: Optional start date timestamp for filtering transactions
+            end_date: Optional end date timestamp for filtering transactions
 
         Returns:
             FinancialData: The financial data retrieved from SimpleFin
@@ -143,13 +179,15 @@ class SimpleFin(LoggingMixin):
             SimpleFinAuthError: If authentication fails (403)
             ClientConnectorError: For connection errors
             ClientConnectorSSLError: For SSL connection errors
+
         """
         self.log(
-            f"Fetching account data with access URL: {access_url}", level=logging.DEBUG
+            f"Fetching account data with access URL: {access_url}",
+            level=logging.DEBUG,
         )
 
         # Parse the access URL
-        scheme, rest, auth = self.decode_access_url(access_url)
+        _scheme, _rest, auth = self.decode_access_url(access_url)
         ssl_context = verify_ssl
         connector = TCPConnector(ssl=ssl_context)
 
@@ -159,25 +197,31 @@ class SimpleFin(LoggingMixin):
             access_url = (
                 f"{access_url}&start-date={start_date}"
                 if start_date
-                else f"{access_url}&start-date=978360153" # Monday, January 1, 2001 2:42:33 PM
+                else f"{access_url}&start-date=978360153"
+                # Monday, January 1, 2001 2:42:33 PM
             )
             if end_date:
                 access_url = f"{access_url}&end-date={end_date}"
             async with ClientSession(auth=auth, connector=connector) as session:
                 response = await session.get(access_url, ssl=verify_ssl, proxy=proxy)
-                if response.status == 402:
-                    raise SimpleFinPaymentRequiredError()
-                if response.status == 403:
-                    raise SimpleFinAuthError()
+                if response.status == HTTP_PAYMENT_REQUIRED:
+                    _raise_payment_required_error()
+                if response.status == HTTP_FORBIDDEN:
+                    _raise_auth_error()
                 data = await response.json()
                 self.log(f"Data received from SimpleFin: {data}", level=logging.DEBUG)
             financial_data: FinancialData = FinancialData(**data)  # type: ignore[attr-defined]
             self.log(f"Parsed FinancialData: {financial_data}", level=logging.DEBUG)
-            self.log(f"Data fetch for access URL {access_url} completed for start date: {start_date} | end date: {end_date} complated.", level=logging.INFO)
-            return financial_data
+            self.log(
+                f"Data fetch for access URL {access_url} completed "
+                f"for start date: {start_date} | end date: {end_date} completed.",
+                level=logging.INFO,
+            )
         except (ClientConnectorError, ClientConnectorSSLError) as err:
-            LOGGER.error(f"Connection error during data fetch: {err}")
-            raise err
+            self.log(f"Connection error during claim: {err}", level=logging.ERROR)
+            raise
         except Exception as e:
-            LOGGER.error(f"Error fetching data: {e}")
-            raise e
+            self.log(f"Error fetching data: {e}", level=logging.ERROR)
+            raise
+        else:
+            return financial_data

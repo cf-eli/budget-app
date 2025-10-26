@@ -1,75 +1,125 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { TransactionResponse } from 'src/api';
-import BudgetAssignmentCell from './BudgetAssignmentCell.vue';
-import TransactionBreakdownDialog from './breakdown/TransactionBreakdownDialog.vue';
-import TransactionTypeDialog from './actions/TransactionTypeDialog.vue';
+import { ref } from 'vue'
+import type { TransactionResponse } from 'src/api'
+import BudgetAssignmentCell from './BudgetAssignmentCell.vue'
+import TransactionBreakdownDialog from './breakdown/TransactionBreakdownDialog.vue'
+import TransactionTypeDialog from './actions/TransactionTypeDialog.vue'
 
 interface Props {
-  transactions: TransactionResponse[];
+  transactions: TransactionResponse[]
   pagination: {
-    page: number;
-    rowsPerPage: number;
-    rowsNumber: number;
-    sortBy: string;
-    descending: boolean;
-  };
-  loading?: boolean;
+    page: number
+    rowsPerPage: number
+    rowsNumber: number
+    sortBy: string
+    descending: boolean
+  }
+  loading?: boolean
 }
 
 interface Emits {
-  (e: 'update:pagination', value: Props['pagination']): void;
-  (e: 'refresh'): void;
+  (_event: 'update:pagination', _value: Props['pagination']): void
+  (_event: 'refresh'): void
 }
 
-const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
+defineProps<Props>()
+const emit = defineEmits<Emits>()
 
-const breakdownDialogVisible = ref(false);
-const typeDialogVisible = ref(false);
-const selectedTransaction = ref<TransactionResponse | null>(null);
+const breakdownDialogVisible = ref(false)
+const typeDialogVisible = ref(false)
+const selectedTransaction = ref<TransactionResponse | null>(null)
 
 const columns = [
-  { name: 'id', required: true, label: 'ID', align: 'center' as const, field: 'id', sortable: true },
-  { name: 'org_domain', label: 'Organization', align: 'center' as const, field: (row: TransactionResponse) => row.account?.org.name || 'N/A', sortable: true },
-  { name: 'account_name', label: 'Account Name', align: 'center' as const, field: (row: TransactionResponse) => row.account?.name || 'N/A', sortable: true },
-  { name: 'amount', label: 'Amount', align: 'right' as const, field: 'amount', sortable: true, format: (val: number) => `$${val.toFixed(2)}` },
-  { name: 'description', label: 'Description', align: 'left' as const, field: 'description', sortable: true },
-  { name: 'transacted_at', label: 'Date', align: 'center' as const, field: 'transacted_at', sortable: true },
+  {
+    name: 'id',
+    required: true,
+    label: 'ID',
+    align: 'center' as const,
+    field: 'id',
+    sortable: true,
+  },
+  {
+    name: 'org_domain',
+    label: 'Organization',
+    align: 'center' as const,
+    field: (row: TransactionResponse) => row.account?.org.name || 'N/A',
+    sortable: true,
+  },
+  {
+    name: 'account_name',
+    label: 'Account Name',
+    align: 'center' as const,
+    field: (row: TransactionResponse) => row.account?.name || 'N/A',
+    sortable: true,
+  },
+  {
+    name: 'amount',
+    label: 'Amount',
+    align: 'right' as const,
+    field: 'amount',
+    sortable: true,
+    format: (val: number) => `$${val.toFixed(2)}`,
+  },
+  {
+    name: 'description',
+    label: 'Description',
+    align: 'left' as const,
+    field: 'description',
+    sortable: true,
+  },
+  {
+    name: 'transacted_at',
+    label: 'Date',
+    align: 'center' as const,
+    field: 'transacted_at',
+    sortable: true,
+  },
   { name: 'payee', label: 'Payee', align: 'left' as const, field: 'payee', sortable: true },
   { name: 'pending', label: 'Pending', align: 'center' as const, field: 'pending', sortable: true },
-  { name: 'budget_name', label: 'Budget', align: 'center' as const, field: 'budget_name', sortable: true },
-  { name: 'actions', label: 'Actions', align: 'center' as const, field: 'actions', sortable: false }
-];
+  {
+    name: 'budget_name',
+    label: 'Budget',
+    align: 'center' as const,
+    field: 'budget_name',
+    sortable: true,
+  },
+  {
+    name: 'actions',
+    label: 'Actions',
+    align: 'center' as const,
+    field: 'actions',
+    sortable: false,
+  },
+]
 
 function onPaginationChange(newPagination: Props['pagination']) {
-  emit('update:pagination', newPagination);
+  emit('update:pagination', newPagination)
 }
 
 function onRefresh() {
-  emit('refresh');
+  emit('refresh')
 }
 
 function onBudgetUpdated() {
-  emit('refresh');
+  emit('refresh')
 }
 
 function openBreakdown(transaction: TransactionResponse) {
-  selectedTransaction.value = transaction;
-  breakdownDialogVisible.value = true;
+  selectedTransaction.value = transaction
+  breakdownDialogVisible.value = true
 }
 
 function openTypeDialog(transaction: TransactionResponse) {
-  selectedTransaction.value = transaction;
-  typeDialogVisible.value = true;
+  selectedTransaction.value = transaction
+  typeDialogVisible.value = true
 }
 
 function onBreakdownSaved() {
-  emit('refresh');
+  emit('refresh')
 }
 
 function onTypeSaved() {
-  emit('refresh');
+  emit('refresh')
 }
 </script>
 
@@ -92,22 +142,15 @@ function onTypeSaved() {
               <q-icon name="account_balance" size="28px" color="primary" />
               <span class="text-h5 text-white">Recent Transactions</span>
             </div>
-            <q-btn
-              flat
-              round
-              icon="refresh"
-              color="primary"
-              :loading="loading"
-              @click="onRefresh"
-            >
+            <q-btn flat round icon="refresh" color="primary" :loading="loading" @click="onRefresh">
               <q-tooltip>Refresh</q-tooltip>
             </q-btn>
           </div>
         </template>
-       
+
         <template v-slot:body-cell-amount="props">
           <q-td :props="props" class="text-right">
-            <span 
+            <span
               class="text-weight-medium"
               :class="props.row.amount < 0 ? 'text-negative' : 'text-positive'"
             >
@@ -118,10 +161,7 @@ function onTypeSaved() {
 
         <template v-slot:body-cell-pending="props">
           <q-td :props="props">
-            <q-badge 
-              :color="props.row.pending ? 'orange' : 'positive'"
-              text-color="white"
-            >
+            <q-badge :color="props.row.pending ? 'orange' : 'positive'" text-color="white">
               {{ props.row.pending ? 'Pending' : 'Posted' }}
             </q-badge>
           </q-td>
@@ -138,16 +178,12 @@ function onTypeSaved() {
             >
               Split
               <q-tooltip>
-                This transaction has been split into line items. 
-                Edit budgets for individual items in the breakdown.
+                This transaction has been split into line items. Edit budgets for individual items
+                in the breakdown.
               </q-tooltip>
             </q-chip>
-            
-            <budget-assignment-cell
-              v-else
-              :transaction="row"
-              @updated="onBudgetUpdated"
-            />
+
+            <budget-assignment-cell v-else :transaction="row" @updated="onBudgetUpdated" />
           </q-td>
         </template>
 
@@ -167,14 +203,7 @@ function onTypeSaved() {
                 </q-tooltip>
               </q-btn>
 
-              <q-btn
-                flat
-                dense
-                icon="label"
-                color="accent"
-                size="sm"
-                @click="openTypeDialog(row)"
-              >
+              <q-btn flat dense icon="label" color="accent" size="sm" @click="openTypeDialog(row)">
                 <q-tooltip>Mark transaction type</q-tooltip>
               </q-btn>
             </q-btn-group>

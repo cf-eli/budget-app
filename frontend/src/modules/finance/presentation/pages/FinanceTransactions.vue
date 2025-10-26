@@ -1,57 +1,57 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { apiFinanceV1TransactionsGetTransactions, type TransactionResponse } from 'src/api';
-import TransactionTable from 'src/modules/finance/presentation/components/TransactionTable.vue';
+import { ref, onMounted } from 'vue'
+import { apiV1TransactionsGetTransactions, type TransactionResponse } from 'src/api'
+import TransactionTable from 'src/modules/finance/presentation/components/TransactionTable.vue'
 
-const transactions = ref<TransactionResponse[]>([]);
-const loading = ref(false);
+const transactions = ref<TransactionResponse[]>([])
+const loading = ref(false)
 
 const pagination = ref({
   page: 1,
   rowsPerPage: 10,
   rowsNumber: 0,
   sortBy: 'transacted_at',
-  descending: true
-});
+  descending: true,
+})
 
 async function fetchTransactions() {
-  loading.value = true;
+  loading.value = true
   try {
-    const response = await apiFinanceV1TransactionsGetTransactions({
+    const response = await apiV1TransactionsGetTransactions({
       query: {
         page: pagination.value.page,
         descending: pagination.value.descending,
         sort_by: pagination.value.sortBy,
-        rows_per_page: pagination.value.rowsPerPage
-      }
-    });
-   
+        rows_per_page: pagination.value.rowsPerPage,
+      },
+    })
+
     if (response.data) {
       transactions.value = Array.isArray(response.data)
         ? response.data
-        : response.data.transactions || [];
-      
-      pagination.value.rowsNumber = response.data.total || transactions.value.length;
+        : response.data.transactions || []
+
+      pagination.value.rowsNumber = response.data.total || transactions.value.length
     }
   } catch (error) {
-    console.error('Failed to fetch transactions:', error);
+    console.error('Failed to fetch transactions:', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
 function handlePaginationUpdate(newPagination: typeof pagination.value) {
-  pagination.value = newPagination;
-  fetchTransactions();
+  pagination.value = newPagination
+  fetchTransactions()
 }
 
 function handleRefresh() {
-  fetchTransactions();
+  fetchTransactions()
 }
 
 onMounted(() => {
-  fetchTransactions();
-});
+  fetchTransactions()
+})
 </script>
 
 <template>

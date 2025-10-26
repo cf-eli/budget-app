@@ -14,7 +14,7 @@ uv sync
 
 ### 3. Set Up PostgreSQL Database
 ```bash
-docker run --name db -e POSTGRES_DB=finance -d postgres -p 5432:5432
+docker run --name db -e POSTGRES_DB=finance -e POSTGRES_PASSWORD=postgres -d postgres -p 5432
 ```
 
 ### 4. Configure Environment Variables

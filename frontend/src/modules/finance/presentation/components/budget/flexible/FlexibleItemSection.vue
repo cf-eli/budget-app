@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { FlexibleBudgetResponse } from 'src/api';
+import type { FlexibleBudgetResponse } from 'src/api'
 
 interface Props {
-  flexible: FlexibleBudgetResponse;
+  flexible: FlexibleBudgetResponse
 }
 
-defineProps<Props>();
+defineProps<Props>()
 
-const formatCurrency = (value: number | null | undefined) => 
-  value !== null && value !== undefined ? `$${value.toLocaleString()}` : 'N/A';
+const formatCurrency = (value: number | null | undefined) =>
+  value !== null && value !== undefined ? `$${value.toLocaleString()}` : 'N/A'
 </script>
 
 <template>
@@ -16,10 +16,7 @@ const formatCurrency = (value: number | null | undefined) =>
     <q-card-section class="q-pa-md">
       <div class="row items-center justify-between q-mb-md">
         <div class="text-h6 text-white">{{ flexible.name }}</div>
-        <q-badge 
-          :color="flexible.fixed ? 'blue-grey-8' : 'orange-8'" 
-          text-color="white"
-        >
+        <q-badge :color="flexible.fixed ? 'blue-grey-8' : 'orange-8'" text-color="white">
           {{ flexible.fixed ? 'Fixed' : 'Flexible' }}
         </q-badge>
       </div>
@@ -58,8 +55,14 @@ const formatCurrency = (value: number | null | undefined) =>
             <q-item class="q-px-none q-py-xs">
               <q-item-section>
                 <q-item-label caption class="text-grey-5">Remaining</q-item-label>
-                <q-item-label 
-                  :class="flexible.amount_after_transactions > 0 ? 'text-positive' : flexible.amount_after_transactions < 0 ? 'text-negative' : 'text-grey'"
+                <q-item-label
+                  :class="
+                    flexible.amount_after_transactions > 0
+                      ? 'text-positive'
+                      : flexible.amount_after_transactions < 0
+                        ? 'text-negative'
+                        : 'text-grey'
+                  "
                 >
                   {{ formatCurrency(flexible.amount_after_transactions) }}
                 </q-item-label>
@@ -69,13 +72,13 @@ const formatCurrency = (value: number | null | undefined) =>
         </div>
 
         <div class="col-auto text-right">
-          <div 
+          <div
             class="text-h4 text-weight-bold q-mb-xs"
             :class="Math.abs(flexible.transaction_sum) > 0 ? 'text-negative' : 'text-grey'"
           >
             -{{ formatCurrency(Math.abs(flexible.transaction_sum)) }}
           </div>
-          <div 
+          <div
             class="text-subtitle2"
             :class="flexible.amount_after_transactions > 0 ? 'text-positive' : 'text-grey-6'"
           >
@@ -84,9 +87,7 @@ const formatCurrency = (value: number | null | undefined) =>
         </div>
       </div>
 
-      <q-badge v-if="!flexible.enable" color="grey" class="q-mt-sm">
-        Disabled
-      </q-badge>
+      <q-badge v-if="!flexible.enable" color="grey" class="q-mt-sm"> Disabled </q-badge>
     </q-card-section>
   </q-card>
 </template>

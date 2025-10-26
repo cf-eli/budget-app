@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ApiFinanceV1BudgetsAllGetAllBudgetsData, ApiFinanceV1BudgetsAllGetAllBudgetsResponses, ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData, ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors, ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses, ApiFinanceV1BudgetsCreateCreateBudgetData, ApiFinanceV1BudgetsCreateCreateBudgetErrors, ApiFinanceV1BudgetsCreateCreateBudgetResponses, ApiFinanceV1BudgetsNamesGetBudgetsNamesData, ApiFinanceV1BudgetsNamesGetBudgetsNamesResponses, ApiFinanceV1TransactionsGetTransactionsData, ApiFinanceV1TransactionsGetTransactionsErrors, ApiFinanceV1TransactionsGetTransactionsResponses, ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointData, ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors, ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses, ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointData, ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors, ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses, ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownData, ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownErrors, ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownResponses, ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownData, ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownErrors, ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownResponses, ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeData, ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeErrors, ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeResponses, ApiFinanceV1TransactionsUpdateUpdateTransactionsData, ApiFinanceV1TransactionsUpdateUpdateTransactionsResponses, ApiFinanceV1UserTokenUpdateAccessUrlEndpointData, ApiFinanceV1UserTokenUpdateAccessUrlEndpointErrors, ApiFinanceV1UserTokenUpdateAccessUrlEndpointResponses } from './types.gen';
+import type { ApiV1BudgetsAllGetAllBudgetsData, ApiV1BudgetsAllGetAllBudgetsResponses, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses, ApiV1BudgetsCreateCreateBudgetData, ApiV1BudgetsCreateCreateBudgetErrors, ApiV1BudgetsCreateCreateBudgetResponses, ApiV1BudgetsNamesGetBudgetsNamesData, ApiV1BudgetsNamesGetBudgetsNamesResponses, ApiV1HealthHealthCheckData, ApiV1HealthHealthCheckResponses, ApiV1TransactionsGetTransactionsData, ApiV1TransactionsGetTransactionsErrors, ApiV1TransactionsGetTransactionsResponses, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointData, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointData, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownData, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownErrors, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownResponses, ApiV1TransactionsTransactionIdBreakdownGetBreakdownData, ApiV1TransactionsTransactionIdBreakdownGetBreakdownErrors, ApiV1TransactionsTransactionIdBreakdownGetBreakdownResponses, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointData, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointErrors, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponses, ApiV1TransactionsUpdateUpdateTransactionsData, ApiV1TransactionsUpdateUpdateTransactionsResponses, ApiV1UserTokenUpdateAccessUrlEndpointData, ApiV1UserTokenUpdateAccessUrlEndpointErrors, ApiV1UserTokenUpdateAccessUrlEndpointResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -19,73 +19,19 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * Get transactions (gateway)
+ * UpdateAccessUrlEndpoint
  *
- * Forwards a request to retrieve transactions for the authenticated user from the finance microservice. Supports pagination, sorting and direction flags.
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/user/token
  */
-export const apiFinanceV1TransactionsGetTransactions = <ThrowOnError extends boolean = false>(options: Options<ApiFinanceV1TransactionsGetTransactionsData, ThrowOnError>) => {
-    return (options.client ?? client).get<ApiFinanceV1TransactionsGetTransactionsResponses, ApiFinanceV1TransactionsGetTransactionsErrors, ThrowOnError>({
+export const apiV1UserTokenUpdateAccessUrlEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1UserTokenUpdateAccessUrlEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).put<ApiV1UserTokenUpdateAccessUrlEndpointResponses, ApiV1UserTokenUpdateAccessUrlEndpointErrors, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
                 type: 'http'
             }
         ],
-        url: '/api/finance/v1/transactions',
-        ...options
-    });
-};
-
-/**
- * Update transactions (gateway)
- *
- * Forwards a POST to the finance microservice that triggers fetching and storing new transactions for users' accounts.
- */
-export const apiFinanceV1TransactionsUpdateUpdateTransactions = <ThrowOnError extends boolean = false>(options?: Options<ApiFinanceV1TransactionsUpdateUpdateTransactionsData, ThrowOnError>) => {
-    return (options?.client ?? client).post<ApiFinanceV1TransactionsUpdateUpdateTransactionsResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/finance/v1/transactions/update',
-        ...options
-    });
-};
-
-/**
- * Get transaction breakdown (gateway)
- *
- * Forwards a request to retrieve the breakdown (line items) for the specified transaction from the finance microservice.
- */
-export const apiFinanceV1TransactionsTransactionIdBreakdownGetBreakdown = <ThrowOnError extends boolean = false>(options: Options<ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownData, ThrowOnError>) => {
-    return (options.client ?? client).get<ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownResponses, ApiFinanceV1TransactionsTransactionIdBreakdownGetBreakdownErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/finance/v1/transactions/{transaction_id}/breakdown',
-        ...options
-    });
-};
-
-/**
- * Create transaction breakdown (gateway)
- *
- * Forwards a request to create a breakdown (line items) for the given transaction on the finance microservice.
- */
-export const apiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdown = <ThrowOnError extends boolean = false>(options: Options<ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownData, ThrowOnError>) => {
-    return (options.client ?? client).post<ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownResponses, ApiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdownErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/finance/v1/transactions/{transaction_id}/breakdown',
+        url: '/api/finance/v1/user/token',
         ...options,
         headers: {
             'Content-Type': 'application/json',
@@ -95,74 +41,12 @@ export const apiFinanceV1TransactionsTransactionIdBreakdownCreateBreakdown = <Th
 };
 
 /**
- * Delete line item (gateway)
+ * CreateBudget
  *
- * Forwards a request to delete the specified line item from a transaction on the finance microservice.
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/create
  */
-export const apiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointData, ThrowOnError>) => {
-    return (options.client ?? client).delete<ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses, ApiFinanceV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/finance/v1/transactions/line-items/{line_item_id}',
-        ...options
-    });
-};
-
-/**
- * Update line item (gateway)
- *
- * Forwards a request to update a line item belonging to a transaction on the finance microservice.
- */
-export const apiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointData, ThrowOnError>) => {
-    return (options.client ?? client).put<ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses, ApiFinanceV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/finance/v1/transactions/line-items/{line_item_id}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
-
-/**
- * Update transaction type (gateway)
- *
- * Forwards a request to update the type of a transaction on the finance microservice.
- */
-export const apiFinanceV1TransactionsTransactionIdTypeUpdateTransactionType = <ThrowOnError extends boolean = false>(options: Options<ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeData, ThrowOnError>) => {
-    return (options.client ?? client).patch<ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeResponses, ApiFinanceV1TransactionsTransactionIdTypeUpdateTransactionTypeErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/finance/v1/transactions/{transaction_id}/type',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
-
-/**
- * Create budget (gateway)
- *
- * Forwards a POST to create a new budget on the finance microservice.
- */
-export const apiFinanceV1BudgetsCreateCreateBudget = <ThrowOnError extends boolean = false>(options: Options<ApiFinanceV1BudgetsCreateCreateBudgetData, ThrowOnError>) => {
-    return (options.client ?? client).post<ApiFinanceV1BudgetsCreateCreateBudgetResponses, ApiFinanceV1BudgetsCreateCreateBudgetErrors, ThrowOnError>({
+export const apiV1BudgetsCreateCreateBudget = <ThrowOnError extends boolean = false>(options: Options<ApiV1BudgetsCreateCreateBudgetData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApiV1BudgetsCreateCreateBudgetResponses, ApiV1BudgetsCreateCreateBudgetErrors, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
@@ -179,12 +63,12 @@ export const apiFinanceV1BudgetsCreateCreateBudget = <ThrowOnError extends boole
 };
 
 /**
- * Add transaction to budget (gateway)
+ * AddTransactionToBudget
  *
- * Forwards a request to add an existing transaction to the specified budget on the finance microservice.
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/{budget_id}/transactions/{transaction_id}
  */
-export const apiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudget = <ThrowOnError extends boolean = false>(options: Options<ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData, ThrowOnError>) => {
-    return (options.client ?? client).post<ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses, ApiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors, ThrowOnError>({
+export const apiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudget = <ThrowOnError extends boolean = false>(options: Options<ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
@@ -197,12 +81,12 @@ export const apiFinanceV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionT
 };
 
 /**
- * Get all budgets (gateway)
+ * GetAllBudgets
  *
- * Forwards a request to retrieve all budgets for the authenticated user from the finance microservice.
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/all
  */
-export const apiFinanceV1BudgetsAllGetAllBudgets = <ThrowOnError extends boolean = false>(options?: Options<ApiFinanceV1BudgetsAllGetAllBudgetsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<ApiFinanceV1BudgetsAllGetAllBudgetsResponses, unknown, ThrowOnError>({
+export const apiV1BudgetsAllGetAllBudgets = <ThrowOnError extends boolean = false>(options?: Options<ApiV1BudgetsAllGetAllBudgetsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<ApiV1BudgetsAllGetAllBudgetsResponses, unknown, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
@@ -215,12 +99,12 @@ export const apiFinanceV1BudgetsAllGetAllBudgets = <ThrowOnError extends boolean
 };
 
 /**
- * Get budget names (gateway)
+ * GetBudgetsNames
  *
- * Forwards a request to retrieve all budget IDs and names for the authenticated user from the finance microservice.
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/names
  */
-export const apiFinanceV1BudgetsNamesGetBudgetsNames = <ThrowOnError extends boolean = false>(options?: Options<ApiFinanceV1BudgetsNamesGetBudgetsNamesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<ApiFinanceV1BudgetsNamesGetBudgetsNamesResponses, unknown, ThrowOnError>({
+export const apiV1BudgetsNamesGetBudgetsNames = <ThrowOnError extends boolean = false>(options?: Options<ApiV1BudgetsNamesGetBudgetsNamesData, ThrowOnError>) => {
+    return (options?.client ?? client).get<ApiV1BudgetsNamesGetBudgetsNamesResponses, unknown, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
@@ -233,23 +117,157 @@ export const apiFinanceV1BudgetsNamesGetBudgetsNames = <ThrowOnError extends boo
 };
 
 /**
- * Update user access URL (gateway)
+ * GetTransactions
  *
- * Forwards a request to update the authenticated user's access URL on the finance microservice. Accepts a token in the body used to claim an access URL.
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/transactions
  */
-export const apiFinanceV1UserTokenUpdateAccessUrlEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiFinanceV1UserTokenUpdateAccessUrlEndpointData, ThrowOnError>) => {
-    return (options.client ?? client).put<ApiFinanceV1UserTokenUpdateAccessUrlEndpointResponses, ApiFinanceV1UserTokenUpdateAccessUrlEndpointErrors, ThrowOnError>({
+export const apiV1TransactionsGetTransactions = <ThrowOnError extends boolean = false>(options: Options<ApiV1TransactionsGetTransactionsData, ThrowOnError>) => {
+    return (options.client ?? client).get<ApiV1TransactionsGetTransactionsResponses, ApiV1TransactionsGetTransactionsErrors, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
                 type: 'http'
             }
         ],
-        url: '/api/finance/v1/user/token',
+        url: '/api/finance/v1/transactions',
+        ...options
+    });
+};
+
+/**
+ * UpdateTransactions
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/transactions/update
+ */
+export const apiV1TransactionsUpdateUpdateTransactions = <ThrowOnError extends boolean = false>(options?: Options<ApiV1TransactionsUpdateUpdateTransactionsData, ThrowOnError>) => {
+    return (options?.client ?? client).post<ApiV1TransactionsUpdateUpdateTransactionsResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/transactions/update',
+        ...options
+    });
+};
+
+/**
+ * GetBreakdown
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/transactions/{transaction_id}/breakdown
+ */
+export const apiV1TransactionsTransactionIdBreakdownGetBreakdown = <ThrowOnError extends boolean = false>(options: Options<ApiV1TransactionsTransactionIdBreakdownGetBreakdownData, ThrowOnError>) => {
+    return (options.client ?? client).get<ApiV1TransactionsTransactionIdBreakdownGetBreakdownResponses, ApiV1TransactionsTransactionIdBreakdownGetBreakdownErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/transactions/{transaction_id}/breakdown',
+        ...options
+    });
+};
+
+/**
+ * CreateBreakdown
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/transactions/{transaction_id}/breakdown
+ */
+export const apiV1TransactionsTransactionIdBreakdownCreateBreakdown = <ThrowOnError extends boolean = false>(options: Options<ApiV1TransactionsTransactionIdBreakdownCreateBreakdownData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApiV1TransactionsTransactionIdBreakdownCreateBreakdownResponses, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/transactions/{transaction_id}/breakdown',
         ...options,
         headers: {
             'Content-Type': 'application/json',
             ...options.headers
         }
+    });
+};
+
+/**
+ * DeleteLineItemEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/transactions/line-items/{line_item_id}
+ */
+export const apiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).delete<ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/transactions/line-items/{line_item_id}',
+        ...options
+    });
+};
+
+/**
+ * UpdateLineItemEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/transactions/line-items/{line_item_id}
+ */
+export const apiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).put<ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/transactions/line-items/{line_item_id}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * MarkTransactionTypeEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/transactions/{transaction_id}/type
+ */
+export const apiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).patch<ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponses, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/transactions/{transaction_id}/type',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * HealthCheck
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/health
+ */
+export const apiV1HealthHealthCheck = <ThrowOnError extends boolean = false>(options?: Options<ApiV1HealthHealthCheckData, ThrowOnError>) => {
+    return (options?.client ?? client).get<ApiV1HealthHealthCheckResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/health',
+        ...options
     });
 };

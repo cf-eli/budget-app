@@ -1,28 +1,28 @@
 <script setup lang="ts">
 interface LineItem {
-  id?: number;
-  description: string;
-  amount: number;
-  quantity?: number;
-  unit_price?: number;
-  category?: string;
-  budget_id?: number;
-  notes?: string;
+  id?: number
+  description: string
+  amount: number
+  quantity?: number
+  unit_price?: number
+  category?: string
+  budget_id?: number
+  notes?: string
 }
 
 interface Props {
-  items: LineItem[];
+  items: LineItem[]
 }
 
 interface Emits {
-  (e: 'edit', index: number): void;
-  (e: 'delete', index: number): void;
+  (_event: 'edit', _index: number): void
+  (_event: 'delete', _index: number): void
 }
 
-defineProps<Props>();
-const emit = defineEmits<Emits>();
+defineProps<Props>()
+const emit = defineEmits<Emits>()
 
-const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
+const formatCurrency = (value: number) => `$${value.toFixed(2)}`
 </script>
 
 <template>
@@ -36,9 +36,7 @@ const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
             <span v-if="item.quantity && item.unit_price">
               {{ item.quantity }} × {{ formatCurrency(item.unit_price) }}
             </span>
-            <span v-if="item.category" class="q-ml-sm">
-              • {{ item.category }}
-            </span>
+            <span v-if="item.category" class="q-ml-sm"> • {{ item.category }} </span>
           </q-item-label>
           <q-item-label caption v-if="item.notes">
             {{ item.notes }}
@@ -47,21 +45,12 @@ const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
 
         <q-item-section side top>
           <div class="text-h6">{{ formatCurrency(item.amount) }}</div>
-          <div v-if="item.budget_id" class="text-caption text-primary">
-            Budget assigned
-          </div>
+          <div v-if="item.budget_id" class="text-caption text-primary">Budget assigned</div>
         </q-item-section>
 
         <q-item-section side top>
           <div class="row q-gutter-xs">
-            <q-btn
-              flat
-              round
-              dense
-              icon="edit"
-              size="sm"
-              @click="emit('edit', index)"
-            />
+            <q-btn flat round dense icon="edit" size="sm" @click="emit('edit', index)" />
             <q-btn
               flat
               round

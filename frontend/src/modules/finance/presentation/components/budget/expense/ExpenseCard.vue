@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { ExpenseBudgetResponse, BudgetRequest } from 'src/api';
-import ExpenseItemSection from './ExpenseItemSection.vue';
-import ExpenseForm from './ExpenseForm.vue';
+import { ref } from 'vue'
+import type { ExpenseBudgetResponse, BudgetRequest } from 'src/api'
+import ExpenseItemSection from './ExpenseItemSection.vue'
+import ExpenseForm from './ExpenseForm.vue'
 
 interface Props {
-  expenses: ExpenseBudgetResponse[];
+  expenses: ExpenseBudgetResponse[]
 }
 
 interface Emits {
-  (e: 'refresh'): void;
-  (e: 'create', budget: BudgetRequest): void;
+  (_event: 'refresh'): void
+  (_event: 'create', _budget: BudgetRequest): void
 }
 
-defineProps<Props>();
-const emit = defineEmits<Emits>();
+defineProps<Props>()
+const emit = defineEmits<Emits>()
 
-const formVisible = ref(false);
+const formVisible = ref(false)
 
 function openForm() {
-  formVisible.value = true;
+  formVisible.value = true
 }
 
 function showDetails(id: number) {
-  console.log('Show details for expense:', id);
+  console.log('Show details for expense:', id)
 }
 
 async function handleFormSubmit(formData: BudgetRequest) {
-  await emit('create', formData);
-  formVisible.value = false;
+  await emit('create', formData)
+  formVisible.value = false
 }
 </script>
 
@@ -39,14 +39,7 @@ async function handleFormSubmit(formData: BudgetRequest) {
         <q-icon name="shopping_cart" size="28px" color="negative" />
         <span class="text-h5 text-white">Expenses</span>
       </div>
-      <q-btn
-        flat
-        round
-        icon="add"
-        color="positive"
-        size="md"
-        @click="openForm"
-      >
+      <q-btn flat round icon="add" color="positive" size="md" @click="openForm">
         <q-tooltip>Add Expense</q-tooltip>
       </q-btn>
     </q-card-section>
@@ -55,8 +48,8 @@ async function handleFormSubmit(formData: BudgetRequest) {
 
     <q-card-section class="category-items-section">
       <q-list separator class="q-pa-none">
-        <q-item 
-          v-for="expense in expenses" 
+        <q-item
+          v-for="expense in expenses"
           :key="expense.id"
           clickable
           class="q-pa-none"
@@ -72,13 +65,7 @@ async function handleFormSubmit(formData: BudgetRequest) {
         <q-card-section>
           <q-icon name="inbox" size="64px" color="grey-6" />
           <div class="text-subtitle1 text-grey-6 q-mt-md">No expenses yet</div>
-          <q-btn
-            outline
-            color="primary"
-            label="Add Expense"
-            class="q-mt-md"
-            @click="openForm"
-          />
+          <q-btn outline color="primary" label="Add Expense" class="q-mt-md" @click="openForm" />
         </q-card-section>
       </q-card>
     </q-card-section>

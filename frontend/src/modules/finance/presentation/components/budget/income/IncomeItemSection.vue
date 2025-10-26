@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { IncomeBudgetResponse } from 'src/api';
+import type { IncomeBudgetResponse } from 'src/api'
 
 interface Props {
-  income: IncomeBudgetResponse;
+  income: IncomeBudgetResponse
 }
 
-defineProps<Props>();
+defineProps<Props>()
 
-const formatCurrency = (value: number | null | undefined) => 
-  value !== null && value !== undefined ? `$${value.toLocaleString()}` : 'N/A';
+const formatCurrency = (value: number | null | undefined) =>
+  value !== null && value !== undefined ? `$${value.toLocaleString()}` : 'N/A'
 </script>
 
 <template>
@@ -16,10 +16,7 @@ const formatCurrency = (value: number | null | undefined) =>
     <q-card-section class="q-pa-md">
       <div class="row items-center justify-between q-mb-md">
         <div class="text-h6 text-white">{{ income.name }}</div>
-        <q-badge 
-          :color="income.fixed ? 'blue-grey-8' : 'orange-8'" 
-          text-color="white"
-        >
+        <q-badge :color="income.fixed ? 'blue-grey-8' : 'orange-8'" text-color="white">
           {{ income.fixed ? 'Fixed' : 'Flexible' }}
         </q-badge>
       </div>
@@ -44,7 +41,7 @@ const formatCurrency = (value: number | null | undefined) =>
             <q-item class="q-px-none q-py-xs">
               <q-item-section>
                 <q-item-label caption class="text-grey-5">Remaining</q-item-label>
-                <q-item-label 
+                <q-item-label
                   :class="income.amount_after_transactions >= 0 ? 'text-positive' : 'text-negative'"
                 >
                   {{ formatCurrency(income.amount_after_transactions) }}
