@@ -80,7 +80,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <q-card flat bordered class="q-mt-md">
+  <q-card flat bordered class="q-mt-md dialog-card">
     <q-card-section>
       <q-form @submit.prevent="submit">
         <div class="row q-col-gutter-md">
@@ -89,6 +89,7 @@ onMounted(() => {
               v-model="formData.description"
               label="Description *"
               filled
+              class="dialog-input"
               :rules="[(val) => !!val || 'Description is required']"
             />
           </div>
@@ -99,6 +100,7 @@ onMounted(() => {
               type="number"
               label="Quantity"
               filled
+              class="dialog-input"
               step="0.01"
             />
           </div>
@@ -109,6 +111,7 @@ onMounted(() => {
               type="number"
               label="Unit Price"
               filled
+              class="dialog-input"
               prefix="$"
               step="0.01"
             />
@@ -120,6 +123,7 @@ onMounted(() => {
               type="number"
               label="Total Amount *"
               filled
+              class="dialog-input"
               prefix="$"
               step="0.01"
               :rules="[
@@ -131,7 +135,7 @@ onMounted(() => {
           </div>
 
           <div class="col-6">
-            <q-input v-model="formData.category" label="Category" filled />
+            <q-input v-model="formData.category" label="Category" filled class="dialog-input" />
           </div>
 
           <div class="col-6">
@@ -142,19 +146,20 @@ onMounted(() => {
               clearable
               emit-value
               map-options
+              class="dialog-select"
               :options="budgetStore.budgetOptions"
               :loading="budgetStore.loading"
             />
           </div>
 
           <div class="col-12">
-            <q-input v-model="formData.notes" label="Notes" filled type="textarea" rows="2" />
+            <q-input v-model="formData.notes" label="Notes" filled type="textarea" rows="2" class="dialog-textarea" />
           </div>
         </div>
 
-        <div class="row justify-end q-mt-md q-gutter-sm">
-          <q-btn flat label="Cancel" @click="cancel" />
-          <q-btn color="primary" label="Add Item" type="submit" />
+        <div class="row justify-end q-mt-md q-gutter-sm dialog-actions">
+          <q-btn flat label="Cancel" class="btn-cancel" @click="cancel" />
+          <q-btn flat label="Add Item" class="btn-submit" type="submit" />
         </div>
       </q-form>
     </q-card-section>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useQuasar } from 'quasar'
 import type { TransactionResponse } from 'src/api'
 import {
   apiV1TransactionsTransactionIdBreakdownGetBreakdown,
@@ -33,6 +34,8 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+
+const $q = useQuasar()
 
 const lineItems = ref<LineItem[]>([])
 const showAddForm = ref(false)
@@ -263,8 +266,8 @@ watch(
 </script>
 
 <template>
-  <q-dialog :model-value="visible" @update:model-value="emit('update:visible', $event)">
-    <q-card style="min-width: 600px; max-width: 800px">
+  <q-dialog :model-value="visible" @update:model-value="emit('update:visible', $event)" :maximized="$q.screen.lt.sm">
+    <q-card class="dialog-card transaction-breakdown-dialog" :style="$q.screen.lt.sm ? '' : 'min-width: 600px; max-width: 800px; width: 90vw;'">
       <q-card-section class="row items-center q-pb-none">
         <div class="text-h6">{{ isExistingBreakdown ? 'Edit' : 'Break Down' }} Transaction</div>
         <q-space />
@@ -273,7 +276,7 @@ watch(
 
       <q-card-section>
         <!-- Transaction Info -->
-        <div class="q-mb-md q-pa-md bg-grey-2 rounded">
+        <div class="q-mb-md q-pa-md dialog-info-section">
           <div class="text-subtitle1">{{ transaction.description }}</div>
           <div class="text-subtitle2 text-grey-7">
             {{ transaction.payee }} • {{ transaction.transacted_at }}
@@ -323,10 +326,10 @@ watch(
           @cancel="showAddForm = false; editingItemIndex = null" />
       </q-card-section>
 
-      <q-card-actions align="right">
-        <q-btn flat label="Cancel" @click="cancel" />
-        <q-btn color="primary" :label="isExistingBreakdown ? 'Update Breakdown' : 'Save Breakdown'"
-          :disable="!isBalanced || lineItems.length === 0" @click="saveBreakdown" />
+      <q-card-actions align="right" class="dialog-actions">
+        <q-btn flat label="Cancel" class="btn-cancel" @click="cancel" />
+        <q-btn flat :label="isExistingBreakdown ? 'Update Breakdown' : 'Save Breakdown'"
+          class="btn-submit" :disable="!isBalanced || lineItems.length === 0" @click="saveBreakdown" />
       </q-card-actions>
     </q-card>
   </q-dialog>

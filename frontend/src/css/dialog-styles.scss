@@ -1,0 +1,329 @@
+// Shared dialog and form styles for better visibility on dark backgrounds
+
+// Input field styling for better visibility
+.dialog-input {
+  .q-field__control {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: rgba(255, 255, 255, 0.25) !important;
+    }
+  }
+
+  .q-field__native,
+  .q-field__input {
+    color: #ffffff !important;
+  }
+
+  .q-field__label {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  .q-field__prefix,
+  .q-field__suffix {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  // When focused
+  &.q-field--focused {
+    .q-field__control {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: #3b82f6 !important;
+    }
+
+    .q-field__label {
+      color: #3b82f6 !important;
+    }
+  }
+
+  // Error state
+  &.q-field--error {
+    .q-field__control {
+      border-color: #ef4444 !important;
+    }
+  }
+}
+
+// Textarea specific styling
+.dialog-textarea {
+  .q-field__control {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    min-height: 80px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: rgba(255, 255, 255, 0.25) !important;
+    }
+  }
+
+  .q-field__native {
+    color: #ffffff !important;
+  }
+
+  &.q-field--focused {
+    .q-field__control {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: #3b82f6 !important;
+    }
+  }
+}
+
+// Select/dropdown styling
+.dialog-select {
+  .q-field__control {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: rgba(255, 255, 255, 0.25) !important;
+    }
+  }
+
+  .q-field__native,
+  .q-field__input {
+    color: #ffffff !important;
+  }
+
+  &.q-field--focused {
+    .q-field__control {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: #3b82f6 !important;
+    }
+  }
+}
+
+// Button group styling for better visibility
+.dialog-actions {
+  padding: 16px;
+  gap: 8px;
+
+  .q-btn {
+    min-width: 80px;
+    font-weight: 500;
+    text-transform: none;
+
+    &.btn-cancel {
+      background: rgba(239, 68, 68, 0.1) !important;
+      color: #ef4444 !important;
+      border: 1px solid rgba(239, 68, 68, 0.3) !important;
+
+      &:hover {
+        background: rgba(239, 68, 68, 0.2) !important;
+        border-color: rgba(239, 68, 68, 0.5) !important;
+      }
+    }
+
+    &.btn-submit {
+      background: rgba(34, 197, 94, 0.15) !important;
+      color: #22c55e !important;
+      border: 1px solid rgba(34, 197, 94, 0.4) !important;
+
+      &:hover {
+        background: rgba(34, 197, 94, 0.25) !important;
+        border-color: rgba(34, 197, 94, 0.6) !important;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+      }
+    }
+  }
+}
+
+// Card background for better contrast
+.dialog-card {
+  background: #2a2d35 !important;
+  color: #ffffff !important;
+
+  .q-card__section {
+    color: #ffffff !important;
+  }
+
+  .text-h6,
+  .text-subtitle1,
+  .text-subtitle2 {
+    color: #ffffff !important;
+  }
+}
+
+// Checkbox styling for better visibility
+.dialog-checkbox {
+  .q-checkbox__bg {
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  }
+
+  .q-checkbox__label {
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  &.q-checkbox--truthy {
+    .q-checkbox__bg {
+      background: #3b82f6 !important;
+      border-color: #3b82f6 !important;
+    }
+  }
+}
+
+// List items in dialogs
+.dialog-list {
+  .q-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 8px;
+    border-radius: 4px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    &.q-item--active {
+      background: rgba(59, 130, 246, 0.15) !important;
+      border-color: rgba(59, 130, 246, 0.4) !important;
+    }
+  }
+
+  .q-item__label {
+    color: #ffffff !important;
+  }
+
+  .q-item__label--caption {
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+}
+
+// Info sections (like transaction info)
+.dialog-info-section {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 12px;
+
+  .text-subtitle1,
+  .text-subtitle2 {
+    color: #ffffff !important;
+  }
+
+  .text-grey-7 {
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+}
+
+// Budget assignment popup styling (q-popup-edit)
+.q-popup-edit {
+  background: #2a2d35 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  .q-popup-edit__title {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .q-popup-edit__buttons {
+    background: rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+    .q-btn {
+      color: #ffffff !important;
+
+      &:first-child {
+        color: #ef4444 !important;
+      }
+
+      &:last-child {
+        color: #22c55e !important;
+      }
+    }
+  }
+
+  // Style the select dropdown inside popup
+  .q-field {
+    .q-field__control {
+      background: rgba(255, 255, 255, 0.08) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.12) !important;
+        border-color: rgba(255, 255, 255, 0.25) !important;
+      }
+    }
+
+    .q-field__native,
+    .q-field__input {
+      color: #ffffff !important;
+    }
+
+    .q-field__label {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    &.q-field--focused {
+      .q-field__control {
+        background: rgba(255, 255, 255, 0.12) !important;
+        border-color: #3b82f6 !important;
+      }
+    }
+  }
+}
+
+// Style the menu that appears when clicking the select in popup
+.q-menu {
+  background: #2a2d35 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+
+  .q-item {
+    color: #ffffff !important;
+    background: transparent !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    &.q-manual-focusable--focused {
+      background: rgba(59, 130, 246, 0.15) !important;
+    }
+
+    &.q-item--active {
+      background: rgba(59, 130, 246, 0.2) !important;
+      color: #3b82f6 !important;
+    }
+  }
+
+  .q-item__label {
+    color: #ffffff !important;
+  }
+
+  .q-item__section {
+    color: #ffffff !important;
+  }
+}
+
+// Additional specific styling for dropdowns
+.q-select__dropdown {
+  .q-item {
+    color: #ffffff !important;
+
+    .q-item__label {
+      color: #ffffff !important;
+    }
+  }
+}
+
+// Style for virtual scroll items in dropdowns
+.q-virtual-scroll__content {
+  .q-item {
+    color: #ffffff !important;
+    background: transparent !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08) !important;
+    }
+  }
+}

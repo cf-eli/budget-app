@@ -21,11 +21,13 @@
           flat
           dense
           icon="health_and_safety"
-          label="Health Check"
+          :label="$q.screen.gt.xs ? 'Health Check' : undefined"
           @click="checkHealth"
           color="white"
           class="q-mr-md"
-        />
+        >
+          <q-tooltip v-if="$q.screen.lt.sm">Health Check</q-tooltip>
+        </q-btn>
 
         <q-badge color="grey-7" text-color="white" class="q-px-sm"> v{{ $q.version }} </q-badge>
       </q-toolbar>

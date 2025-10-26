@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useQuasar } from 'quasar'
 import type { BudgetRequest } from 'src/api'
 
 interface Emits {
@@ -8,6 +9,8 @@ interface Emits {
 }
 
 const emit = defineEmits<Emits>()
+
+const $q = useQuasar()
 
 const formData = ref({
   name: '',
@@ -42,7 +45,7 @@ function closeForm() {
 </script>
 
 <template>
-  <q-card style="width: 400px">
+  <q-card class="dialog-card" :style="$q.screen.lt.sm ? 'width: 100vw; max-width: 100vw;' : 'width: 400px; max-width: 90vw;'">
     <q-card-section>
       <div class="text-h6">Add New Flexible Expense</div>
     </q-card-section>
@@ -53,7 +56,7 @@ function closeForm() {
           v-model="formData.name"
           label="Name"
           filled
-          class="q-mb-md"
+          class="q-mb-md dialog-input"
           :rules="[(val) => !!val || 'Name is required']"
         />
 
@@ -72,7 +75,7 @@ function closeForm() {
           type="number"
           label="Expected Amount"
           filled
-          class="q-mb-md"
+          class="q-mb-md dialog-input"
           prefix="$"
           :rules="[
             (val) => (val !== null && val !== '') || 'Amount is required',
@@ -86,7 +89,7 @@ function closeForm() {
             type="number"
             label="Minimum"
             filled
-            class="q-mb-md"
+            class="q-mb-md dialog-input"
             prefix="$"
           />
           <q-input
@@ -94,14 +97,14 @@ function closeForm() {
             type="number"
             label="Maximum"
             filled
-            class="q-mb-md"
+            class="q-mb-md dialog-input"
             prefix="$"
           />
         </div>
 
-        <div class="row justify-end q-mt-md">
-          <q-btn flat label="Cancel" color="negative" @click="closeForm" />
-          <q-btn flat label="Add" color="positive" type="submit" />
+        <div class="row justify-end q-mt-md dialog-actions">
+          <q-btn flat label="Cancel" class="btn-cancel" @click="closeForm" />
+          <q-btn flat label="Add" class="btn-submit" type="submit" />
         </div>
       </q-form>
     </q-card-section>

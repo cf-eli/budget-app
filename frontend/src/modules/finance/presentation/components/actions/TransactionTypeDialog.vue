@@ -62,7 +62,7 @@ function cancel() {
 
 <template>
   <q-dialog :model-value="visible" @update:model-value="emit('update:visible', $event)">
-    <q-card style="min-width: 400px">
+    <q-card class="dialog-card" style="min-width: 400px">
       <q-card-section class="row items-center q-pb-none">
         <div class="text-h6">Mark Transaction Type</div>
         <q-space />
@@ -71,7 +71,7 @@ function cancel() {
 
       <q-card-section v-if="transaction">
         <!-- Transaction Info -->
-        <div class="q-mb-md q-pa-md bg-grey-2 rounded">
+        <div class="q-mb-md q-pa-md dialog-info-section">
           <div class="text-subtitle1">{{ transaction.description }}</div>
           <div class="text-subtitle2 text-grey-7">
             {{ transaction.payee }} • ${{ Math.abs(transaction.amount).toFixed(2) }}
@@ -80,7 +80,7 @@ function cancel() {
 
         <!-- Transaction Type Selection -->
         <div class="text-subtitle2 q-mb-sm">Select Transaction Type:</div>
-        <q-list bordered separator>
+        <q-list bordered separator class="dialog-list">
           <q-item
             v-for="option in transactionTypeOptions"
             :key="option.value"
@@ -105,18 +105,19 @@ function cancel() {
 
         <!-- Exclude from Budget Option -->
         <div class="q-mt-md">
-          <q-checkbox v-model="excludeFromBudget" label="Exclude from budget calculations" />
+          <q-checkbox v-model="excludeFromBudget" label="Exclude from budget calculations" class="dialog-checkbox" />
           <div class="text-caption text-grey-7 q-pl-lg">
             This transaction will be hidden from the transaction list and not counted in budgets.
           </div>
         </div>
       </q-card-section>
 
-      <q-card-actions align="right">
-        <q-btn flat label="Cancel" @click="cancel" />
+      <q-card-actions align="right" class="dialog-actions">
+        <q-btn flat label="Cancel" class="btn-cancel" @click="cancel" />
         <q-btn
-          color="primary"
+          flat
           label="Mark Transaction"
+          class="btn-submit"
           :disable="!selectedType"
           :loading="loading"
           @click="saveType"
