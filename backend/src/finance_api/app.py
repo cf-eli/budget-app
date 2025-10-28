@@ -8,7 +8,7 @@ import jwt
 from litestar import Request, Router
 from litestar.app import Litestar
 from litestar.config.cors import CORSConfig
-from litestar.middleware import AbstractMiddleware, DefineMiddleware
+from litestar.middleware import ASGIMiddleware
 from litestar.openapi.config import OpenAPIConfig
 from litestar.openapi.plugins import RedocRenderPlugin, SwaggerRenderPlugin
 from litestar.openapi.spec import Components, SecurityScheme
@@ -23,12 +23,11 @@ from finance_api.controllers.transaction import transactions_router
 from finance_api.controllers.user import user_router
 
 
-class JWTUserMiddleware(AbstractMiddleware):
+class JWTUserMiddleware(ASGIMiddleware):
     """Middleware for JWT authentication and user context."""
 
     def __init__(
         self,
-        app: ASGIApp,
         secret: str,
         jwt_algorithm: str = "HS256",
         jwt_audience: str = "test-dev",
@@ -37,66 +36,73 @@ class JWTUserMiddleware(AbstractMiddleware):
         Initialize JWT middleware.
 
         Args:
-            app: The ASGI application
             secret: JWT secret key
             jwt_algorithm: JWT algorithm to use
             jwt_audience: JWT audience
 
         """
-        super().__init__(app)
         self.secret = secret
         self.jwt_algorithm = jwt_algorithm
         self.jwt_audience = jwt_audience
 
-    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+    async def handle(
+        self,
+        scope: Scope,
+        receive: Receive,
+        send: Send,
+        next_app: ASGIApp,
+    ) -> None:
         """Process the request and add user context."""
         if scope["type"] == "http":
-            # Get headers from scope
-            headers = dict(scope.get("headers", []))
-            auth_header = headers.get(b"authorization", b"").decode()
-            if auth_header and auth_header.startswith("Bearer "):
-                token = auth_header.split(" ")[1]
-                try:
-                    payload = jwt.decode(
-                        token,
-                        self.secret,
-                        algorithms=[self.jwt_algorithm],
-                        audience=self.jwt_audience,
-                    )
-                    # Attach user to scope
-                    scope["user"] = {
-                        "id": payload.get("sub"),
-                        "name": payload.get("name"),
-                        "first_name": payload.get("given_name"),
-                        "last_name": payload.get("family_name"),
-                        "email": payload.get("email"),
-                        "roles": payload.get("roles", []),
-                    }
-                except jwt.ExpiredSignatureError:
-                    scope["user"] = None
-                except jwt.InvalidAudienceError:
-                    scope["user"] = None
-                except jwt.PyJWTError:
-                    scope["user"] = None
+            if not settings.enable_auth:
+                # When auth is disabled, use default user
+                scope["user"] = {"id": settings.dev_default_user_id}
             else:
-                scope["user"] = None
+                # Get headers from scope
+                headers = dict(scope.get("headers", []))
+                auth_header = headers.get(b"authorization", b"").decode()
+                if auth_header and auth_header.startswith("Bearer "):
+                    token = auth_header.split(" ")[1]
+                    try:
+                        payload = jwt.decode(
+                            token,
+                            self.secret,
+                            algorithms=[self.jwt_algorithm],
+                            audience=self.jwt_audience,
+                        )
+                        # Attach user to scope
+                        scope["user"] = {
+                            "id": payload.get("sub"),
+                            "name": payload.get("name"),
+                            "first_name": payload.get("given_name"),
+                            "last_name": payload.get("family_name"),
+                            "email": payload.get("email"),
+                            "roles": payload.get("roles", []),
+                        }
+                    except jwt.ExpiredSignatureError:
+                        scope["user"] = None
+                    except jwt.InvalidAudienceError:
+                        scope["user"] = None
+                    except jwt.PyJWTError:
+                        scope["user"] = None
+                else:
+                    scope["user"] = None
 
         # Call the next middleware/handler
-        await self.app(scope, receive, send)
+        await next_app(scope, receive, send)
 
 
 def get_middlewares() -> list[Middleware]:
     """Get list of middlewares based on settings."""
     middlewares = []
-    if settings.enable_auth:
-        middlewares.append(
-            DefineMiddleware(
-                JWTUserMiddleware,
-                secret=settings.homelab_client_secret,
-                jwt_algorithm=settings.jwt_algorithm,
-                jwt_audience=settings.finance_jwt_aud,
-            ),
-        )
+    # if settings.enable_auth:
+    middlewares.append(
+        JWTUserMiddleware(
+            secret=settings.homelab_client_secret,
+            jwt_algorithm=settings.jwt_algorithm,
+            jwt_audience=settings.finance_jwt_aud,
+        ),
+    )
     return middlewares
 
 

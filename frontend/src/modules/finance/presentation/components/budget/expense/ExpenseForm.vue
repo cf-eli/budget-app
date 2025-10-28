@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useQuasar } from 'quasar'
 import type { BudgetRequest } from 'src/api'
+import { useDateSelectionStore } from 'src/modules/finance/presentation/stores/dateSelectionStore'
 
 interface Emits {
   (_event: 'close'): void
@@ -11,6 +12,7 @@ interface Emits {
 const emit = defineEmits<Emits>()
 
 const $q = useQuasar()
+const dateStore = useDateSelectionStore()
 
 const formData = ref({
   name: '',
@@ -20,10 +22,6 @@ const formData = ref({
   max: null as number | null,
 })
 
-const now = new Date()
-const currentMonth = now.getMonth() + 1
-const currentYear = now.getFullYear()
-
 function submitForm() {
   const budget: BudgetRequest = {
     name: formData.value.name,
@@ -32,8 +30,8 @@ function submitForm() {
     expected_amount: formData.value.expected_amount,
     min: formData.value.fixed ? null : formData.value.min,
     max: formData.value.fixed ? null : formData.value.max,
-    month: currentMonth,
-    year: currentYear,
+    month: dateStore.selectedMonth,
+    year: dateStore.selectedYear,
   }
 
   emit('submit', budget)

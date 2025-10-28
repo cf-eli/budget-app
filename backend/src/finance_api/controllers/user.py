@@ -1,9 +1,8 @@
 """User management endpoints."""
 
 from litestar import Request, Router, put, status_codes
-from litestar.exceptions.http_exceptions import ImproperlyConfiguredException
+from litestar.exceptions import NotAuthorizedException
 
-from finance_api.config import settings
 from finance_api.crud.user import ensure_user, update_access_url
 from finance_api.schemas.exceptions import FinanceServerError
 from finance_api.schemas.schema import MessageResponse, TokenRequest
@@ -30,11 +29,11 @@ async def update_access_url_endpoint(
         A dictionary confirming the update of the access URL.
 
     """
-    try:
-        request_user = request.user
-    except ImproperlyConfiguredException:
-        # Use configured default user for testing when auth is disabled
-        request_user = {"id": settings.dev_default_user_id}
+    request_user = request.user
+    if request_user is None:
+        msg = "Authentication required"
+        raise NotAuthorizedException(msg)
+
     user = await ensure_user(request_user["id"])
     if not user:
         msg = "User not found"

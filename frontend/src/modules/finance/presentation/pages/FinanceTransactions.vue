@@ -43,11 +43,15 @@ async function fetchTransactions() {
     })
 
     if (response.data) {
-      transactions.value = Array.isArray(response.data)
-        ? response.data
-        : response.data.transactions || []
-
-      pagination.value.rowsNumber = response.data.total || transactions.value.length
+      // Handle paginated response
+      if (!Array.isArray(response.data) && response.data.transactions) {
+        transactions.value = response.data.transactions
+        pagination.value.rowsNumber = response.data.total
+      } else {
+        // Fallback for legacy array response
+        transactions.value = Array.isArray(response.data) ? response.data : []
+        pagination.value.rowsNumber = transactions.value.length
+      }
     }
   } catch (error) {
     console.error('Failed to fetch transactions:', error)
@@ -57,7 +61,11 @@ async function fetchTransactions() {
 }
 
 function handlePaginationUpdate(newPagination: typeof pagination.value) {
-  pagination.value = newPagination
+  // Update pagination but preserve rowsNumber (will be updated after fetch)
+  pagination.value.page = newPagination.page
+  pagination.value.rowsPerPage = newPagination.rowsPerPage
+  pagination.value.sortBy = newPagination.sortBy
+  pagination.value.descending = newPagination.descending
   fetchTransactions()
 }
 

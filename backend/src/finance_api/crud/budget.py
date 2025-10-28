@@ -15,16 +15,20 @@ from finance_api.models.transaction import SimpleFinTransaction, TransactionLine
 async def create_budget(
     user_id: int,
     name: str,
+    month: int | None = None,
+    year: int | None = None,
     session: AsyncSession | None = None,
 ) -> int:
     """Create a budget entry and return the budget ID."""
     now = datetime.now(UTC)
-    current_year = now.year
-    current_month = now.month
+    if month is None:
+        month = now.month
+    if year is None:
+        year = now.year
     async with get_session(session) as sess:
         stmt = (
             insert(Budget)
-            .values(user_id=user_id, name=name, month=current_month, year=current_year)
+            .values(user_id=user_id, name=name, month=month, year=year)
             .returning(Budget.id)
         )
         result = await sess.execute(stmt)
@@ -39,11 +43,19 @@ async def create_income(
     expected_amount: float | None,
     min_amount: float | None,
     max_amount: float | None,
+    month: int | None = None,
+    year: int | None = None,
     session: AsyncSession | None = None,
 ) -> None:
     """Create a budget with income details."""
     # Create budget first
-    budget_id = await create_budget(user_id, name, session=session)
+    budget_id = await create_budget(
+        user_id,
+        name,
+        month=month,
+        year=year,
+        session=session,
+    )
 
     # Create income entry linked to budget
     async with get_session(session) as sess:
@@ -66,10 +78,18 @@ async def create_expense(
     expected_amount: float | None,
     min_amount: float | None,
     max_amount: float | None,
+    month: int | None = None,
+    year: int | None = None,
     session: AsyncSession | None = None,
 ) -> None:
     """Create a budget with expense details."""
-    budget_id = await create_budget(user_id, name, session=session)
+    budget_id = await create_budget(
+        user_id,
+        name,
+        month=month,
+        year=year,
+        session=session,
+    )
 
     async with get_session(session) as sess:
         stmt = insert(Expense).values(
@@ -91,10 +111,18 @@ async def create_fund(
     increment: float | None,
     current_amount: float = 0.0,
     max_amount: float | None = None,
+    month: int | None = None,
+    year: int | None = None,
     session: AsyncSession | None = None,
 ) -> None:
     """Create a budget with fund details."""
-    budget_id = await create_budget(user_id, name, session=session)
+    budget_id = await create_budget(
+        user_id,
+        name,
+        month=month,
+        year=year,
+        session=session,
+    )
 
     async with get_session(session) as sess:
         stmt = insert(Fund).values(
@@ -137,6 +165,14 @@ async def get_budgets(
 
     # Get all budget sums at once (optimized, includes line items)
     budget_sums = await get_all_budget_sums_with_line_items(
+        month=month,
+        year=year,
+        session=session,
+    )
+
+    # Get carryover amounts
+    carryover_by_name = await get_carryover_for_budgets(
+        user_id=user_id,
         month=month,
         year=year,
         session=session,
@@ -186,15 +222,18 @@ async def get_budgets(
     for row in rows:
         row_dict = row._mapping  # noqa: SLF001
         budget_id = row_dict["budget_id"]
+        budget_name = row_dict["name"]
         transaction_sum = budget_sums.get(budget_id, 0.0)
+        carryover = carryover_by_name.get(budget_name, 0.0)
 
         budget_info = {
             "id": budget_id,
             "user_id": row_dict["user_id"],
-            "name": row_dict["name"],
+            "name": budget_name,
             "enable": row_dict["enable"],
             "deleted": row_dict["deleted"],
             "transaction_sum": float(transaction_sum),
+            "carryover": float(carryover),
         }
 
         if row_dict["income_id"] is not None:
@@ -446,3 +485,278 @@ async def get_all_budget_sums_with_line_items(
             )
 
         return combined
+
+
+async def get_carryover_for_budgets(
+    user_id: int,
+    month: int,
+    year: int,
+    session: AsyncSession | None = None,
+) -> dict[str, float]:
+    """
+    Calculate carryover amounts for budgets based on previous months.
+
+    Carryover is the sum of transaction_sum (current activity) from all
+    previous months for budgets with the same name. Returns dict with
+    budget names as keys.
+
+    Args:
+        user_id: User ID
+        month: Current month (1-12)
+        year: Current year (e.g., 2024)
+        session: Optional database session
+
+    Returns:
+        Dict of {budget_name: carryover_amount}
+
+    """
+    async with get_session(session) as sess:
+        # Get all budgets for current month/year to get their names
+        current_budgets_query = (
+            select(Budget.id, Budget.name)
+            .where(Budget.user_id == user_id)
+            .where(Budget.month == month)
+            .where(Budget.year == year)
+        )
+        current_budgets_result = await sess.execute(current_budgets_query)
+        current_budgets = {row.id: row.name for row in current_budgets_result}
+
+        if not current_budgets:
+            return {}
+
+        # Get all previous budgets with same names
+        budget_names = list(set(current_budgets.values()))
+
+        # Get all previous budgets (before current month/year)
+        # Create comparison date for the start of current month
+        current_month_start = datetime(year, month, 1, tzinfo=UTC)
+
+        previous_budgets_query = (
+            select(Budget.id, Budget.name, Budget.month, Budget.year)
+            .where(Budget.user_id == user_id)
+            .where(Budget.name.in_(budget_names))
+        )
+        previous_budgets_result = await sess.execute(previous_budgets_query)
+        previous_budgets = []
+        for row in previous_budgets_result:
+            budget_month_start = datetime(row.year, row.month, 1, tzinfo=UTC)
+            # Only include budgets from before current month
+            if budget_month_start < current_month_start:
+                previous_budgets.append((row.id, row.name, row.month, row.year))
+
+        if not previous_budgets:
+            return dict.fromkeys(budget_names, 0.0)
+
+        # Get transaction sums for all previous budgets
+        carryover_by_name = dict.fromkeys(budget_names, 0.0)
+
+        for budget_id, budget_name, prev_month, prev_year in previous_budgets:
+            # Get transaction sum for this previous budget
+            last_day = monthrange(prev_year, prev_month)[1]
+            prev_month_start = datetime(prev_year, prev_month, 1, tzinfo=UTC)
+            prev_month_end = datetime(
+                prev_year,
+                prev_month,
+                last_day,
+                23,
+                59,
+                59,
+                999999,
+                tzinfo=UTC,
+            )
+
+            # Sum unsplit transactions for this budget
+            unsplit_query = (
+                select(func.sum(SimpleFinTransaction.amount))
+                .where(SimpleFinTransaction.budget_id == budget_id)
+                .where(~SimpleFinTransaction.is_split)
+                .where(SimpleFinTransaction.transacted_at >= prev_month_start)
+                .where(SimpleFinTransaction.transacted_at <= prev_month_end)
+            )
+            unsplit_result = await sess.execute(unsplit_query)
+            unsplit_sum = unsplit_result.scalar() or 0.0
+
+            # Sum line items for this budget
+            split_query = (
+                select(func.sum(TransactionLineItem.amount))
+                .join(
+                    SimpleFinTransaction,
+                    TransactionLineItem.parent_transaction_id
+                    == SimpleFinTransaction.id,
+                )
+                .where(TransactionLineItem.budget_id == budget_id)
+                .where(SimpleFinTransaction.transacted_at >= prev_month_start)
+                .where(SimpleFinTransaction.transacted_at <= prev_month_end)
+            )
+            split_result = await sess.execute(split_query)
+            split_sum = split_result.scalar() or 0.0
+
+            carryover_by_name[budget_name] += unsplit_sum + split_sum
+
+        return carryover_by_name
+
+
+async def copy_budgets_from_previous_month(
+    user_id: int,
+    target_month: int,
+    target_year: int,
+    source_month: int | None = None,
+    source_year: int | None = None,
+    session: AsyncSession | None = None,
+) -> dict:
+    """
+    Copy all budgets from source month to target month.
+
+    Args:
+        user_id: User ID
+        target_month: Target month (1-12)
+        target_year: Target year (e.g., 2024)
+        source_month: Optional source month (defaults to previous month)
+        source_year: Optional source year (defaults based on source_month)
+        session: Optional database session
+
+    Returns:
+        Dict with counts of copied budgets and source month/year
+
+    Raises:
+        ValueError: If target month already has budgets or no source month found
+
+    """
+    # Calculate source month and year if not provided
+    if source_month is None or source_year is None:
+        # Default to previous month
+        if target_month == 1:
+            source_month = 12
+            source_year = target_year - 1
+        else:
+            source_month = target_month - 1
+            source_year = target_year
+
+    # Use provided source_month/year (for copying from next month in past scenarios)
+    prev_month = source_month
+    prev_year = source_year
+
+    async with get_session(session) as sess:
+        # Check if target month already has budgets
+        target_check = (
+            select(Budget.id)
+            .where(Budget.user_id == user_id)
+            .where(Budget.month == target_month)
+            .where(Budget.year == target_year)
+            .limit(1)
+        )
+        target_result = await sess.execute(target_check)
+        if target_result.scalar_one_or_none() is not None:
+            msg = f"Target month {target_month}/{target_year} already has budgets"
+            raise ValueError(msg)
+
+        # Get all budgets from previous month
+        prev_budgets_query = (
+            select(
+                Budget.id,
+                Budget.name,
+                Budget.enable,
+                Budget.deleted,
+                Income.id.label("income_id"),
+                Income.fixed.label("income_fixed"),
+                Income.expected_amount.label("income_expected"),
+                Income.min.label("income_min"),
+                Income.max.label("income_max"),
+                Expense.id.label("expense_id"),
+                Expense.fixed.label("expense_fixed"),
+                Expense.flexible.label("expense_flexible"),
+                Expense.expected_amount.label("expense_expected"),
+                Expense.min.label("expense_min"),
+                Expense.max.label("expense_max"),
+                Fund.id.label("fund_id"),
+                Fund.priority.label("fund_priority"),
+                Fund.increment.label("fund_increment"),
+                Fund.max.label("fund_max"),
+            )
+            .where(Budget.user_id == user_id)
+            .where(Budget.month == prev_month)
+            .where(Budget.year == prev_year)
+            .outerjoin(Income, Budget.id == Income.id)
+            .outerjoin(Expense, Budget.id == Expense.id)
+            .outerjoin(Fund, Budget.id == Fund.id)
+        )
+
+        prev_result = await sess.execute(prev_budgets_query)
+        prev_budgets = prev_result.all()
+
+        if not prev_budgets:
+            msg = f"No budgets found in previous month {prev_month}/{prev_year}"
+            raise ValueError(msg)
+
+        # Track counts
+        counts = {"income": 0, "expense": 0, "flexible": 0, "fund": 0}
+
+        # Copy each budget
+        for row in prev_budgets:
+            row_dict = row._mapping  # noqa: SLF001
+
+            # Create new budget
+            new_budget_stmt = (
+                insert(Budget)
+                .values(
+                    user_id=user_id,
+                    name=row_dict["name"],
+                    enable=row_dict["enable"],
+                    deleted=row_dict["deleted"],
+                    month=target_month,
+                    year=target_year,
+                )
+                .returning(Budget.id)
+            )
+            new_budget_result = await sess.execute(new_budget_stmt)
+            new_budget_id = new_budget_result.scalar_one()
+
+            # Copy income details if exists
+            if row_dict["income_id"] is not None:
+                income_stmt = insert(Income).values(
+                    id=new_budget_id,
+                    fixed=row_dict["income_fixed"],
+                    expected_amount=row_dict["income_expected"],
+                    min=row_dict["income_min"],
+                    max=row_dict["income_max"],
+                )
+                await sess.execute(income_stmt)
+                counts["income"] += 1
+
+            # Copy expense details if exists
+            elif row_dict["expense_id"] is not None:
+                expense_stmt = insert(Expense).values(
+                    id=new_budget_id,
+                    fixed=row_dict["expense_fixed"],
+                    flexible=row_dict["expense_flexible"],
+                    expected_amount=row_dict["expense_expected"],
+                    min=row_dict["expense_min"],
+                    max=row_dict["expense_max"],
+                )
+                await sess.execute(expense_stmt)
+                if row_dict["expense_flexible"]:
+                    counts["flexible"] += 1
+                else:
+                    counts["expense"] += 1
+
+            # Copy fund details if exists
+            elif row_dict["fund_id"] is not None:
+                fund_stmt = insert(Fund).values(
+                    id=new_budget_id,
+                    priority=row_dict["fund_priority"],
+                    increment=row_dict["fund_increment"],
+                    current_amount=0.0,  # Reset current amount for new month
+                    max=row_dict["fund_max"],
+                )
+                await sess.execute(fund_stmt)
+                counts["fund"] += 1
+
+        # Commit all changes
+        await sess.commit()
+
+        return {
+            "message": "Successfully copied budgets",
+            "copied_budgets": counts,
+            "source_month": prev_month,
+            "source_year": prev_year,
+        }

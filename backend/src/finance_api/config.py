@@ -1,10 +1,12 @@
 """Configuration settings for the finance API."""
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
+
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     test_jwt_aud: str = "test-dev"
     jwt_algorithm: str = "HS256"
@@ -18,12 +20,6 @@ class Settings(BaseSettings):
     finance_jwt_aud: str = "finance-api"
     # Default user for development when auth is disabled
     dev_default_user_id: str = "user_001"
-
-    class Config:
-        """Pydantic configuration."""
-
-        env_file = ".env"
-        extra = "ignore"
 
 
 def get_settings() -> Settings:

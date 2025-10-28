@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { apiV1BudgetsNamesGetBudgetsNames } from 'src/api'
+import {
+  apiV1BudgetsNamesGetBudgetsNames,
+  apiV1BudgetsCopyFromPreviousCopyBudgetsFromPrevious,
+  type CopyBudgetsResponse,
+} from 'src/api'
 
 interface BudgetOption {
   label: string
@@ -66,6 +70,38 @@ export const useBudgetStore = defineStore('budget', () => {
     await fetchPromise.value
   }
 
+  async function copyFromPreviousMonth(
+    targetMonth: number,
+    targetYear: number,
+    sourceMonth?: number,
+    sourceYear?: number,
+  ): Promise<CopyBudgetsResponse | null> {
+    try {
+      loading.value = true
+      const response = await apiV1BudgetsCopyFromPreviousCopyBudgetsFromPrevious({
+        body: {
+          target_month: targetMonth,
+          target_year: targetYear,
+          source_month: sourceMonth,
+          source_year: sourceYear,
+        },
+      })
+
+      if (response.data) {
+        // Clear cache to force refetch of budget names
+        clearCache()
+        return response.data
+      }
+
+      return null
+    } catch (error) {
+      console.error('Error copying budgets:', error)
+      throw error
+    } finally {
+      loading.value = false
+    }
+  }
+
   function clearCache() {
     budgetOptions.value = []
     lastFetched.value = null
@@ -84,6 +120,7 @@ export const useBudgetStore = defineStore('budget', () => {
     currentMonth,
     currentYear,
     fetchBudgets,
+    copyFromPreviousMonth,
     clearCache,
     getBudgetNameById,
   }

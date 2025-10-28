@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import type { TransactionResponse } from 'src/api'
 import BudgetAssignmentCell from './BudgetAssignmentCell.vue'
 import TransactionBreakdownDialog from './breakdown/TransactionBreakdownDialog.vue'
@@ -22,8 +22,20 @@ interface Emits {
   (_event: 'refresh'): void
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+
+// Create a local pagination ref that syncs with props
+const localPagination = ref({ ...props.pagination })
+
+// Watch for prop changes and update local pagination
+watch(
+  () => props.pagination,
+  (newVal) => {
+    localPagination.value = { ...newVal }
+  },
+  { deep: true }
+)
 
 const breakdownDialogVisible = ref(false)
 const typeDialogVisible = ref(false)
@@ -92,8 +104,9 @@ const columns = [
   },
 ]
 
-function onPaginationChange(newPagination: Props['pagination']) {
-  emit('update:pagination', newPagination)
+function onPaginationChange(requestProps: { pagination: Props['pagination'] }) {
+  // Emit the new pagination state to parent which will trigger a new fetch
+  emit('update:pagination', requestProps.pagination)
 }
 
 function onRefresh() {
@@ -131,10 +144,11 @@ function onTypeSaved() {
         :rows="transactions"
         :columns="columns"
         :loading="loading"
-        :pagination="pagination"
+        v-model:pagination="localPagination"
+        :rows-per-page-options="[5, 10, 20, 50, 100]"
         row-key="transaction_id"
         class="transaction-table"
-        @update:pagination="onPaginationChange"
+        @request="onPaginationChange"
       >
         <template v-slot:top>
           <div class="row items-center justify-between full-width q-pa-md">
@@ -270,5 +284,34 @@ function onTypeSaved() {
   background: #2a2d35;
   border-top: 1px solid #3a3d45;
   color: #ffffff;
+}
+
+/* Style the pagination dropdown to match other dropdowns */
+.transaction-table :deep(.q-table__bottom .q-field__native) {
+  color: #ffffff;
+}
+
+.transaction-table :deep(.q-table__bottom .q-field__label) {
+  color: #9ca3af;
+}
+
+/* Style the pagination info text */
+.transaction-table :deep(.q-table__bottom-item) {
+  color: #ffffff;
+}
+</style>
+
+<style>
+/* Global styles for pagination dropdown menu (appears in portal) */
+.q-menu .q-item {
+  color: #ffffff;
+}
+
+.q-menu {
+  background: #2a2d35;
+}
+
+.q-item:hover {
+  background: #323540;
 }
 </style>

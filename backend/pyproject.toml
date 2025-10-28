@@ -35,22 +35,6 @@ ignore = [
     'D212',
 ]
 
-[tool.ruff.lint.per-file-ignores]
-# Allow print statements and less strict rules in scripts
-"scripts/**" = ["T201", "S311", "PLR0915", "C901", "PLR0912"]
-# Test files can have longer functions and magic values
-"tests/**.py" = [
-    "PLR2004",
-    "S101",
-    "D100",
-    "D103",
-    "D104",
-    "S105",
-    "SLF001",
-    "ARG001",
-    "SIM117",
-]
-
 
 [build-system]
 requires = ["setuptools>=68.0"]

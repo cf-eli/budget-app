@@ -41,6 +41,7 @@ class IncomeBudgetResponse(BaseModel):
     name: str
     transaction_sum: float
     amount_after_transactions: float
+    carryover: float
 
 
 class ExpenseBudgetResponse(BaseModel):
@@ -57,6 +58,7 @@ class ExpenseBudgetResponse(BaseModel):
     name: str
     transaction_sum: float
     amount_after_transactions: float
+    carryover: float
 
 
 class FundBudgetResponse(BaseModel):
@@ -73,6 +75,7 @@ class FundBudgetResponse(BaseModel):
     name: str
     transaction_sum: float
     amount_after_transactions: float
+    carryover: float
 
 
 class FlexibleBudgetResponse(BaseModel):
@@ -89,6 +92,7 @@ class FlexibleBudgetResponse(BaseModel):
     name: str
     transaction_sum: float
     amount_after_transactions: float
+    carryover: float
 
 
 class AllBudgetsResponse(BaseModel):
@@ -98,3 +102,30 @@ class AllBudgetsResponse(BaseModel):
     expenses: list[ExpenseBudgetResponse] = []
     flexibles: list[FlexibleBudgetResponse] = []
     funds: list[FundBudgetResponse] = []
+
+
+class CopyBudgetsRequest(BaseModel):
+    """Request schema for copying budgets from previous month."""
+
+    target_month: int
+    target_year: int
+    source_month: int | None = None
+    source_year: int | None = None
+
+
+class CopiedBudgetCounts(BaseModel):
+    """Schema for counts of copied budgets by type."""
+
+    income: int
+    expense: int
+    flexible: int
+    fund: int
+
+
+class CopyBudgetsResponse(BaseModel):
+    """Response schema for copy budgets operation."""
+
+    message: str
+    copied_budgets: CopiedBudgetCounts
+    source_month: int
+    source_year: int

@@ -130,3 +130,14 @@ class CreateBreakdownRequest(BaseModel):
 
     transaction_id: int
     line_items: list[CreateLineItemRequest]
+
+
+class PaginatedTransactionResponse(BaseModel):
+    """Response schema for paginated transaction list."""
+
+    transactions: list[TransactionResponse]
+    total: int
+    page: int
+    rows_per_page: int
+
+    model_config = {"from_attributes": True}

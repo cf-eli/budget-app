@@ -1,15 +1,13 @@
 """Transaction management endpoints."""
 
 from litestar import Request, Router, delete, get, patch, post, put, status_codes
-from litestar.exceptions.http_exceptions import ImproperlyConfiguredException
+from litestar.exceptions import NotAuthorizedException
 
-from finance_api.config import settings
 from finance_api.crud import transaction as trans_crud
 from finance_api.crud.account import save_account
 from finance_api.crud.organization import save_organization
 from finance_api.crud.user import ensure_user, get_all_users
 from finance_api.models.db import engine
-from finance_api.models.transaction import SimpleFinTransaction
 from finance_api.schemas.exceptions import FinanceServerError
 from finance_api.schemas.finance import (
     CreateBreakdownRequest,
@@ -20,6 +18,7 @@ from finance_api.schemas.finance import (
 from finance_api.schemas.schema import MessageResponse
 from finance_api.schemas.transactions import (
     MarkTransactionTypeRequest,
+    PaginatedTransactionResponse,
     TransactionResponse,
 )
 from finance_api.services.simplefin import SimpleFin
@@ -27,26 +26,26 @@ from finance_api.services.simplefin import SimpleFin
 
 @get(
     "/",
-    response=list[SimpleFinTransaction],
+    response=PaginatedTransactionResponse,
     status_code=status_codes.HTTP_200_OK,
 )
 async def get_transactions(
     request: Request,
-    page: int,  # noqa: ARG001
-    descending: bool,  # noqa: ARG001
-    sort_by: str,  # noqa: ARG001
-    rows_per_page: int,  # noqa: ARG001
-    include_excluded: bool = False,  # noqa: ARG001
+    page: int = 1,
+    descending: bool = True,
+    sort_by: str = "transacted_at",  # noqa: ARG001
+    rows_per_page: int = 10,
+    include_excluded: bool = False,
     transaction_type: str | None = None,  # noqa: ARG001
     month: int | None = None,
     year: int | None = None,
-) -> list[TransactionResponse]:
+) -> PaginatedTransactionResponse:
     """
     Get transactions with optional filtering.
 
     Args:
         request: The HTTP request object
-        page: Page number for pagination
+        page: Page number for pagination (1-indexed)
         descending: Sort order (True for descending, False for ascending)
         sort_by: Field to sort by
         rows_per_page: Number of rows per page
@@ -56,22 +55,39 @@ async def get_transactions(
         year: Optional year filter (e.g., 2024). If not provided, uses current year
 
     Returns:
-        A list of transactions matching the criteria
+        Paginated response with transactions and total count
 
     """
-    try:
-        request_user = request.user
-    except ImproperlyConfiguredException:
-        # Use configured default user for testing when auth is disabled
-        request_user = {"id": settings.dev_default_user_id}
+    request_user = request.user
+    if request_user is None:
+        msg = "Authentication required"
+        raise NotAuthorizedException(msg)
 
     user = await ensure_user(request_user["id"])
     if not user:
         msg = "User not found"
         raise FinanceServerError(msg)
+
+    # Calculate offset from page number (convert from 1-indexed to 0-indexed)
+    offset = (page - 1) * rows_per_page
+
     # TODO(cf-eli): #004 Change to proper exception handling
-    transactions = await trans_crud.get_transactions(user.id, month=month, year=year)
-    return [TransactionResponse.model_validate(txn) for txn in transactions]
+    transactions, total = await trans_crud.get_transactions_paginated(
+        user.id,
+        month=month,
+        year=year,
+        include_excluded=include_excluded,
+        sort_desc=descending,
+        limit=rows_per_page,
+        offset=offset,
+    )
+
+    return PaginatedTransactionResponse(
+        transactions=[TransactionResponse.model_validate(txn) for txn in transactions],
+        total=total,
+        page=page,
+        rows_per_page=rows_per_page,
+    )
 
 
 @post(

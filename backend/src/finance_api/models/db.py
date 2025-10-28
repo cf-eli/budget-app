@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 from finance_api.config import settings
 
@@ -48,7 +48,7 @@ async def get_session(
             yield new_session
 
 
-async def test_connection() -> None:
+async def test_connection() -> None:  # pragma: no cover
     """Test database connection."""
     async with engine.connect() as conn:
         result = await conn.execute(text("SELECT NOW()"))

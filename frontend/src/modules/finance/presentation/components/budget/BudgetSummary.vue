@@ -12,6 +12,14 @@ const props = defineProps<Props>()
 
 const formatCurrency = (value: number) => `$${value.toLocaleString()}`
 
+// Carryover calculations (sum from all budget types)
+const totalCarryover = computed(() => {
+  const incomeCarryover = props.incomes.reduce((sum, i) => sum + (i.carryover || 0), 0)
+  const expenseCarryover = props.expenses.reduce((sum, e) => sum + (e.carryover || 0), 0)
+  const flexibleCarryover = props.flexibles.reduce((sum, f) => sum + (f.carryover || 0), 0)
+  return incomeCarryover + expenseCarryover + flexibleCarryover
+})
+
 // Expected calculations
 const totalExpectedIncome = computed(() =>
   props.incomes.reduce((sum, i) => sum + (i.expected_amount || 0), 0),
@@ -26,7 +34,7 @@ const totalExpectedFlexibles = computed(() =>
 )
 
 const expectedBalance = computed(
-  () => totalExpectedIncome.value - totalExpectedExpenses.value - totalExpectedFlexibles.value,
+  () => totalExpectedIncome.value - totalExpectedExpenses.value - totalExpectedFlexibles.value + totalCarryover.value,
 )
 
 // Current (actual transactions) calculations
@@ -43,7 +51,7 @@ const totalCurrentFlexibles = computed(() =>
 )
 
 const currentBalance = computed(
-  () => totalCurrentIncome.value - totalCurrentExpenses.value - totalCurrentFlexibles.value,
+  () => totalCurrentIncome.value - totalCurrentExpenses.value - totalCurrentFlexibles.value + totalCarryover.value,
 )
 </script>
 
@@ -84,6 +92,17 @@ const currentBalance = computed(
                   <q-item-label class="text-amber"
                     >-{{ formatCurrency(totalExpectedFlexibles) }}</q-item-label
                   >
+                </q-item-section>
+              </q-item>
+
+              <q-item v-if="totalCarryover !== 0" class="q-px-none q-py-xs">
+                <q-item-section>
+                  <q-item-label caption class="text-grey-5">Carryover from Previous Months</q-item-label>
+                  <q-item-label
+                    :class="totalCarryover >= 0 ? 'text-positive' : 'text-negative'"
+                  >
+                    {{ totalCarryover >= 0 ? '+' : '' }}{{ formatCurrency(totalCarryover) }}
+                  </q-item-label>
                 </q-item-section>
               </q-item>
 
@@ -137,6 +156,17 @@ const currentBalance = computed(
                   <q-item-label class="text-amber"
                     >-{{ formatCurrency(totalCurrentFlexibles) }}</q-item-label
                   >
+                </q-item-section>
+              </q-item>
+
+              <q-item v-if="totalCarryover !== 0" class="q-px-none q-py-xs">
+                <q-item-section>
+                  <q-item-label caption class="text-grey-5">Carryover from Previous Months</q-item-label>
+                  <q-item-label
+                    :class="totalCarryover >= 0 ? 'text-positive' : 'text-negative'"
+                  >
+                    {{ totalCarryover >= 0 ? '+' : '' }}{{ formatCurrency(totalCarryover) }}
+                  </q-item-label>
                 </q-item-section>
               </q-item>
 
