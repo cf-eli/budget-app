@@ -22,7 +22,6 @@ DATABASE_URL = (
 )
 engine = create_async_engine(
     DATABASE_URL,
-    echo=True,  # logs all SQL
     pool_pre_ping=True,  # Verify connections before using
 )
 

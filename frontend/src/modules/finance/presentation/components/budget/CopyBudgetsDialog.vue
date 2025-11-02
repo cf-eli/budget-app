@@ -70,6 +70,14 @@ function handleCancel() {
         This will copy all income, expense, flexible expense, and fund budget categories. Existing
         transaction assignments will not be copied.
       </p>
+      <q-banner class="bg-info text-white q-mt-md" rounded dense>
+        <template #avatar>
+          <q-icon name="info" />
+        </template>
+        <div class="text-body2">
+          <strong>Funds:</strong> Copied funds will automatically link to their existing master fund families. No manual linking required.
+        </div>
+      </q-banner>
     </q-card-section>
 
     <q-card-actions align="right" class="q-px-md q-pb-md">

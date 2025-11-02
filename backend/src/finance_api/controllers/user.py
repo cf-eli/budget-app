@@ -1,9 +1,9 @@
 """User management endpoints."""
 
-from litestar import Request, Router, put, status_codes
-from litestar.exceptions import NotAuthorizedException
+from litestar import Router, put, status_codes
 
-from finance_api.crud.user import ensure_user, update_access_url
+from finance_api.crud.user import update_access_url
+from finance_api.models.user import User
 from finance_api.schemas.exceptions import FinanceServerError
 from finance_api.schemas.schema import MessageResponse, TokenRequest
 from finance_api.services.simplefin import SimpleFin
@@ -11,7 +11,7 @@ from finance_api.services.simplefin import SimpleFin
 
 @put("/token", response=MessageResponse, status_code=status_codes.HTTP_200_OK)
 async def update_access_url_endpoint(
-    request: Request,
+    user: User,
     data: TokenRequest,
 ) -> MessageResponse:
     """
@@ -29,16 +29,6 @@ async def update_access_url_endpoint(
         A dictionary confirming the update of the access URL.
 
     """
-    request_user = request.user
-    if request_user is None:
-        msg = "Authentication required"
-        raise NotAuthorizedException(msg)
-
-    user = await ensure_user(request_user["id"])
-    if not user:
-        msg = "User not found"
-        raise FinanceServerError(msg)  # TODO(cf-eli): #004 Change to proper exception
-
     data_dict = data.model_dump()
     setup_token = data_dict.get("token")
     if not setup_token:

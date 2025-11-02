@@ -16,7 +16,7 @@ const dateStore = useDateSelectionStore()
 
 const formData = ref({
   name: '',
-  current_amount: 0,
+  month_amount: 0,
   increment: 0,
   priority: 0,
   max: null as number | null,
@@ -28,7 +28,7 @@ function submitForm() {
   const budget: BudgetRequest = {
     name: formData.value.name,
     budget_type: 'fund',
-    current_amount: formData.value.current_amount,
+    month_amount: formData.value.month_amount,
     increment: formData.value.increment,
     priority: formData.value.priority || 0,
     max: haveMax.value ? formData.value.max : null,
@@ -61,12 +61,13 @@ function closeForm() {
         />
 
         <q-input
-          v-model.number="formData.current_amount"
+          v-model.number="formData.month_amount"
           type="number"
-          label="Current Amount"
+          label="Starting Balance"
           filled
           class="q-mb-md dialog-input"
           prefix="$"
+          hint="Initial balance for new fund (leave at 0 if starting fresh)"
         />
 
         <q-input

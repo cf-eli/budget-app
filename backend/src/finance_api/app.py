@@ -8,6 +8,8 @@ import jwt
 from litestar import Request, Router
 from litestar.app import Litestar
 from litestar.config.cors import CORSConfig
+from litestar.di import Provide
+from litestar.exceptions import NotAuthorizedException
 from litestar.middleware import ASGIMiddleware
 from litestar.openapi.config import OpenAPIConfig
 from litestar.openapi.plugins import RedocRenderPlugin, SwaggerRenderPlugin
@@ -21,6 +23,8 @@ from finance_api.controllers.budget import budget_router
 from finance_api.controllers.health import health_router
 from finance_api.controllers.transaction import transactions_router
 from finance_api.controllers.user import user_router
+from finance_api.crud.user import ensure_user
+from finance_api.models.user import User
 
 
 class JWTUserMiddleware(ASGIMiddleware):
@@ -79,7 +83,9 @@ class JWTUserMiddleware(ASGIMiddleware):
                             "email": payload.get("email"),
                             "roles": payload.get("roles", []),
                         }
-                    except jwt.ExpiredSignatureError:
+                    except (
+                        jwt.ExpiredSignatureError
+                    ):  # TODO(cf-eli): #004 Change to proper exception handling
                         scope["user"] = None
                     except jwt.InvalidAudienceError:
                         scope["user"] = None
@@ -143,6 +149,20 @@ def get_cors_config() -> CORSConfig:
     )
 
 
+async def user_dependency(request: Request) -> User | None:
+    """Dependency to get the current user."""
+    request_user = request.user
+
+    if request_user is None:
+        msg = "Authentication required"
+        raise NotAuthorizedException(msg)
+
+    if not request_user.get("id"):
+        msg = "User ID missing in token"
+        raise NotAuthorizedException(msg)
+    return await ensure_user(request_user["id"])
+
+
 def get_routes() -> list[Router]:
     """Get list of route handlers for the application."""
     return [
@@ -161,9 +181,12 @@ def exception_handler(request: Request, exc: Exception) -> Response:
     logger.error("Exception in %s %s: %s", request.method, request.url, exc)
     logger.error(traceback.format_exc())
 
+    status_code = getattr(exc, "status_code", HTTP_500_INTERNAL_SERVER_ERROR)
+    detail = getattr(exc, "detail", "")
+
     return Response(
-        content={"detail": str(exc), "type": type(exc).__name__},
-        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+        content=detail,
+        status_code=status_code,
     )
 
 
@@ -182,4 +205,5 @@ def create_app() -> Litestar:
         cors_config=get_cors_config(),
         middleware=get_middlewares(),
         exception_handlers=exception_handlers,
+        dependencies={"user": Provide(user_dependency)},
     )

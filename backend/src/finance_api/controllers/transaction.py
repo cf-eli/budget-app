@@ -1,13 +1,13 @@
 """Transaction management endpoints."""
 
-from litestar import Request, Router, delete, get, patch, post, put, status_codes
-from litestar.exceptions import NotAuthorizedException
+from litestar import Router, delete, get, patch, post, put, status_codes
 
 from finance_api.crud import transaction as trans_crud
 from finance_api.crud.account import save_account
 from finance_api.crud.organization import save_organization
-from finance_api.crud.user import ensure_user, get_all_users
+from finance_api.crud.user import get_all_users
 from finance_api.models.db import engine
+from finance_api.models.user import User
 from finance_api.schemas.exceptions import FinanceServerError
 from finance_api.schemas.finance import (
     CreateBreakdownRequest,
@@ -30,7 +30,7 @@ from finance_api.services.simplefin import SimpleFin
     status_code=status_codes.HTTP_200_OK,
 )
 async def get_transactions(
-    request: Request,
+    user: User,
     page: int = 1,
     descending: bool = True,
     sort_by: str = "transacted_at",  # noqa: ARG001
@@ -44,7 +44,7 @@ async def get_transactions(
     Get transactions with optional filtering.
 
     Args:
-        request: The HTTP request object
+        user: The authenticated user
         page: Page number for pagination (1-indexed)
         descending: Sort order (True for descending, False for ascending)
         sort_by: Field to sort by
@@ -58,16 +58,6 @@ async def get_transactions(
         Paginated response with transactions and total count
 
     """
-    request_user = request.user
-    if request_user is None:
-        msg = "Authentication required"
-        raise NotAuthorizedException(msg)
-
-    user = await ensure_user(request_user["id"])
-    if not user:
-        msg = "User not found"
-        raise FinanceServerError(msg)
-
     # Calculate offset from page number (convert from 1-indexed to 0-indexed)
     offset = (page - 1) * rows_per_page
 

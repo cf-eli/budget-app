@@ -6,6 +6,8 @@ import FundForm from './FundForm.vue'
 
 interface Props {
   funds: FundBudgetResponse[]
+  currentMonth?: number
+  currentYear?: number
 }
 
 interface Emits {
@@ -29,6 +31,10 @@ function showDetails(id: number) {
 async function handleFormSubmit(formData: BudgetRequest) {
   await emit('create', formData)
   formVisible.value = false
+}
+
+function handleRefresh() {
+  emit('refresh')
 }
 </script>
 
@@ -56,7 +62,12 @@ async function handleFormSubmit(formData: BudgetRequest) {
           @click="showDetails(fund.id)"
         >
           <q-item-section class="q-pa-none">
-            <fund-item-section :fund="fund" />
+            <fund-item-section 
+              :fund="fund" 
+              :current-month="currentMonth"
+              :current-year="currentYear"
+              @refresh="handleRefresh"
+            />
           </q-item-section>
         </q-item>
       </q-list>

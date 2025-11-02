@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ApiV1BudgetsAllGetAllBudgetsData, ApiV1BudgetsAllGetAllBudgetsErrors, ApiV1BudgetsAllGetAllBudgetsResponses, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousData, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses, ApiV1BudgetsCreateCreateBudgetData, ApiV1BudgetsCreateCreateBudgetErrors, ApiV1BudgetsCreateCreateBudgetResponses, ApiV1BudgetsNamesGetBudgetsNamesData, ApiV1BudgetsNamesGetBudgetsNamesErrors, ApiV1BudgetsNamesGetBudgetsNamesResponses, ApiV1HealthHealthCheckData, ApiV1HealthHealthCheckResponses, ApiV1TransactionsGetTransactionsData, ApiV1TransactionsGetTransactionsErrors, ApiV1TransactionsGetTransactionsResponses, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointData, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointData, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownData, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownErrors, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownResponses, ApiV1TransactionsTransactionIdBreakdownGetBreakdownData, ApiV1TransactionsTransactionIdBreakdownGetBreakdownErrors, ApiV1TransactionsTransactionIdBreakdownGetBreakdownResponses, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointData, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointErrors, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponses, ApiV1TransactionsUpdateUpdateTransactionsData, ApiV1TransactionsUpdateUpdateTransactionsResponses, ApiV1UserTokenUpdateAccessUrlEndpointData, ApiV1UserTokenUpdateAccessUrlEndpointErrors, ApiV1UserTokenUpdateAccessUrlEndpointResponses } from './types.gen';
+import type { ApiV1BudgetsAllGetAllBudgetsData, ApiV1BudgetsAllGetAllBudgetsErrors, ApiV1BudgetsAllGetAllBudgetsResponses, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousData, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses, ApiV1BudgetsCreateCreateBudgetData, ApiV1BudgetsCreateCreateBudgetErrors, ApiV1BudgetsCreateCreateBudgetResponses, ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointData, ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointErrors, ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointResponses, ApiV1BudgetsFundsFundIdCalculateCalculateFundData, ApiV1BudgetsFundsFundIdCalculateCalculateFundErrors, ApiV1BudgetsFundsFundIdCalculateCalculateFundResponses, ApiV1BudgetsFundsFundIdCombineCombineFundToMasterData, ApiV1BudgetsFundsFundIdCombineCombineFundToMasterErrors, ApiV1BudgetsFundsFundIdCombineCombineFundToMasterResponses, ApiV1BudgetsFundsFundIdUnlinkUnlinkFundData, ApiV1BudgetsFundsFundIdUnlinkUnlinkFundErrors, ApiV1BudgetsFundsFundIdUnlinkUnlinkFundResponses, ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointData, ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointErrors, ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointResponses, ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointData, ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointErrors, ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointResponses, ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointData, ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointErrors, ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointResponses, ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointData, ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointErrors, ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointResponses, ApiV1BudgetsNamesGetBudgetsNamesData, ApiV1BudgetsNamesGetBudgetsNamesErrors, ApiV1BudgetsNamesGetBudgetsNamesResponses, ApiV1HealthHealthCheckData, ApiV1HealthHealthCheckResponses, ApiV1TransactionsGetTransactionsData, ApiV1TransactionsGetTransactionsErrors, ApiV1TransactionsGetTransactionsResponses, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointData, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointData, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownData, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownErrors, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownResponses, ApiV1TransactionsTransactionIdBreakdownGetBreakdownData, ApiV1TransactionsTransactionIdBreakdownGetBreakdownErrors, ApiV1TransactionsTransactionIdBreakdownGetBreakdownResponses, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointData, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointErrors, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponses, ApiV1TransactionsUpdateUpdateTransactionsData, ApiV1TransactionsUpdateUpdateTransactionsResponses, ApiV1UserTokenUpdateAccessUrlEndpointData, ApiV1UserTokenUpdateAccessUrlEndpointErrors, ApiV1UserTokenUpdateAccessUrlEndpointResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -81,6 +81,28 @@ export const apiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudget
 };
 
 /**
+ * CopyBudgetsFromPrevious
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/copy-from-previous
+ */
+export const apiV1BudgetsCopyFromPreviousCopyBudgetsFromPrevious = <ThrowOnError extends boolean = false>(options: Options<ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/budgets/copy-from-previous',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
  * GetAllBudgets
  *
  * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/all
@@ -117,24 +139,166 @@ export const apiV1BudgetsNamesGetBudgetsNames = <ThrowOnError extends boolean = 
 };
 
 /**
- * CopyBudgetsFromPrevious
+ * CombineFundToMaster
  *
- * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/copy-from-previous
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/funds/{fund_id}/combine
  */
-export const apiV1BudgetsCopyFromPreviousCopyBudgetsFromPrevious = <ThrowOnError extends boolean = false>(options: Options<ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousData, ThrowOnError>) => {
-    return (options.client ?? client).post<ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors, ThrowOnError>({
+export const apiV1BudgetsFundsFundIdCombineCombineFundToMaster = <ThrowOnError extends boolean = false>(options: Options<ApiV1BudgetsFundsFundIdCombineCombineFundToMasterData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApiV1BudgetsFundsFundIdCombineCombineFundToMasterResponses, ApiV1BudgetsFundsFundIdCombineCombineFundToMasterErrors, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
                 type: 'http'
             }
         ],
-        url: '/api/finance/v1/budgets/copy-from-previous',
+        url: '/api/finance/v1/budgets/funds/{fund_id}/combine',
         ...options,
         headers: {
             'Content-Type': 'application/json',
             ...options.headers
         }
+    });
+};
+
+/**
+ * UnlinkFund
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/funds/{fund_id}/unlink
+ */
+export const apiV1BudgetsFundsFundIdUnlinkUnlinkFund = <ThrowOnError extends boolean = false>(options: Options<ApiV1BudgetsFundsFundIdUnlinkUnlinkFundData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApiV1BudgetsFundsFundIdUnlinkUnlinkFundResponses, ApiV1BudgetsFundsFundIdUnlinkUnlinkFundErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/budgets/funds/{fund_id}/unlink',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * ApplyFundIncrementsEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/funds/apply-increments
+ */
+export const apiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointResponses, ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/budgets/funds/apply-increments',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * DiscontinueMasterEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/funds/masters/{master_id}/discontinue
+ */
+export const apiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointResponses, ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/budgets/funds/masters/{master_id}/discontinue',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * AddMonthToMasterEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/funds/masters/{master_id}/add-month
+ */
+export const apiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointResponses, ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/budgets/funds/masters/{master_id}/add-month',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * CalculateFund
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/funds/{fund_id}/calculate
+ */
+export const apiV1BudgetsFundsFundIdCalculateCalculateFund = <ThrowOnError extends boolean = false>(options: Options<ApiV1BudgetsFundsFundIdCalculateCalculateFundData, ThrowOnError>) => {
+    return (options.client ?? client).get<ApiV1BudgetsFundsFundIdCalculateCalculateFundResponses, ApiV1BudgetsFundsFundIdCalculateCalculateFundErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/budgets/funds/{fund_id}/calculate',
+        ...options
+    });
+};
+
+/**
+ * GetMasterFundDetailsEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/funds/masters/{master_id}/details
+ */
+export const apiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).get<ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointResponses, ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/budgets/funds/masters/{master_id}/details',
+        ...options
+    });
+};
+
+/**
+ * GetOrphanedMastersEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/budgets/funds/orphaned-masters
+ */
+export const apiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).get<ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointResponses, ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/budgets/funds/orphaned-masters',
+        ...options
     });
 };
 

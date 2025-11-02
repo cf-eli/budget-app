@@ -8,6 +8,9 @@ import FundCard from 'src/modules/finance/presentation/components/budget/fund/Fu
 import BudgetSummary from 'src/modules/finance/presentation/components/budget/BudgetSummary.vue'
 import MonthYearSelector from 'src/modules/finance/presentation/components/MonthYearSelector.vue'
 import CopyBudgetsDialog from 'src/modules/finance/presentation/components/budget/CopyBudgetsDialog.vue'
+import OrphanedFundsBanner from 'src/modules/finance/presentation/components/budget/fund/OrphanedFundsBanner.vue'
+import DiscontinueFundDialog from 'src/modules/finance/presentation/components/budget/fund/DiscontinueFundDialog.vue'
+import AddMonthToMasterDialog from 'src/modules/finance/presentation/components/budget/fund/AddMonthToMasterDialog.vue'
 import {
   apiV1BudgetsAllGetAllBudgets,
   apiV1BudgetsCreateCreateBudget,
@@ -16,6 +19,7 @@ import {
   type FlexibleBudgetResponse,
   type FundBudgetResponse,
   type BudgetRequest,
+  type OrphanedMasterInfo,
 } from 'src/api'
 import { useBudgetStore } from 'src/modules/finance/presentation/stores/budgetStore'
 import { useDateSelectionStore } from 'src/modules/finance/presentation/stores/dateSelectionStore'
@@ -33,6 +37,11 @@ const showCopyDialog = ref(false)
 const dismissedBanners = ref<Set<string>>(new Set())
 const sourceMonthYear = ref<{ month: number; year: number } | null>(null)
 const checkingForSource = ref(false)
+
+// Orphaned fund dialog state
+const showDiscontinueDialog = ref(false)
+const showAddMonthDialog = ref(false)
+const selectedOrphanedMaster = ref<OrphanedMasterInfo | null>(null)
 
 const selectedMonthYear = computed({
   get: () => ({
@@ -257,6 +266,21 @@ function dismissBanner() {
   dismissedBanners.value.add(bannerKey.value)
 }
 
+function handleDiscontinueFund(master: OrphanedMasterInfo) {
+  selectedOrphanedMaster.value = master
+  showDiscontinueDialog.value = true
+}
+
+function handleAddMonthToMaster(master: OrphanedMasterInfo) {
+  selectedOrphanedMaster.value = master
+  showAddMonthDialog.value = true
+}
+
+function handleOrphanedFundDialogSuccess() {
+  // Refresh budgets after successful dialog action
+  fetchBudgets()
+}
+
 // Watch for external changes to the date store
 watch(
   () => [dateStore.selectedMonth, dateStore.selectedYear],
@@ -305,12 +329,34 @@ onMounted(() => {
       </div>
     </q-banner>
 
-    <budget-summary :incomes="incomes" :expenses="expenses" :flexibles="flexibles" />
+    <!-- Orphaned Funds Warning Banner -->
+    <orphaned-funds-banner
+      :month="dateStore.selectedMonth"
+      :year="dateStore.selectedYear"
+      @discontinue="handleDiscontinueFund"
+      @add-month="handleAddMonthToMaster"
+    />
+
+    <budget-summary 
+      :incomes="incomes" 
+      :expenses="expenses" 
+      :flexibles="flexibles" 
+      :funds="funds"
+      :current-month="dateStore.selectedMonth"
+      :current-year="dateStore.selectedYear"
+      @refresh="fetchBudgets"
+    />
 
     <income-card :incomes="incomes" @refresh="fetchBudgets" @create="createBudget" />
     <expense-card :expenses="expenses" @refresh="fetchBudgets" @create="createBudget" />
     <flexible-card :flexibles="flexibles" @refresh="fetchBudgets" @create="createBudget" />
-    <fund-card :funds="funds" @refresh="fetchBudgets" @create="createBudget" />
+    <fund-card 
+      :funds="funds" 
+      :current-month="dateStore.selectedMonth"
+      :current-year="dateStore.selectedYear"
+      @refresh="fetchBudgets" 
+      @create="createBudget" 
+    />
 
     <!-- Copy Budgets Dialog -->
     <q-dialog
@@ -329,6 +375,26 @@ onMounted(() => {
         @cancel="showCopyDialog = false"
       />
     </q-dialog>
+
+    <!-- Discontinue Fund Master Dialog -->
+    <discontinue-fund-dialog
+      v-if="showDiscontinueDialog && selectedOrphanedMaster"
+      :master="selectedOrphanedMaster"
+      :month="dateStore.selectedMonth"
+      :year="dateStore.selectedYear"
+      @close="showDiscontinueDialog = false"
+      @success="handleOrphanedFundDialogSuccess"
+    />
+
+    <!-- Add Month to Master Dialog -->
+    <add-month-to-master-dialog
+      v-if="showAddMonthDialog && selectedOrphanedMaster"
+      :master="selectedOrphanedMaster"
+      :month="dateStore.selectedMonth"
+      :year="dateStore.selectedYear"
+      @close="showAddMonthDialog = false"
+      @success="handleOrphanedFundDialogSuccess"
+    />
   </q-page>
 </template>
 

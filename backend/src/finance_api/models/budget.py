@@ -1,13 +1,18 @@
 """Budget models for income, expenses, and funds."""
 
+from datetime import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     Boolean,
+    DateTime,
     Float,
     ForeignKey,
     Integer,
+    Numeric,
     String,
+    func,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -64,18 +69,73 @@ class Expense(Base):
     max: Mapped[float | None] = mapped_column(Float, nullable=True)
 
 
+class FundMaster(Base):
+    """
+    Fund master model tracking cumulative balance across linked funds.
+
+    Each fund points to a master, and linking funds means pointing to the same master.
+    The master tracks the total balance across all months for a "fund family".
+    """
+
+    __tablename__ = "fund_masters"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str | None] = mapped_column(
+        String,
+        nullable=True,
+    )  # Optional "fund family" name
+    total_amount: Mapped[Decimal] = mapped_column(
+        Numeric(15, 2),
+        nullable=False,
+        default=Decimal("0.00"),
+        server_default="0.00",
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=func.now,
+        server_default=func.now(),
+    )
+
+    # Relationship
+    funds: Mapped[list["Fund"]] = relationship(back_populates="master_fund")
+
+
 class Fund(Base):
-    """Fund budget model for savings funds."""
+    """
+    Fund budget model for savings funds with master fund tracking.
+
+    master_fund_id: Links to FundMaster for balance continuity
+        (which funds share balance)
+    month_amount: Amount added/allocated this specific month only
+
+    Note: Fund identity across months is tracked implicitly through
+        master_fund_id. When copying budgets, funds automatically link
+        to their source fund's master.
+    """
 
     __tablename__ = "fund"
 
     id: Mapped[int] = mapped_column(Integer, ForeignKey("budget.id"), primary_key=True)
     priority: Mapped[int] = mapped_column(Integer, nullable=False)
-    increment: Mapped[float] = mapped_column(Float, nullable=False)
-    current_amount: Mapped[float] = mapped_column(
-        Float,
+    increment: Mapped[Decimal] = mapped_column(
+        Numeric(15, 2),
         nullable=False,
-        default=0.0,
-        server_default="0.0",
+        default=Decimal("0.00"),
     )
-    max: Mapped[float | None] = mapped_column(Float, nullable=True)
+    month_amount: Mapped[Decimal] = mapped_column(
+        Numeric(15, 2),
+        nullable=False,
+        default=Decimal("0.00"),
+        server_default="0.00",
+    )
+    max: Mapped[Decimal | None] = mapped_column(Numeric(15, 2), nullable=True)
+
+    # Link to master fund for balance tracking
+    master_fund_id: Mapped[int] = mapped_column(
+        ForeignKey("fund_masters.id"),
+        nullable=False,
+    )
+
+    # Relationships
+    master_fund: Mapped["FundMaster"] = relationship(back_populates="funds")

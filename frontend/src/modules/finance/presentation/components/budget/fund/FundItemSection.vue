@@ -1,24 +1,73 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { FundBudgetResponse } from 'src/api'
+import FundCalculationDialog from './FundCalculationDialog.vue'
 
 interface Props {
   fund: FundBudgetResponse
+  currentMonth?: number
+  currentYear?: number
+}
+
+interface Emits {
+  (_event: 'refresh'): void
 }
 
 defineProps<Props>()
+const emit = defineEmits<Emits>()
+
+const showCalculationDialog = ref(false)
 
 const formatCurrency = (value: number | null | undefined) =>
   value !== null && value !== undefined ? `$${value.toLocaleString()}` : 'N/A'
+
+function viewCalculation(event: Event) {
+  event.stopPropagation()
+  showCalculationDialog.value = true
+}
+
+function handleRefresh() {
+  emit('refresh')
+}
 </script>
 
 <template>
   <q-card flat bordered class="budget-item-card">
     <q-card-section class="q-pa-md">
       <div class="row items-center justify-between q-mb-md">
-        <div class="text-h6 text-white">{{ fund.name }}</div>
-        <q-badge v-if="fund.priority !== null" color="teal-8" text-color="white">
-          Priority: {{ fund.priority }}
-        </q-badge>
+        <div class="col">
+          <div class="row items-center q-gutter-sm">
+            <div class="text-h6 text-white">{{ fund.name }}</div>
+            <q-icon
+              v-if="fund.is_linked"
+              name="link"
+              color="positive"
+              size="20px"
+            >
+              <q-tooltip>Linked to previous month</q-tooltip>
+            </q-icon>
+          </div>
+          <div v-if="fund.master_fund_name" class="text-caption text-grey-5 q-mt-xs">
+            <q-icon name="account_balance_wallet" size="14px" class="q-mr-xs" />
+            Master: {{ fund.master_fund_name }}
+          </div>
+        </div>
+        <div class="row items-center q-gutter-sm">
+          <q-badge v-if="fund.priority !== null" color="teal-8" text-color="white">
+            Priority: {{ fund.priority }}
+          </q-badge>
+          <q-btn
+            flat
+            round
+            dense
+            icon="calculate"
+            color="primary"
+            size="sm"
+            @click="viewCalculation"
+          >
+            <q-tooltip>View Calculation Details</q-tooltip>
+          </q-btn>
+        </div>
       </div>
 
       <div class="row items-start justify-between">
@@ -26,8 +75,15 @@ const formatCurrency = (value: number | null | undefined) =>
           <q-list dense class="text-white">
             <q-item class="q-px-none q-py-xs">
               <q-item-section>
-                <q-item-label caption class="text-grey-5">Current Amount</q-item-label>
-                <q-item-label>{{ formatCurrency(fund.current_amount) }}</q-item-label>
+                <q-item-label caption class="text-grey-5">Master Balance</q-item-label>
+                <q-item-label class="text-weight-medium">{{ formatCurrency(fund.master_balance) }}</q-item-label>
+              </q-item-section>
+            </q-item>
+
+            <q-item class="q-px-none q-py-xs">
+              <q-item-section>
+                <q-item-label caption class="text-grey-5">This Month</q-item-label>
+                <q-item-label>{{ formatCurrency(fund.month_amount) }}</q-item-label>
               </q-item-section>
             </q-item>
 
@@ -71,6 +127,17 @@ const formatCurrency = (value: number | null | undefined) =>
 
       <q-badge v-if="!fund.enable" color="grey" class="q-mt-sm"> Disabled </q-badge>
     </q-card-section>
+
+    <!-- Calculation Dialog -->
+    <fund-calculation-dialog
+      v-if="showCalculationDialog"
+      :fund-id="fund.id"
+      :fund-name="fund.name"
+      :current-month="currentMonth || new Date().getMonth() + 1"
+      :current-year="currentYear || new Date().getFullYear()"
+      @close="showCalculationDialog = false"
+      @refresh="handleRefresh"
+    />
   </q-card>
 </template>
 

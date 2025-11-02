@@ -112,10 +112,52 @@ export type PaginatedTransactionResponse = {
 };
 
 /**
+ * OrphanedMastersResponse
+ */
+export type OrphanedMastersResponse = {
+    orphaned_masters: Array<OrphanedMasterInfo>;
+};
+
+/**
+ * OrphanedMasterInfo
+ */
+export type OrphanedMasterInfo = {
+    master_id: number;
+    name: string;
+    balance: number;
+    last_active_month?: number | null;
+    last_active_year?: number | null;
+    last_fund_name?: string | null;
+};
+
+/**
  * MessageResponse
  */
 export type MessageResponse = {
     message: string;
+};
+
+/**
+ * MasterFundDetailsResponse
+ */
+export type MasterFundDetailsResponse = {
+    master_id: number;
+    master_name?: string | null;
+    total_balance: number;
+    funds: Array<FundInMaster>;
+};
+
+/**
+ * FundInMaster
+ */
+export type FundInMaster = {
+    fund_id: number;
+    budget_name: string;
+    month: number;
+    year: number;
+    month_amount: number;
+    transactions: number;
+    net_contribution: number;
 };
 
 /**
@@ -152,6 +194,51 @@ export type HealthResponse = {
 };
 
 /**
+ * FundUnlinkRequest
+ */
+export type FundUnlinkRequest = {
+    keep_amount: number;
+};
+
+/**
+ * FundCombineRequest
+ */
+export type FundCombineRequest = {
+    target_fund_id: number;
+};
+
+/**
+ * FundCalculationResponse
+ */
+export type FundCalculationResponse = {
+    fund_id: number;
+    name: string;
+    priority: number;
+    increment: number;
+    max?: number | null;
+    master_balance: number;
+    month_amount: number;
+    calculated_amount: number;
+    transactions: number;
+    breakdown: Array<FundCalculationBreakdown>;
+    master_id: number;
+};
+
+/**
+ * FundCalculationBreakdown
+ */
+export type FundCalculationBreakdown = {
+    fund_id: number;
+    fund_name: string;
+    month: number;
+    year: number;
+    master_id: number;
+    master_name?: string | null;
+    master_balance: number;
+    transactions: number;
+};
+
+/**
  * FundBudgetResponse
  */
 export type FundBudgetResponse = {
@@ -161,12 +248,26 @@ export type FundBudgetResponse = {
     deleted: boolean;
     priority?: number | null;
     increment?: number | null;
-    current_amount?: number | null;
+    master_balance: number;
+    month_amount: number;
     max?: number | null;
     name: string;
     transaction_sum: number;
     amount_after_transactions: number;
     carryover: number;
+    master_fund_id: number;
+    master_fund_name?: string | null;
+};
+
+/**
+ * FundApplicationDetail
+ */
+export type FundApplicationDetail = {
+    fund_id: number;
+    fund_name: string;
+    amount_added?: number | null;
+    new_amount?: number | null;
+    reason?: string | null;
 };
 
 /**
@@ -203,6 +304,14 @@ export type ExpenseBudgetResponse = {
     transaction_sum: number;
     amount_after_transactions: number;
     carryover: number;
+};
+
+/**
+ * DiscontinueMasterRequest
+ */
+export type DiscontinueMasterRequest = {
+    month: number;
+    year: number;
 };
 
 /**
@@ -269,7 +378,8 @@ export type BudgetRequest = {
     max?: number | null;
     priority?: number | null;
     increment?: number | null;
-    current_amount?: number | null;
+    month_amount?: number | null;
+    master_fund_id?: number | null;
     month: number;
     year: number;
 };
@@ -280,6 +390,28 @@ export type BudgetRequest = {
 export type BudgetNameResponse = {
     name: string;
     id: number;
+    master_id?: number | null;
+};
+
+/**
+ * ApplyFundIncrementsResponse
+ */
+export type ApplyFundIncrementsResponse = {
+    applied_funds: Array<FundApplicationDetail>;
+    skipped_funds: Array<FundApplicationDetail>;
+    balance_before: number;
+    balance_after: number;
+    total_applied: number;
+    would_go_negative: boolean;
+};
+
+/**
+ * ApplyFundIncrementsRequest
+ */
+export type ApplyFundIncrementsRequest = {
+    month: number;
+    year: number;
+    safe_mode?: boolean;
 };
 
 /**
@@ -290,6 +422,17 @@ export type AllBudgetsResponse = {
     expenses?: Array<ExpenseBudgetResponse>;
     flexibles?: Array<FlexibleBudgetResponse>;
     funds?: Array<FundBudgetResponse>;
+};
+
+/**
+ * AddMonthToMasterRequest
+ */
+export type AddMonthToMasterRequest = {
+    month: number;
+    year: number;
+    priority: number;
+    increment: number;
+    max?: number | null;
 };
 
 export type ApiV1UserTokenUpdateAccessUrlEndpointData = {
@@ -357,8 +500,8 @@ export type ApiV1BudgetsCreateCreateBudgetResponse = ApiV1BudgetsCreateCreateBud
 export type ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData = {
     body?: never;
     path: {
-        budget_id: number;
         transaction_id: number;
+        budget_id: number;
     };
     query?: never;
     url: '/api/finance/v1/budgets/{budget_id}/transactions/{transaction_id}';
@@ -387,6 +530,37 @@ export type ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetR
 };
 
 export type ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponse = ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses[keyof ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses];
+
+export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousData = {
+    body: CopyBudgetsRequest;
+    path?: never;
+    query?: never;
+    url: '/api/finance/v1/budgets/copy-from-previous';
+};
+
+export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousError = ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors[keyof ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors];
+
+export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses = {
+    /**
+     * Document created, URL follows
+     */
+    201: CopyBudgetsResponse;
+};
+
+export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponse = ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses[keyof ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses];
 
 export type ApiV1BudgetsAllGetAllBudgetsData = {
     body?: never;
@@ -456,14 +630,16 @@ export type ApiV1BudgetsNamesGetBudgetsNamesResponses = {
 
 export type ApiV1BudgetsNamesGetBudgetsNamesResponse = ApiV1BudgetsNamesGetBudgetsNamesResponses[keyof ApiV1BudgetsNamesGetBudgetsNamesResponses];
 
-export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousData = {
-    body: CopyBudgetsRequest;
-    path?: never;
+export type ApiV1BudgetsFundsFundIdCombineCombineFundToMasterData = {
+    body: FundCombineRequest;
+    path: {
+        fund_id: number;
+    };
     query?: never;
-    url: '/api/finance/v1/budgets/copy-from-previous';
+    url: '/api/finance/v1/budgets/funds/{fund_id}/combine';
 };
 
-export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors = {
+export type ApiV1BudgetsFundsFundIdCombineCombineFundToMasterErrors = {
     /**
      * Validation Exception
      */
@@ -476,16 +652,246 @@ export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors = {
     };
 };
 
-export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousError = ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors[keyof ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors];
+export type ApiV1BudgetsFundsFundIdCombineCombineFundToMasterError = ApiV1BudgetsFundsFundIdCombineCombineFundToMasterErrors[keyof ApiV1BudgetsFundsFundIdCombineCombineFundToMasterErrors];
 
-export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses = {
+export type ApiV1BudgetsFundsFundIdCombineCombineFundToMasterResponses = {
     /**
-     * Document created, URL follows
+     * Request fulfilled, document follows
      */
-    201: CopyBudgetsResponse;
+    200: MessageResponse;
 };
 
-export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponse = ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses[keyof ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses];
+export type ApiV1BudgetsFundsFundIdCombineCombineFundToMasterResponse = ApiV1BudgetsFundsFundIdCombineCombineFundToMasterResponses[keyof ApiV1BudgetsFundsFundIdCombineCombineFundToMasterResponses];
+
+export type ApiV1BudgetsFundsFundIdUnlinkUnlinkFundData = {
+    body: FundUnlinkRequest;
+    path: {
+        fund_id: number;
+    };
+    query?: never;
+    url: '/api/finance/v1/budgets/funds/{fund_id}/unlink';
+};
+
+export type ApiV1BudgetsFundsFundIdUnlinkUnlinkFundErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1BudgetsFundsFundIdUnlinkUnlinkFundError = ApiV1BudgetsFundsFundIdUnlinkUnlinkFundErrors[keyof ApiV1BudgetsFundsFundIdUnlinkUnlinkFundErrors];
+
+export type ApiV1BudgetsFundsFundIdUnlinkUnlinkFundResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: MessageResponse;
+};
+
+export type ApiV1BudgetsFundsFundIdUnlinkUnlinkFundResponse = ApiV1BudgetsFundsFundIdUnlinkUnlinkFundResponses[keyof ApiV1BudgetsFundsFundIdUnlinkUnlinkFundResponses];
+
+export type ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointData = {
+    body: ApplyFundIncrementsRequest;
+    path?: never;
+    query?: never;
+    url: '/api/finance/v1/budgets/funds/apply-increments';
+};
+
+export type ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointError = ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointErrors[keyof ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointErrors];
+
+export type ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: ApplyFundIncrementsResponse;
+};
+
+export type ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointResponse = ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointResponses[keyof ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointResponses];
+
+export type ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointData = {
+    body: DiscontinueMasterRequest;
+    path: {
+        master_id: number;
+    };
+    query?: never;
+    url: '/api/finance/v1/budgets/funds/masters/{master_id}/discontinue';
+};
+
+export type ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointError = ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointErrors[keyof ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointErrors];
+
+export type ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: MessageResponse;
+};
+
+export type ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointResponse = ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointResponses[keyof ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointResponses];
+
+export type ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointData = {
+    body: AddMonthToMasterRequest;
+    path: {
+        master_id: number;
+    };
+    query?: never;
+    url: '/api/finance/v1/budgets/funds/masters/{master_id}/add-month';
+};
+
+export type ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointError = ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointErrors[keyof ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointErrors];
+
+export type ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: MessageResponse;
+};
+
+export type ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointResponse = ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointResponses[keyof ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointResponses];
+
+export type ApiV1BudgetsFundsFundIdCalculateCalculateFundData = {
+    body?: never;
+    path: {
+        fund_id: number;
+    };
+    query?: never;
+    url: '/api/finance/v1/budgets/funds/{fund_id}/calculate';
+};
+
+export type ApiV1BudgetsFundsFundIdCalculateCalculateFundErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1BudgetsFundsFundIdCalculateCalculateFundError = ApiV1BudgetsFundsFundIdCalculateCalculateFundErrors[keyof ApiV1BudgetsFundsFundIdCalculateCalculateFundErrors];
+
+export type ApiV1BudgetsFundsFundIdCalculateCalculateFundResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: FundCalculationResponse;
+};
+
+export type ApiV1BudgetsFundsFundIdCalculateCalculateFundResponse = ApiV1BudgetsFundsFundIdCalculateCalculateFundResponses[keyof ApiV1BudgetsFundsFundIdCalculateCalculateFundResponses];
+
+export type ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointData = {
+    body?: never;
+    path: {
+        master_id: number;
+    };
+    query?: never;
+    url: '/api/finance/v1/budgets/funds/masters/{master_id}/details';
+};
+
+export type ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointError = ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointErrors[keyof ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointErrors];
+
+export type ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: MasterFundDetailsResponse;
+};
+
+export type ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointResponse = ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointResponses[keyof ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointResponses];
+
+export type ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointData = {
+    body?: never;
+    path?: never;
+    query: {
+        month: number;
+        year: number;
+    };
+    url: '/api/finance/v1/budgets/funds/orphaned-masters';
+};
+
+export type ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointError = ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointErrors[keyof ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointErrors];
+
+export type ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: OrphanedMastersResponse;
+};
+
+export type ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointResponse = ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointResponses[keyof ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointResponses];
 
 export type ApiV1TransactionsGetTransactionsData = {
     body?: never;
