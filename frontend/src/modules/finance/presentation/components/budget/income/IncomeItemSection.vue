@@ -1,14 +1,22 @@
 <script setup lang="ts">
 import type { IncomeBudgetResponse } from 'src/api'
+import { useDeleteBudget } from 'src/modules/finance/presentation/composables/useDeleteBudget'
 
 interface Props {
   income: IncomeBudgetResponse
 }
 
-defineProps<Props>()
+interface Emits {
+  (_event: 'deleted'): void
+}
+
+const _props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+const { handleDelete } = useDeleteBudget()
 
 const formatCurrency = (value: number | null | undefined) =>
   value !== null && value !== undefined ? `$${value.toLocaleString()}` : 'N/A'
+
 </script>
 
 <template>
@@ -16,9 +24,22 @@ const formatCurrency = (value: number | null | undefined) =>
     <q-card-section class="q-pa-md">
       <div class="row items-center justify-between q-mb-md">
         <div class="text-h6 text-white">{{ income.name }}</div>
-        <q-badge :color="income.fixed ? 'blue-grey-8' : 'orange-8'" text-color="white">
-          {{ income.fixed ? 'Fixed' : 'Flexible' }}
-        </q-badge>
+        <div class="row items-center q-gutter-xs">
+          <q-badge :color="income.fixed ? 'blue-grey-8' : 'orange-8'" text-color="white">
+            {{ income.fixed ? 'Fixed' : 'Flexible' }}
+          </q-badge>
+          <q-btn
+            flat
+            dense
+            round
+            size="sm"
+            icon="delete"
+            color="negative"
+            @click="handleDelete(income.id, income.name, () => emit('deleted'))"
+          >
+            <q-tooltip>Delete budget (click twice to confirm)</q-tooltip>
+          </q-btn>
+        </div>
       </div>
 
       <div class="row items-start justify-between">

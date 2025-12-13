@@ -500,8 +500,8 @@ export type ApiV1BudgetsCreateCreateBudgetResponse = ApiV1BudgetsCreateCreateBud
 export type ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData = {
     body?: never;
     path: {
-        transaction_id: number;
         budget_id: number;
+        transaction_id: number;
     };
     query?: never;
     url: '/api/finance/v1/budgets/{budget_id}/transactions/{transaction_id}';
@@ -561,6 +561,39 @@ export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses = {
 };
 
 export type ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponse = ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses[keyof ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses];
+
+export type ApiV1BudgetsBudgetIdDeleteBudgetData = {
+    body?: never;
+    path: {
+        budget_id: number;
+    };
+    query?: never;
+    url: '/api/finance/v1/budgets/{budget_id}';
+};
+
+export type ApiV1BudgetsBudgetIdDeleteBudgetErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1BudgetsBudgetIdDeleteBudgetError = ApiV1BudgetsBudgetIdDeleteBudgetErrors[keyof ApiV1BudgetsBudgetIdDeleteBudgetErrors];
+
+export type ApiV1BudgetsBudgetIdDeleteBudgetResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: MessageResponse;
+};
+
+export type ApiV1BudgetsBudgetIdDeleteBudgetResponse = ApiV1BudgetsBudgetIdDeleteBudgetResponses[keyof ApiV1BudgetsBudgetIdDeleteBudgetResponses];
 
 export type ApiV1BudgetsAllGetAllBudgetsData = {
     body?: never;

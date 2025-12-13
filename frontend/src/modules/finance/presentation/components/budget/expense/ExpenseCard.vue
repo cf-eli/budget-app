@@ -56,7 +56,7 @@ async function handleFormSubmit(formData: BudgetRequest) {
           @click="showDetails(expense.id)"
         >
           <q-item-section class="q-pa-none">
-            <expense-item-section :expense="expense" />
+            <expense-item-section :expense="expense" @deleted="emit('refresh')" />
           </q-item-section>
         </q-item>
       </q-list>

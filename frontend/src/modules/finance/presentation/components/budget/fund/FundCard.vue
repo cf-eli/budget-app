@@ -67,6 +67,7 @@ function handleRefresh() {
               :current-month="currentMonth"
               :current-year="currentYear"
               @refresh="handleRefresh"
+              @deleted="handleRefresh"
             />
           </q-item-section>
         </q-item>

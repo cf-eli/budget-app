@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { FundBudgetResponse } from 'src/api'
+import { useDeleteBudget } from 'src/modules/finance/presentation/composables/useDeleteBudget'
 import FundCalculationDialog from './FundCalculationDialog.vue'
 
 interface Props {
@@ -11,10 +12,12 @@ interface Props {
 
 interface Emits {
   (_event: 'refresh'): void
+  (_event: 'deleted'): void
 }
 
-defineProps<Props>()
+const _props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const { handleDelete } = useDeleteBudget()
 
 const showCalculationDialog = ref(false)
 
@@ -66,6 +69,17 @@ function handleRefresh() {
             @click="viewCalculation"
           >
             <q-tooltip>View Calculation Details</q-tooltip>
+          </q-btn>
+          <q-btn
+            flat
+            round
+            dense
+            icon="delete"
+            color="negative"
+            size="sm"
+            @click="handleDelete(fund.id, fund.name, () => emit('deleted'))"
+          >
+            <q-tooltip>Delete fund (click twice to confirm)</q-tooltip>
           </q-btn>
         </div>
       </div>

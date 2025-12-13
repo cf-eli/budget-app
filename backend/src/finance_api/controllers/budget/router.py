@@ -15,6 +15,7 @@ route_handlers = [
     management.create_budget,
     management.add_transaction_to_budget,
     management.copy_budgets_from_previous,
+    management.delete_budget,
     # Query endpoints
     queries.get_all_budgets,
     queries.get_budgets_names,

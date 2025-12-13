@@ -1,14 +1,22 @@
 <script setup lang="ts">
 import type { FlexibleBudgetResponse } from 'src/api'
+import { useDeleteBudget } from 'src/modules/finance/presentation/composables/useDeleteBudget'
 
 interface Props {
   flexible: FlexibleBudgetResponse
 }
 
-defineProps<Props>()
+interface Emits {
+  (_event: 'deleted'): void
+}
+
+const _props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+const { handleDelete } = useDeleteBudget()
 
 const formatCurrency = (value: number | null | undefined) =>
   value !== null && value !== undefined ? `$${value.toLocaleString()}` : 'N/A'
+
 </script>
 
 <template>
@@ -16,9 +24,22 @@ const formatCurrency = (value: number | null | undefined) =>
     <q-card-section class="q-pa-md">
       <div class="row items-center justify-between q-mb-md">
         <div class="text-h6 text-white">{{ flexible.name }}</div>
-        <q-badge :color="flexible.fixed ? 'blue-grey-8' : 'orange-8'" text-color="white">
-          {{ flexible.fixed ? 'Fixed' : 'Flexible' }}
-        </q-badge>
+        <div class="row items-center q-gutter-xs">
+          <q-badge :color="flexible.fixed ? 'blue-grey-8' : 'orange-8'" text-color="white">
+            {{ flexible.fixed ? 'Fixed' : 'Flexible' }}
+          </q-badge>
+          <q-btn
+            flat
+            dense
+            round
+            size="sm"
+            icon="delete"
+            color="negative"
+            @click="handleDelete(flexible.id, flexible.name, () => emit('deleted'))"
+          >
+            <q-tooltip>Delete budget (click twice to confirm)</q-tooltip>
+          </q-btn>
+        </div>
       </div>
 
       <div class="row items-start justify-between">

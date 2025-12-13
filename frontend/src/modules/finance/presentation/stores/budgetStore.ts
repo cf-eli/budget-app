@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import {
   apiV1BudgetsNamesGetBudgetsNames,
   apiV1BudgetsCopyFromPreviousCopyBudgetsFromPrevious,
+  apiV1BudgetsBudgetIdDeleteBudget,
   type CopyBudgetsResponse,
 } from 'src/api'
 
@@ -107,6 +108,30 @@ export const useBudgetStore = defineStore('budget', () => {
     lastFetched.value = null
   }
 
+  async function deleteBudget(budgetId: number): Promise<boolean> {
+    try {
+      loading.value = true
+      const response = await apiV1BudgetsBudgetIdDeleteBudget({
+        path: {
+          budget_id: budgetId,
+        },
+      })
+
+      if (response.data) {
+        // Clear cache to force refetch
+        clearCache()
+        return true
+      }
+
+      return false
+    } catch (error) {
+      console.error('Error deleting budget:', error)
+      throw error
+    } finally {
+      loading.value = false
+    }
+  }
+
   function getBudgetNameById(id: number | null): string | null {
     if (id === null) return null
     const budget = budgetOptions.value.find((option) => option.value === id)
@@ -121,6 +146,7 @@ export const useBudgetStore = defineStore('budget', () => {
     currentYear,
     fetchBudgets,
     copyFromPreviousMonth,
+    deleteBudget,
     clearCache,
     getBudgetNameById,
   }

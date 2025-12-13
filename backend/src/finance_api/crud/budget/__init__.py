@@ -14,6 +14,7 @@ from finance_api.crud.budget.calculations_fund_allocations import (
     apply_fund_increments,
 )
 from finance_api.crud.budget.copy import copy_budgets_from_previous_month
+from finance_api.crud.budget.delete import delete_budget_by_id, delete_budgets
 from finance_api.crud.budget.expense import (
     create_expense,
     get_expense_sum,
@@ -48,6 +49,8 @@ __all__ = [
     "create_expense",
     "create_fund",
     "create_income",
+    "delete_budget_by_id",
+    "delete_budgets",
     "discontinue_fund_master",
     "get_all_budget_sums_with_line_items",
     "get_budget_sum_with_line_items",

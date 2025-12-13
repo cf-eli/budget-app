@@ -1,7 +1,7 @@
 """Budget management endpoints."""
 
-from litestar import post, status_codes
-from litestar.exceptions import NotFoundException
+from litestar import delete, post, status_codes
+from litestar.exceptions import InternalServerException, NotFoundException
 
 from finance_api.constants import MAX_MONTH, MAX_YEAR, MIN_MONTH, MIN_YEAR
 from finance_api.crud import budget as budget_crud
@@ -135,9 +135,45 @@ async def copy_budgets_from_previous(
             source_month=data.source_month,
             source_year=data.source_year,
         )
-        return CopyBudgetsResponse.model_validate(result)
     except ValueError as e:
         _handle_copy_error(e)
+    # TODO(cf-eli): #004 Improve this exception handling better
+    return CopyBudgetsResponse.model_validate(result)  # pyright: ignore[reportPossiblyUnboundVariable]
+
+
+@delete(
+    "/{budget_id:int}",
+    response=MessageResponse,
+    status_code=status_codes.HTTP_200_OK,
+)
+async def delete_budget(user: User, budget_id: int) -> MessageResponse:
+    """
+    Delete a specific budget by ID.
+
+    This endpoint removes a single budget (income, expense, or fund)
+    for the authenticated user.
+
+    Args:
+        user: The authenticated user
+        budget_id: The ID of the budget to delete
+
+    Returns:
+        A message confirming the deletion.
+
+    Raises:
+        NotFoundException: If budget not found or doesn't belong to user (404)
+
+    """
+    try:
+        await budget_crud.delete_budget_by_id(
+            budget_id=budget_id,
+            user_id=user.id,
+        )
+        return MessageResponse(message="Budget deleted successfully")
+    except ValueError as e:
+        error_msg = str(e)
+        msg = f"Budget not found: {error_msg}"
+        raise NotFoundException(msg) from e
 
 
 def _validate_month(month: int, field_name: str = "Month") -> None:
@@ -185,4 +221,4 @@ def _handle_copy_error(error: ValueError) -> None:
         raise NotFoundException(msg) from error
     # Re-raise any other ValueError
     msg = f"Error copying budgets: {error_msg}"
-    raise ValueError(msg) from error
+    raise InternalServerException(msg) from error

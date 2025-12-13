@@ -56,7 +56,7 @@ async function handleFormSubmit(formData: BudgetRequest) {
           @click="showDetails(flexible.id)"
         >
           <q-item-section class="q-pa-none">
-            <flexible-item-section :flexible="flexible" />
+            <flexible-item-section :flexible="flexible" @deleted="emit('refresh')" />
           </q-item-section>
         </q-item>
       </q-list>
