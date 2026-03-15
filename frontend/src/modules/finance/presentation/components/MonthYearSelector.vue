@@ -109,15 +109,7 @@ const displayText = computed(() => {
       <q-tooltip>Current Month</q-tooltip>
     </q-btn>
 
-    <q-btn
-      flat
-      round
-      dense
-      icon="chevron_right"
-      color="primary"
-      size="sm"
-      @click="goToNextMonth"
-    >
+    <q-btn flat round dense icon="chevron_right" color="primary" size="sm" @click="goToNextMonth">
       <q-tooltip>Next Month</q-tooltip>
     </q-btn>
 

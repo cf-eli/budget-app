@@ -105,7 +105,11 @@ function cancel() {
 
         <!-- Exclude from Budget Option -->
         <div class="q-mt-md">
-          <q-checkbox v-model="excludeFromBudget" label="Exclude from budget calculations" class="dialog-checkbox" />
+          <q-checkbox
+            v-model="excludeFromBudget"
+            label="Exclude from budget calculations"
+            class="dialog-checkbox"
+          />
           <div class="text-caption text-grey-7 q-pl-lg">
             This transaction will be hidden from the transaction list and not counted in budgets.
           </div>

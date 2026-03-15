@@ -54,8 +54,9 @@ const conditionsSummary = computed(() => {
         {{ rule.name }}
         <q-badge v-if="!rule.is_active" color="grey" class="q-ml-sm">Inactive</q-badge>
       </q-item-label>
-      <q-item-label caption class="text-grey-6">
+      <q-item-label caption class="text-grey-6 rule-conditions">
         {{ conditionsSummary }}
+        <q-tooltip v-if="conditionsSummary.length > 60">{{ conditionsSummary }}</q-tooltip>
       </q-item-label>
       <q-item-label caption class="text-primary">
         Assign to: {{ rule.target_budget_name || 'Unknown Budget' }}
@@ -75,10 +76,27 @@ const conditionsSummary = computed(() => {
         <q-btn flat round dense icon="edit" size="sm" @click="emit('edit', rule)">
           <q-tooltip>Edit rule</q-tooltip>
         </q-btn>
-        <q-btn flat round dense icon="delete" size="sm" color="negative" @click="emit('delete', rule.id)">
+        <q-btn
+          flat
+          round
+          dense
+          icon="delete"
+          size="sm"
+          color="negative"
+          @click="emit('delete', rule.id)"
+        >
           <q-tooltip>Delete rule</q-tooltip>
         </q-btn>
       </div>
     </q-item-section>
   </q-item>
 </template>
+
+<style scoped>
+.rule-conditions {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 400px;
+}
+</style>

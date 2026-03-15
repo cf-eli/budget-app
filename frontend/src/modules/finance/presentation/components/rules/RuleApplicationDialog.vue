@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
-import { useQuasar } from 'quasar'
-import type { RulePreviewItem } from 'src/api'
-import { useRulesStore } from '../../stores/rulesStore'
+import { useRuleApplication } from '../../composables/useRuleApplication'
+import { ruleApplicationColumns } from './ruleApplicationColumns'
 
 interface Props {
   visible: boolean
@@ -17,83 +15,27 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
-const $q = useQuasar()
-const rulesStore = useRulesStore()
 
-const previewItems = ref<RulePreviewItem[]>([])
-const overrideExisting = ref(false)
-const selectedIds = ref<Set<number>>(new Set())
-
-const selectedCount = computed(() => selectedIds.value.size)
-const hasPreview = computed(() => previewItems.value.length > 0)
-
-watch(
-  () => props.visible,
-  async (visible) => {
-    if (visible) {
-      await loadPreview()
-    }
-  },
-)
-
-async function loadPreview() {
-  try {
-    const response = await rulesStore.previewRuleApplication(
-      props.month,
-      props.year,
-      overrideExisting.value,
-    )
-    if (response) {
-      previewItems.value = response.assignments
-      selectedIds.value = new Set(response.assignments.map((a) => a.transaction_id))
-    }
-  } catch {
-    $q.notify({ type: 'negative', message: 'Failed to load rule preview' })
-  }
-}
-
-function toggleSelection(transactionId: number) {
-  if (selectedIds.value.has(transactionId)) {
-    selectedIds.value.delete(transactionId)
-  } else {
-    selectedIds.value.add(transactionId)
-  }
-  selectedIds.value = new Set(selectedIds.value)
-}
-
-function selectAll() {
-  selectedIds.value = new Set(previewItems.value.map((a) => a.transaction_id))
-}
-
-function selectNone() {
-  selectedIds.value = new Set()
-}
-
-async function applyRules() {
-  if (selectedIds.value.size === 0) return
-  try {
-    const response = await rulesStore.applyRules(
-      Array.from(selectedIds.value),
-      overrideExisting.value,
-    )
-    if (response) {
-      $q.notify({
-        type: 'positive',
-        message: `Applied ${response.applied_count} assignments`,
-      })
-      emit('applied')
-      cancel()
-    }
-  } catch {
-    $q.notify({ type: 'negative', message: 'Failed to apply rules' })
-  }
-}
-
-function cancel() {
-  emit('update:visible', false)
-  previewItems.value = []
-  selectedIds.value = new Set()
-}
+const {
+  rulesStore,
+  previewItems,
+  overrideExisting,
+  selectedIds,
+  selectedCount,
+  hasPreview,
+  loadPreview,
+  toggleSelection,
+  selectAll,
+  selectNone,
+  applyRules,
+  cancel,
+} = useRuleApplication({
+  visible: () => props.visible,
+  month: () => props.month,
+  year: () => props.year,
+  onApplied: () => emit('applied'),
+  onClose: () => emit('update:visible', false),
+})
 </script>
 
 <template>
@@ -125,13 +67,7 @@ function cancel() {
         <q-table
           v-else
           :rows="previewItems"
-          :columns="[
-            { name: 'select', label: '', field: 'transaction_id', align: 'center' },
-            { name: 'description', label: 'Description', field: 'transaction_description', align: 'left' },
-            { name: 'amount', label: 'Amount', field: 'transaction_amount', align: 'right' },
-            { name: 'rule', label: 'Rule', field: 'rule_name', align: 'left' },
-            { name: 'budget', label: 'Target Budget', field: 'target_budget_name', align: 'left' },
-          ]"
+          :columns="ruleApplicationColumns"
           row-key="transaction_id"
           flat
           dense
@@ -146,11 +82,37 @@ function cancel() {
               />
             </q-td>
           </template>
+          <template #body-cell-description="cellProps">
+            <q-td :props="cellProps" class="cell-ellipsis">
+              <span>{{ cellProps.value }}</span>
+              <q-tooltip v-if="cellProps.value && cellProps.value.length > 28">{{
+                cellProps.value
+              }}</q-tooltip>
+            </q-td>
+          </template>
           <template #body-cell-amount="cellProps">
             <q-td :props="cellProps">
-              <span :class="cellProps.row.transaction_amount < 0 ? 'text-negative' : 'text-positive'">
+              <span
+                :class="cellProps.row.transaction_amount < 0 ? 'text-negative' : 'text-positive'"
+              >
                 ${{ Math.abs(cellProps.row.transaction_amount).toFixed(2) }}
               </span>
+            </q-td>
+          </template>
+          <template #body-cell-rule="cellProps">
+            <q-td :props="cellProps" class="cell-ellipsis">
+              <span>{{ cellProps.value }}</span>
+              <q-tooltip v-if="cellProps.value && cellProps.value.length > 18">{{
+                cellProps.value
+              }}</q-tooltip>
+            </q-td>
+          </template>
+          <template #body-cell-budget="cellProps">
+            <q-td :props="cellProps" class="cell-ellipsis">
+              <span>{{ cellProps.value }}</span>
+              <q-tooltip v-if="cellProps.value && cellProps.value.length > 18">{{
+                cellProps.value
+              }}</q-tooltip>
             </q-td>
           </template>
         </q-table>
@@ -171,3 +133,11 @@ function cancel() {
     </q-card>
   </q-dialog>
 </template>
+
+<style scoped>
+.cell-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>

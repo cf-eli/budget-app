@@ -44,7 +44,10 @@ const operatorOptions = computed(() => (isNumericField.value ? numericOperators 
 function updateField(value: RuleFieldEnum) {
   const newCondition = { ...props.condition, field: value }
   // Reset operator if switching between text/numeric fields
-  if (value === 'amount' && !['exact', 'greater_than', 'less_than', 'range'].includes(newCondition.operator)) {
+  if (
+    value === 'amount' &&
+    !['exact', 'greater_than', 'less_than', 'range'].includes(newCondition.operator)
+  ) {
     newCondition.operator = 'exact' as RuleOperatorEnum
   } else if (value !== 'amount' && !['exact', 'contains'].includes(newCondition.operator)) {
     newCondition.operator = 'exact' as RuleOperatorEnum

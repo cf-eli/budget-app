@@ -1,16 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
-import { useBudgetStore } from '../../stores/budgetStore'
-
-interface LineItem {
-  description: string
-  amount: number
-  quantity?: number
-  unit_price?: number
-  category?: string
-  budget_id?: number
-  notes?: string
-}
+import { useLineItemForm, type LineItem } from '../../composables/useLineItemForm'
 
 interface Props {
   item?: LineItem | null
@@ -25,34 +14,7 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const budgetStore = useBudgetStore()
-
-const formData = ref<LineItem>({
-  description: '',
-  amount: 0,
-  quantity: 1,
-  category: '',
-  notes: '',
-})
-
-const autoCalculate = ref(true)
-
-watch(
-  () => props.item,
-  (newItem) => {
-    if (newItem) {
-      formData.value = { ...newItem }
-    }
-  },
-  { immediate: true },
-)
-
-// Auto-calculate amount from quantity × unit_price
-watch([() => formData.value.quantity, () => formData.value.unit_price], () => {
-  if (autoCalculate.value && formData.value.quantity && formData.value.unit_price) {
-    formData.value.amount = formData.value.quantity * formData.value.unit_price
-  }
-})
+const { formData, budgetStore, resetForm } = useLineItemForm(() => props.item)
 
 function submit() {
   emit('submit', { ...formData.value })
@@ -63,20 +25,6 @@ function cancel() {
   emit('cancel')
   resetForm()
 }
-
-function resetForm() {
-  formData.value = {
-    description: '',
-    amount: 0,
-    quantity: 1,
-    category: '',
-    notes: '',
-  }
-}
-
-onMounted(() => {
-  budgetStore.fetchBudgets()
-})
 </script>
 
 <template>
@@ -153,7 +101,14 @@ onMounted(() => {
           </div>
 
           <div class="col-12">
-            <q-input v-model="formData.notes" label="Notes" filled type="textarea" rows="2" class="dialog-textarea" />
+            <q-input
+              v-model="formData.notes"
+              label="Notes"
+              filled
+              type="textarea"
+              rows="2"
+              class="dialog-textarea"
+            />
           </div>
         </div>
 

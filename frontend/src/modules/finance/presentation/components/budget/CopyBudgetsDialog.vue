@@ -49,11 +49,7 @@ function handleCancel() {
 
 <template>
   <q-card
-    :style="
-      $q.screen.lt.sm
-        ? 'width: 100vw; max-width: 100vw;'
-        : 'width: 500px; max-width: 90vw;'
-    "
+    :style="$q.screen.lt.sm ? 'width: 100vw; max-width: 100vw;' : 'width: 500px; max-width: 90vw;'"
   >
     <q-card-section class="row items-center">
       <div class="text-h6">Copy Budgets</div>
@@ -64,7 +60,8 @@ function handleCancel() {
     <q-card-section>
       <p class="text-body1">
         Copy all budget items from <strong>{{ previousMonthName }} {{ previousYear }}</strong> to
-        <strong>{{ targetMonthName }} {{ targetYear }}</strong>?
+        <strong>{{ targetMonthName }} {{ targetYear }}</strong
+        >?
       </p>
       <p class="text-body2 text-grey-7 q-mt-md">
         This will copy all income, expense, flexible expense, and fund budget categories. Existing
@@ -75,7 +72,8 @@ function handleCancel() {
           <q-icon name="info" />
         </template>
         <div class="text-body2">
-          <strong>Funds:</strong> Copied funds will automatically link to their existing master fund families. No manual linking required.
+          <strong>Funds:</strong> Copied funds will automatically link to their existing master fund
+          families. No manual linking required.
         </div>
       </q-banner>
     </q-card-section>

@@ -91,7 +91,7 @@ watch(
   () => {
     pagination.value.page = 1
     fetchTransactions()
-  }
+  },
 )
 
 onMounted(() => {
@@ -110,7 +110,10 @@ onMounted(() => {
           label="Apply Rules"
           @click="applyRulesDialogVisible = true"
         />
-        <month-year-selector v-model="selectedMonthYear" @update:model-value="handleMonthYearChange" />
+        <month-year-selector
+          v-model="selectedMonthYear"
+          @update:model-value="handleMonthYearChange"
+        />
       </div>
     </div>
 

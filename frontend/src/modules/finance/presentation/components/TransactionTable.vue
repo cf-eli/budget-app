@@ -2,9 +2,12 @@
 import { ref, watch } from 'vue'
 import type { TransactionResponse } from 'src/api'
 import BudgetAssignmentCell from './BudgetAssignmentCell.vue'
-import TransactionBreakdownDialog from './breakdown/TransactionBreakdownDialog.vue'
-import TransactionTypeDialog from './actions/TransactionTypeDialog.vue'
-import RuleCreationDialog from './rules/RuleCreationDialog.vue'
+import EllipsisCell from './EllipsisCell.vue'
+import TransactionActionButtons from './TransactionActionButtons.vue'
+import TransactionDialogs from './TransactionDialogs.vue'
+import TransactionTableHeader from './TransactionTableHeader.vue'
+import { transactionTableColumns } from './transactionTableColumns'
+import { useTransactionDialogs } from '../composables/useTransactionDialogs'
 
 interface Props {
   transactions: TransactionResponse[]
@@ -28,124 +31,28 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-// Create a local pagination ref that syncs with props
 const localPagination = ref({ ...props.pagination })
-
-// Watch for prop changes and update local pagination
 watch(
   () => props.pagination,
   (newVal) => {
     localPagination.value = { ...newVal }
   },
-  { deep: true }
+  { deep: true },
 )
 
-const breakdownDialogVisible = ref(false)
-const typeDialogVisible = ref(false)
-const ruleDialogVisible = ref(false)
-const selectedTransaction = ref<TransactionResponse | null>(null)
-
-const columns = [
-  {
-    name: 'id',
-    required: true,
-    label: 'ID',
-    align: 'center' as const,
-    field: 'id',
-    sortable: true,
-  },
-  {
-    name: 'org_domain',
-    label: 'Organization',
-    align: 'center' as const,
-    field: (row: TransactionResponse) => row.account?.org.name || 'N/A',
-    sortable: true,
-  },
-  {
-    name: 'account_name',
-    label: 'Account Name',
-    align: 'center' as const,
-    field: (row: TransactionResponse) => row.account?.name || 'N/A',
-    sortable: true,
-  },
-  {
-    name: 'amount',
-    label: 'Amount',
-    align: 'right' as const,
-    field: 'amount',
-    sortable: true,
-    format: (val: number) => `$${val.toFixed(2)}`,
-  },
-  {
-    name: 'description',
-    label: 'Description',
-    align: 'left' as const,
-    field: 'description',
-    sortable: true,
-  },
-  {
-    name: 'transacted_at',
-    label: 'Date',
-    align: 'center' as const,
-    field: 'transacted_at',
-    sortable: true,
-  },
-  { name: 'payee', label: 'Payee', align: 'left' as const, field: 'payee', sortable: true },
-  { name: 'pending', label: 'Pending', align: 'center' as const, field: 'pending', sortable: true },
-  {
-    name: 'budget_name',
-    label: 'Budget',
-    align: 'center' as const,
-    field: 'budget_name',
-    sortable: true,
-  },
-  {
-    name: 'actions',
-    label: 'Actions',
-    align: 'center' as const,
-    field: 'actions',
-    sortable: false,
-  },
-]
+const {
+  breakdownDialogVisible,
+  typeDialogVisible,
+  ruleDialogVisible,
+  selectedTransaction,
+  openBreakdown,
+  openTypeDialog,
+  openRuleDialog,
+  onDialogSaved,
+} = useTransactionDialogs(() => emit('refresh'))
 
 function onPaginationChange(requestProps: { pagination: Props['pagination'] }) {
-  // Emit the new pagination state to parent which will trigger a new fetch
   emit('update:pagination', requestProps.pagination)
-}
-
-function onRefresh() {
-  emit('refresh')
-}
-
-function onBudgetUpdated() {
-  emit('refresh')
-}
-
-function openBreakdown(transaction: TransactionResponse) {
-  selectedTransaction.value = transaction
-  breakdownDialogVisible.value = true
-}
-
-function openTypeDialog(transaction: TransactionResponse) {
-  selectedTransaction.value = transaction
-  typeDialogVisible.value = true
-}
-
-function onBreakdownSaved() {
-  emit('refresh')
-}
-
-function onTypeSaved() {
-  emit('refresh')
-}
-
-function openRuleDialog(transaction: TransactionResponse) {
-  selectedTransaction.value = transaction
-  ruleDialogVisible.value = true
-}
-
-function onRuleSaved() {
-  emit('refresh')
 }
 </script>
 
@@ -154,43 +61,49 @@ function onRuleSaved() {
     <q-card-section class="q-pa-none">
       <q-table
         flat
+        dense
         :rows="transactions"
-        :columns="columns"
+        :columns="transactionTableColumns"
         :loading="loading"
         v-model:pagination="localPagination"
-        :rows-per-page-options="[5, 10, 20, 50, 100]"
+        :rows-per-page-options="[10, 20, 50, 100]"
         row-key="transaction_id"
         class="transaction-table"
         @request="onPaginationChange"
       >
         <template v-slot:top>
-          <div class="row items-center justify-between full-width q-pa-md">
-            <div class="row items-center q-gutter-sm">
-              <q-icon name="account_balance" size="28px" color="primary" />
-              <span class="text-h5 text-white">Recent Transactions</span>
-            </div>
-            <q-btn flat round icon="refresh" color="primary" :loading="loading" @click="onRefresh">
-              <q-tooltip>Refresh</q-tooltip>
-            </q-btn>
-          </div>
+          <transaction-table-header :loading="loading" @refresh="emit('refresh')" />
         </template>
 
-        <template v-slot:body-cell-amount="props">
-          <q-td :props="props" class="text-right">
-            <span
-              class="text-weight-medium"
-              :class="props.row.amount < 0 ? 'text-negative' : 'text-positive'"
-            >
-              {{ props.value }}
-            </span>
+        <template v-slot:body-cell-description="cellProps">
+          <ellipsis-cell :cell-props="cellProps" :tooltip-threshold="25" />
+        </template>
+        <template v-slot:body-cell-payee="cellProps">
+          <ellipsis-cell :cell-props="cellProps" :tooltip-threshold="18" />
+        </template>
+        <template v-slot:body-cell-account_name="cellProps">
+          <ellipsis-cell :cell-props="cellProps" :tooltip-threshold="16" />
+        </template>
+        <template v-slot:body-cell-org_name="cellProps">
+          <ellipsis-cell :cell-props="cellProps" :tooltip-threshold="14" />
+        </template>
+
+        <template v-slot:body-cell-pending="cellProps">
+          <q-td :props="cellProps" class="text-center">
+            <q-badge :color="cellProps.row.pending ? 'warning' : 'positive'" dense>
+              {{ cellProps.row.pending ? 'Pending' : 'Posted' }}
+            </q-badge>
           </q-td>
         </template>
 
-        <template v-slot:body-cell-pending="props">
-          <q-td :props="props">
-            <q-badge :color="props.row.pending ? 'orange' : 'positive'" text-color="white">
-              {{ props.row.pending ? 'Pending' : 'Posted' }}
-            </q-badge>
+        <template v-slot:body-cell-amount="cellProps">
+          <q-td :props="cellProps" class="text-right">
+            <span
+              class="text-weight-medium"
+              :class="cellProps.row.amount < 0 ? 'text-negative' : 'text-positive'"
+            >
+              {{ cellProps.value }}
+            </span>
           </q-td>
         </template>
 
@@ -202,141 +115,36 @@ function onRuleSaved() {
               text-color="white"
               icon="call_split"
               size="sm"
+              dense
             >
               Split
-              <q-tooltip>
-                This transaction has been split into line items. Edit budgets for individual items
-                in the breakdown.
-              </q-tooltip>
+              <q-tooltip>Transaction split into line items</q-tooltip>
             </q-chip>
-
-            <budget-assignment-cell v-else :transaction="row" @updated="onBudgetUpdated" />
+            <budget-assignment-cell v-else :transaction="row" @updated="onDialogSaved" />
           </q-td>
         </template>
 
         <template v-slot:body-cell-actions="{ row }">
-          <q-td class="text-center">
-            <q-btn-group flat>
-              <q-btn
-                flat
-                dense
-                :icon="row.is_split ? 'edit' : 'receipt_long'"
-                :color="row.is_split ? 'secondary' : 'primary'"
-                size="sm"
-                @click="openBreakdown(row)"
-              >
-                <q-tooltip>
-                  {{ row.is_split ? 'Edit breakdown' : 'Break down transaction' }}
-                </q-tooltip>
-              </q-btn>
-
-              <q-btn flat dense icon="label" color="accent" size="sm" @click="openTypeDialog(row)">
-                <q-tooltip>Mark transaction type</q-tooltip>
-              </q-btn>
-
-              <q-btn flat dense icon="rule" color="info" size="sm" @click="openRuleDialog(row)">
-                <q-tooltip>Create rule from transaction</q-tooltip>
-              </q-btn>
-            </q-btn-group>
-          </q-td>
+          <transaction-action-buttons
+            :row="row"
+            @breakdown="openBreakdown"
+            @type="openTypeDialog"
+            @rule="openRuleDialog"
+          />
         </template>
       </q-table>
     </q-card-section>
 
-    <transaction-breakdown-dialog
-      v-if="selectedTransaction"
-      v-model:visible="breakdownDialogVisible"
-      :transaction="selectedTransaction"
-      @saved="onBreakdownSaved"
-    />
-
-    <transaction-type-dialog
-      v-model:visible="typeDialogVisible"
-      :transaction="selectedTransaction"
-      @saved="onTypeSaved"
-    />
-
-    <rule-creation-dialog
-      v-model:visible="ruleDialogVisible"
-      :transaction="selectedTransaction"
+    <transaction-dialogs
+      :selected-transaction="selectedTransaction"
+      v-model:breakdown-dialog-visible="breakdownDialogVisible"
+      v-model:type-dialog-visible="typeDialogVisible"
+      v-model:rule-dialog-visible="ruleDialogVisible"
       :month="month"
       :year="year"
-      @saved="onRuleSaved"
+      @saved="onDialogSaved"
     />
   </q-card>
 </template>
-
-<style scoped>
-.transaction-table-card {
-  background: #2a2d35;
-  border-color: #3a3d45;
-}
-
-.transaction-table :deep(.q-table__top) {
-  background: #2a2d35;
-  border-bottom: 1px solid #3a3d45;
-}
-
-.transaction-table :deep(thead tr) {
-  background: #1e2027;
-}
-
-.transaction-table :deep(th) {
-  color: #9ca3af;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 11px;
-  letter-spacing: 0.5px;
-}
-
-.transaction-table :deep(tbody tr) {
-  background: #2a2d35;
-  transition: all 0.2s;
-}
-
-.transaction-table :deep(tbody tr:hover) {
-  background: #323540;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.transaction-table :deep(td) {
-  color: #ffffff;
-  border-color: #3a3d45;
-}
-
-.transaction-table :deep(.q-table__bottom) {
-  background: #2a2d35;
-  border-top: 1px solid #3a3d45;
-  color: #ffffff;
-}
-
-/* Style the pagination dropdown to match other dropdowns */
-.transaction-table :deep(.q-table__bottom .q-field__native) {
-  color: #ffffff;
-}
-
-.transaction-table :deep(.q-table__bottom .q-field__label) {
-  color: #9ca3af;
-}
-
-/* Style the pagination info text */
-.transaction-table :deep(.q-table__bottom-item) {
-  color: #ffffff;
-}
-</style>
-
-<style>
-/* Global styles for pagination dropdown menu (appears in portal) */
-.q-menu .q-item {
-  color: #ffffff;
-}
-
-.q-menu {
-  background: #2a2d35;
-}
-
-.q-item:hover {
-  background: #323540;
-}
-</style>
+<style scoped src="./TransactionTable.css"></style>
+<style src="./TransactionTableGlobal.css"></style>

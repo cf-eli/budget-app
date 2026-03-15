@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import type { FundBudgetResponse } from 'src/api'
 import { useDeleteBudget } from 'src/modules/finance/presentation/composables/useDeleteBudget'
 import FundCalculationDialog from './FundCalculationDialog.vue'
+import FundDetailsList from './FundDetailsList.vue'
 
 interface Props {
   fund: FundBudgetResponse
@@ -41,12 +42,7 @@ function handleRefresh() {
         <div class="col">
           <div class="row items-center q-gutter-sm">
             <div class="text-h6 text-white">{{ fund.name }}</div>
-            <q-icon
-              v-if="fund.is_linked"
-              name="link"
-              color="positive"
-              size="20px"
-            >
+            <q-icon v-if="fund.is_linked" name="link" color="positive" size="20px">
               <q-tooltip>Linked to previous month</q-tooltip>
             </q-icon>
           </div>
@@ -86,46 +82,7 @@ function handleRefresh() {
 
       <div class="row items-start justify-between">
         <div class="col">
-          <q-list dense class="text-white">
-            <q-item class="q-px-none q-py-xs">
-              <q-item-section>
-                <q-item-label caption class="text-grey-5">Master Balance</q-item-label>
-                <q-item-label class="text-weight-medium">{{ formatCurrency(fund.master_balance) }}</q-item-label>
-              </q-item-section>
-            </q-item>
-
-            <q-item class="q-px-none q-py-xs">
-              <q-item-section>
-                <q-item-label caption class="text-grey-5">This Month</q-item-label>
-                <q-item-label>{{ formatCurrency(fund.month_amount) }}</q-item-label>
-              </q-item-section>
-            </q-item>
-
-            <q-item class="q-px-none q-py-xs">
-              <q-item-section>
-                <q-item-label caption class="text-grey-5">Increment</q-item-label>
-                <q-item-label>{{ formatCurrency(fund.increment) }}</q-item-label>
-              </q-item-section>
-            </q-item>
-
-            <q-item v-if="fund.max !== null" class="q-px-none q-py-xs">
-              <q-item-section>
-                <q-item-label caption class="text-grey-5">Max</q-item-label>
-                <q-item-label>{{ formatCurrency(fund.max) }}</q-item-label>
-              </q-item-section>
-            </q-item>
-
-            <q-item class="q-px-none q-py-xs">
-              <q-item-section>
-                <q-item-label caption class="text-grey-5">Transaction Total</q-item-label>
-                <q-item-label
-                  :class="fund.transaction_sum >= 0 ? 'text-positive' : 'text-negative'"
-                >
-                  {{ formatCurrency(fund.transaction_sum) }}
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
+          <fund-details-list :fund="fund" />
         </div>
 
         <div class="col-auto text-right">

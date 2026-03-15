@@ -79,9 +79,7 @@ async function moveRule(index: number, direction: 'up' | 'down') {
     <q-list v-else bordered separator class="bg-dark">
       <q-item class="bg-grey-9 text-grey-5 text-caption">
         <q-item-section avatar />
-        <q-item-section>
-          Rules are applied in order. Higher rules take priority.
-        </q-item-section>
+        <q-item-section> Rules are applied in order. Higher rules take priority. </q-item-section>
       </q-item>
 
       <template v-for="(rule, index) in rulesStore.rules" :key="rule.id">

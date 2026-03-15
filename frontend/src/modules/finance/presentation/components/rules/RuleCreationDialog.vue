@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
-import { useQuasar } from 'quasar'
-import type { TransactionResponse, RuleCondition, RuleFieldEnum, RuleOperatorEnum } from 'src/api'
-import { useBudgetStore } from '../../stores/budgetStore'
-import { useRulesStore } from '../../stores/rulesStore'
+import type { TransactionResponse } from 'src/api'
+import { useRuleCreation } from '../../composables/useRuleCreation'
 import RuleConditionForm from './RuleConditionForm.vue'
 
 interface Props {
@@ -20,89 +17,27 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
-const $q = useQuasar()
-const budgetStore = useBudgetStore()
-const rulesStore = useRulesStore()
 
-const ruleName = ref('')
-const targetBudgetId = ref<number | null>(null)
-const conditions = ref<RuleCondition[]>([])
-const loading = ref(false)
-
-const canSave = computed(() => {
-  return ruleName.value.trim() && targetBudgetId.value && conditions.value.length > 0
+const {
+  ruleName,
+  targetBudgetId,
+  conditions,
+  loading,
+  canSave,
+  budgetStore,
+  addCondition,
+  updateCondition,
+  removeCondition,
+  saveRule,
+  cancel,
+} = useRuleCreation({
+  getTransaction: () => props.transaction,
+  getVisible: () => props.visible,
+  month: () => props.month,
+  year: () => props.year,
+  onSaved: () => emit('saved'),
+  onClose: () => emit('update:visible', false),
 })
-
-watch(
-  () => props.visible,
-  async (visible) => {
-    if (visible && props.transaction) {
-      await budgetStore.fetchBudgets(true, props.month, props.year)
-      initializeFromTransaction()
-    }
-  },
-)
-
-function initializeFromTransaction() {
-  if (!props.transaction) return
-  ruleName.value = `Rule for ${props.transaction.payee || props.transaction.description}`
-  targetBudgetId.value = props.transaction.budget?.id || null
-  conditions.value = []
-  // Pre-populate with payee if available
-  if (props.transaction.payee) {
-    conditions.value.push({
-      field: 'payee' as RuleFieldEnum,
-      operator: 'exact' as RuleOperatorEnum,
-      value: props.transaction.payee,
-      value2: null,
-    })
-  }
-}
-
-function addCondition() {
-  conditions.value.push({
-    field: 'payee' as RuleFieldEnum,
-    operator: 'exact' as RuleOperatorEnum,
-    value: '',
-    value2: null,
-  })
-}
-
-function updateCondition(index: number, condition: RuleCondition) {
-  conditions.value[index] = condition
-}
-
-function removeCondition(index: number) {
-  conditions.value.splice(index, 1)
-}
-
-async function saveRule() {
-  if (!canSave.value || !targetBudgetId.value) return
-  loading.value = true
-  try {
-    await rulesStore.createRule({
-      name: ruleName.value.trim(),
-      target_budget_id: targetBudgetId.value,
-      conditions: conditions.value,
-      priority: 0,
-      is_active: true,
-    })
-    $q.notify({ type: 'positive', message: 'Rule created successfully' })
-    emit('saved')
-    cancel()
-  } catch {
-    $q.notify({ type: 'negative', message: 'Failed to create rule' })
-  } finally {
-    loading.value = false
-  }
-}
-
-function cancel() {
-  emit('update:visible', false)
-  ruleName.value = ''
-  targetBudgetId.value = null
-  conditions.value = []
-}
 </script>
 
 <template>
@@ -118,8 +53,8 @@ function cancel() {
         <div class="q-mb-md q-pa-md dialog-info-section">
           <div class="text-subtitle1">{{ transaction.description }}</div>
           <div class="text-subtitle2 text-grey-7">
-            {{ transaction.payee }} | ${{ Math.abs(transaction.amount).toFixed(2) }}
-            | {{ transaction.account?.name }}
+            {{ transaction.payee }} | ${{ Math.abs(transaction.amount).toFixed(2) }} |
+            {{ transaction.account?.name }}
           </div>
         </div>
 

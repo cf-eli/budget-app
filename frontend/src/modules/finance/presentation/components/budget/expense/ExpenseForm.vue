@@ -43,7 +43,10 @@ function closeForm() {
 </script>
 
 <template>
-  <q-card class="dialog-card" :style="$q.screen.lt.sm ? 'width: 100vw; max-width: 100vw;' : 'width: 400px; max-width: 90vw;'">
+  <q-card
+    class="dialog-card"
+    :style="$q.screen.lt.sm ? 'width: 100vw; max-width: 100vw;' : 'width: 400px; max-width: 90vw;'"
+  >
     <q-card-section>
       <div class="text-h6">Add New Expense</div>
     </q-card-section>

@@ -16,7 +16,6 @@ const { handleDelete } = useDeleteBudget()
 
 const formatCurrency = (value: number | null | undefined) =>
   value !== null && value !== undefined ? `$${value.toLocaleString()}` : 'N/A'
-
 </script>
 
 <template>

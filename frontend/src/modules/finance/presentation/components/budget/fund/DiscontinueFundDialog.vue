@@ -84,7 +84,8 @@ function close() {
       <q-card-section>
         <div class="text-body1 q-mb-md">
           Are you sure you want to discontinue the fund master
-          <strong>{{ masterName }}</strong>?
+          <strong>{{ masterName }}</strong
+          >?
         </div>
 
         <q-card flat bordered class="bg-orange-1 q-mb-md">

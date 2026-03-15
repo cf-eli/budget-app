@@ -1,0 +1,49 @@
+.transaction-table-card {
+  background: #2a2d35;
+  border-color: #3a3d45;
+}
+.transaction-table :deep(.q-table__top) {
+  background: #2a2d35;
+  border-bottom: 1px solid #3a3d45;
+}
+.transaction-table :deep(thead tr) {
+  background: #1e2027;
+}
+.transaction-table :deep(th) {
+  color: #9ca3af;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+.transaction-table :deep(tbody tr) {
+  background: #2a2d35;
+  transition: background 0.15s;
+}
+.transaction-table :deep(tbody tr:hover) {
+  background: #323540;
+}
+.transaction-table :deep(td) {
+  color: #ffffff;
+  border-color: #3a3d45;
+}
+.transaction-table :deep(.q-table__bottom) {
+  background: #2a2d35;
+  border-top: 1px solid #3a3d45;
+  color: #ffffff;
+}
+.transaction-table :deep(.q-table__bottom .q-field__native) {
+  color: #ffffff;
+}
+.transaction-table :deep(.q-table__bottom .q-field__label) {
+  color: #9ca3af;
+}
+.transaction-table :deep(.q-table__bottom-item) {
+  color: #ffffff;
+}
+.cell-ellipsis,
+.transaction-table :deep(.cell-ellipsis) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

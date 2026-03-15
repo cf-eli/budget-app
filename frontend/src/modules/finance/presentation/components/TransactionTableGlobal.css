@@ -1,0 +1,9 @@
+.q-menu .q-item {
+  color: #ffffff;
+}
+.q-menu {
+  background: #2a2d35;
+}
+.q-item:hover {
+  background: #323540;
+}

@@ -58,10 +58,7 @@ export const useRulesStore = defineStore('rules', () => {
     }
   }
 
-  async function updateRule(
-    ruleId: number,
-    data: UpdateRuleRequest,
-  ): Promise<RuleResponse | null> {
+  async function updateRule(ruleId: number, data: UpdateRuleRequest): Promise<RuleResponse | null> {
     loading.value = true
     try {
       const response = await apiV1RulesRuleIdUpdateRuleEndpoint({

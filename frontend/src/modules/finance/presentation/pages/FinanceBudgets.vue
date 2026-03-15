@@ -147,8 +147,7 @@ async function findSourceMonth() {
 
     // Determine if we're looking at a past month relative to current date
     const isInPast =
-      selectedYear < currentYear ||
-      (selectedYear === currentYear && selectedMonth < currentMonth)
+      selectedYear < currentYear || (selectedYear === currentYear && selectedMonth < currentMonth)
 
     // Try previous month first
     const prevMonth = selectedMonth === 1 ? 12 : selectedMonth - 1
@@ -238,7 +237,7 @@ async function confirmCopyBudgets() {
       dateStore.selectedMonth,
       dateStore.selectedYear,
       sourceMonthYear.value.month,
-      sourceMonthYear.value.year
+      sourceMonthYear.value.year,
     )
 
     if (result) {
@@ -287,7 +286,7 @@ watch(
   () => {
     fetchBudgets()
     budgetStore.clearCache()
-  }
+  },
 )
 
 onMounted(() => {
@@ -303,7 +302,10 @@ onMounted(() => {
 
     <div class="row items-center justify-between q-mb-md">
       <div class="text-h5 text-white">Budgets</div>
-      <month-year-selector v-model="selectedMonthYear" @update:model-value="handleMonthYearChange" />
+      <month-year-selector
+        v-model="selectedMonthYear"
+        @update:model-value="handleMonthYearChange"
+      />
     </div>
 
     <!-- No Budgets Banner -->
@@ -337,10 +339,10 @@ onMounted(() => {
       @add-month="handleAddMonthToMaster"
     />
 
-    <budget-summary 
-      :incomes="incomes" 
-      :expenses="expenses" 
-      :flexibles="flexibles" 
+    <budget-summary
+      :incomes="incomes"
+      :expenses="expenses"
+      :flexibles="flexibles"
       :funds="funds"
       :current-month="dateStore.selectedMonth"
       :current-year="dateStore.selectedYear"
@@ -350,12 +352,12 @@ onMounted(() => {
     <income-card :incomes="incomes" @refresh="fetchBudgets" @create="createBudget" />
     <expense-card :expenses="expenses" @refresh="fetchBudgets" @create="createBudget" />
     <flexible-card :flexibles="flexibles" @refresh="fetchBudgets" @create="createBudget" />
-    <fund-card 
-      :funds="funds" 
+    <fund-card
+      :funds="funds"
       :current-month="dateStore.selectedMonth"
       :current-year="dateStore.selectedYear"
-      @refresh="fetchBudgets" 
-      @create="createBudget" 
+      @refresh="fetchBudgets"
+      @create="createBudget"
     />
 
     <!-- Copy Budgets Dialog -->

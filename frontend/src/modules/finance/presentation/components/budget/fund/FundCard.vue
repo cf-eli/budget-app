@@ -62,8 +62,8 @@ function handleRefresh() {
           @click="showDetails(fund.id)"
         >
           <q-item-section class="q-pa-none">
-            <fund-item-section 
-              :fund="fund" 
+            <fund-item-section
+              :fund="fund"
               :current-month="currentMonth"
               :current-year="currentYear"
               @refresh="handleRefresh"
