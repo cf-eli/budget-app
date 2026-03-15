@@ -5,6 +5,7 @@ from finance_api.crud.transaction.assignment import (
 )
 from finance_api.crud.transaction.base import (
     mark_transaction_type,
+    remove_stale_pending_transactions,
     save_transactions,
 )
 from finance_api.crud.transaction.breakdown import (
@@ -28,6 +29,7 @@ __all__ = [
     "get_transactions",
     "get_transactions_paginated",
     "mark_transaction_type",
+    "remove_stale_pending_transactions",
     "save_transactions",
     "update_line_item",
 ]

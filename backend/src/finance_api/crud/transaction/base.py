@@ -3,6 +3,7 @@
 from datetime import UTC, datetime
 from logging import getLogger
 
+from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -108,4 +109,51 @@ async def mark_transaction_type(
         return transaction
 
 
-# Currently not used, but may be useful for future reporting features
+async def remove_stale_pending_transactions(
+    account_id: str,
+    current_transaction_ids: set[str],
+    session: AsyncSession | None = None,
+) -> int:
+    """
+    Remove pending transactions no longer returned by SimpleFin.
+
+    Some banks create a new transaction when a pending charge posts
+    instead of updating the original. This leaves orphaned pending
+    transactions that no longer exist at the bank.
+
+    Args:
+        account_id: Account to clean up pending transactions for
+        current_transaction_ids: Transaction IDs from the latest sync
+        session: Optional database session
+
+    Returns:
+        Number of stale pending transactions deleted
+
+    """
+    async with get_session(session) as sess:
+        # Find pending transactions for this account not in current sync
+        stale_query = select(SimpleFinTransaction.id).where(
+            SimpleFinTransaction.account_id == account_id,
+            SimpleFinTransaction.pending.is_(True),
+            SimpleFinTransaction.transaction_id.notin_(
+                current_transaction_ids,
+            ),
+        )
+        stale_ids = list((await sess.execute(stale_query)).scalars().all())
+
+        if not stale_ids:
+            return 0
+
+        await sess.execute(
+            delete(SimpleFinTransaction).where(
+                SimpleFinTransaction.id.in_(stale_ids),
+            ),
+        )
+        await sess.commit()
+
+        LOGGER.info(
+            "Removed %d stale pending transactions for account %s",
+            len(stale_ids),
+            account_id,
+        )
+        return len(stale_ids)
