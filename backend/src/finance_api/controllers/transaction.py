@@ -1,10 +1,13 @@
 """Transaction management endpoints."""
 
+import logging
+
 from litestar import Router, delete, get, patch, post, put, status_codes
 
 from finance_api.crud import transaction as trans_crud
 from finance_api.crud.account import save_account
 from finance_api.crud.organization import save_organization
+from finance_api.crud.rule import auto_apply_rules_for_user
 from finance_api.crud.user import get_all_users
 from finance_api.models.db import engine
 from finance_api.models.user import User
@@ -22,6 +25,8 @@ from finance_api.schemas.transactions import (
     TransactionResponse,
 )
 from finance_api.services.simplefin import SimpleFin
+
+LOGGER = logging.getLogger(__name__)
 
 
 @get(
@@ -113,6 +118,20 @@ async def update_transactions() -> MessageResponse:
 
                 # Save transactions
                 await trans_crud.save_transactions(account.id, account.transactions)
+
+        # Auto-apply rules for users who have it enabled
+        if user.auto_apply_rules:
+            try:
+                result = await auto_apply_rules_for_user(user.id)
+                LOGGER.info(
+                    "Auto-applied rules for user %s: %d applied, %d skipped",
+                    user.id,
+                    result.applied_count,
+                    result.skipped_count,
+                )
+            except Exception:
+                LOGGER.exception("Failed to auto-apply rules for user %s", user.id)
+
     return MessageResponse(message="Transactions updated successfully")
 
 

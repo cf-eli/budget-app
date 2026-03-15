@@ -5,6 +5,37 @@ export type ClientOptions = {
 };
 
 /**
+ * UpdateRuleRequest
+ */
+export type UpdateRuleRequest = {
+    name?: string | null;
+    target_budget_id?: number | null;
+    conditions?: Array<RuleCondition> | null;
+    priority?: number | null;
+    is_active?: boolean | null;
+};
+
+/**
+ * RuleOperatorEnum
+ */
+export type RuleOperatorEnum = 'exact' | 'contains' | 'greater_than' | 'less_than' | 'range';
+
+/**
+ * RuleFieldEnum
+ */
+export type RuleFieldEnum = 'payee' | 'description' | 'amount' | 'account_id' | 'account_name' | 'org_domain' | 'org_name';
+
+/**
+ * RuleCondition
+ */
+export type RuleCondition = {
+    field: RuleFieldEnum;
+    operator: RuleOperatorEnum;
+    value: string | number;
+    value2?: number | null;
+};
+
+/**
  * TransactionWithBreakdownResponse
  */
 export type TransactionWithBreakdownResponse = {
@@ -99,6 +130,67 @@ export type TransactionBudget = {
  */
 export type TokenRequest = {
     token: string;
+};
+
+/**
+ * RuleResponse
+ */
+export type RuleResponse = {
+    id: number;
+    name: string;
+    target_budget_id: number;
+    target_budget_name?: string | null;
+    conditions: Array<RuleCondition>;
+    priority: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+};
+
+/**
+ * RulePreviewResponse
+ */
+export type RulePreviewResponse = {
+    assignments: Array<RulePreviewItem>;
+    total_count: number;
+    already_assigned_count: number;
+    new_assignment_count: number;
+};
+
+/**
+ * RulePreviewItem
+ */
+export type RulePreviewItem = {
+    transaction_id: number;
+    transaction_description: string;
+    transaction_payee?: string | null;
+    transaction_amount: number;
+    transacted_at: string;
+    account_name: string;
+    org_name?: string | null;
+    rule_name: string;
+    rule_id: number;
+    target_budget_id: number;
+    target_budget_name?: string | null;
+    current_budget_id?: number | null;
+    current_budget_name?: string | null;
+    selected?: boolean;
+};
+
+/**
+ * RulePreviewRequest
+ */
+export type RulePreviewRequest = {
+    month: number;
+    year: number;
+    override_existing?: boolean;
+};
+
+/**
+ * ReorderRulesRequest
+ */
+export type ReorderRulesRequest = {
+    rule_ids: Array<number>;
 };
 
 /**
@@ -315,6 +407,17 @@ export type DiscontinueMasterRequest = {
 };
 
 /**
+ * CreateRuleRequest
+ */
+export type CreateRuleRequest = {
+    name: string;
+    target_budget_id: number;
+    conditions: Array<RuleCondition>;
+    priority?: number;
+    is_active?: boolean;
+};
+
+/**
  * CreateLineItemRequest
  */
 export type CreateLineItemRequest = {
@@ -391,6 +494,23 @@ export type BudgetNameResponse = {
     name: string;
     id: number;
     master_id?: number | null;
+};
+
+/**
+ * ApplyRulesResponse
+ */
+export type ApplyRulesResponse = {
+    applied_count: number;
+    skipped_count: number;
+    error_count: number;
+};
+
+/**
+ * ApplyRulesRequest
+ */
+export type ApplyRulesRequest = {
+    transaction_ids: Array<number>;
+    override_existing?: boolean;
 };
 
 /**
@@ -500,8 +620,8 @@ export type ApiV1BudgetsCreateCreateBudgetResponse = ApiV1BudgetsCreateCreateBud
 export type ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData = {
     body?: never;
     path: {
-        budget_id: number;
         transaction_id: number;
+        budget_id: number;
     };
     query?: never;
     url: '/api/finance/v1/budgets/{budget_id}/transactions/{transaction_id}';
@@ -1146,6 +1266,262 @@ export type ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointRespons
 };
 
 export type ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponse = ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponses[keyof ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponses];
+
+export type ApiV1RulesGetRulesEndpointData = {
+    body?: never;
+    path?: never;
+    query?: {
+        include_inactive?: boolean;
+    };
+    url: '/api/finance/v1/rules';
+};
+
+export type ApiV1RulesGetRulesEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1RulesGetRulesEndpointError = ApiV1RulesGetRulesEndpointErrors[keyof ApiV1RulesGetRulesEndpointErrors];
+
+export type ApiV1RulesGetRulesEndpointResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: Array<RuleResponse>;
+};
+
+export type ApiV1RulesGetRulesEndpointResponse = ApiV1RulesGetRulesEndpointResponses[keyof ApiV1RulesGetRulesEndpointResponses];
+
+export type ApiV1RulesCreateRuleEndpointData = {
+    body: CreateRuleRequest;
+    path?: never;
+    query?: never;
+    url: '/api/finance/v1/rules';
+};
+
+export type ApiV1RulesCreateRuleEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1RulesCreateRuleEndpointError = ApiV1RulesCreateRuleEndpointErrors[keyof ApiV1RulesCreateRuleEndpointErrors];
+
+export type ApiV1RulesCreateRuleEndpointResponses = {
+    /**
+     * Document created, URL follows
+     */
+    201: RuleResponse;
+};
+
+export type ApiV1RulesCreateRuleEndpointResponse = ApiV1RulesCreateRuleEndpointResponses[keyof ApiV1RulesCreateRuleEndpointResponses];
+
+export type ApiV1RulesRuleIdDeleteRuleEndpointData = {
+    body?: never;
+    path: {
+        rule_id: number;
+    };
+    query?: never;
+    url: '/api/finance/v1/rules/{rule_id}';
+};
+
+export type ApiV1RulesRuleIdDeleteRuleEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1RulesRuleIdDeleteRuleEndpointError = ApiV1RulesRuleIdDeleteRuleEndpointErrors[keyof ApiV1RulesRuleIdDeleteRuleEndpointErrors];
+
+export type ApiV1RulesRuleIdDeleteRuleEndpointResponses = {
+    /**
+     * Request fulfilled, nothing follows
+     */
+    204: void;
+};
+
+export type ApiV1RulesRuleIdDeleteRuleEndpointResponse = ApiV1RulesRuleIdDeleteRuleEndpointResponses[keyof ApiV1RulesRuleIdDeleteRuleEndpointResponses];
+
+export type ApiV1RulesRuleIdGetRuleEndpointData = {
+    body?: never;
+    path: {
+        rule_id: number;
+    };
+    query?: never;
+    url: '/api/finance/v1/rules/{rule_id}';
+};
+
+export type ApiV1RulesRuleIdGetRuleEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1RulesRuleIdGetRuleEndpointError = ApiV1RulesRuleIdGetRuleEndpointErrors[keyof ApiV1RulesRuleIdGetRuleEndpointErrors];
+
+export type ApiV1RulesRuleIdGetRuleEndpointResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: RuleResponse;
+};
+
+export type ApiV1RulesRuleIdGetRuleEndpointResponse = ApiV1RulesRuleIdGetRuleEndpointResponses[keyof ApiV1RulesRuleIdGetRuleEndpointResponses];
+
+export type ApiV1RulesRuleIdUpdateRuleEndpointData = {
+    body: UpdateRuleRequest;
+    path: {
+        rule_id: number;
+    };
+    query?: never;
+    url: '/api/finance/v1/rules/{rule_id}';
+};
+
+export type ApiV1RulesRuleIdUpdateRuleEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1RulesRuleIdUpdateRuleEndpointError = ApiV1RulesRuleIdUpdateRuleEndpointErrors[keyof ApiV1RulesRuleIdUpdateRuleEndpointErrors];
+
+export type ApiV1RulesRuleIdUpdateRuleEndpointResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: RuleResponse;
+};
+
+export type ApiV1RulesRuleIdUpdateRuleEndpointResponse = ApiV1RulesRuleIdUpdateRuleEndpointResponses[keyof ApiV1RulesRuleIdUpdateRuleEndpointResponses];
+
+export type ApiV1RulesReorderReorderRulesEndpointData = {
+    body: ReorderRulesRequest;
+    path?: never;
+    query?: never;
+    url: '/api/finance/v1/rules/reorder';
+};
+
+export type ApiV1RulesReorderReorderRulesEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1RulesReorderReorderRulesEndpointError = ApiV1RulesReorderReorderRulesEndpointErrors[keyof ApiV1RulesReorderReorderRulesEndpointErrors];
+
+export type ApiV1RulesReorderReorderRulesEndpointResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: MessageResponse;
+};
+
+export type ApiV1RulesReorderReorderRulesEndpointResponse = ApiV1RulesReorderReorderRulesEndpointResponses[keyof ApiV1RulesReorderReorderRulesEndpointResponses];
+
+export type ApiV1RulesPreviewPreviewRulesEndpointData = {
+    body: RulePreviewRequest;
+    path?: never;
+    query?: never;
+    url: '/api/finance/v1/rules/preview';
+};
+
+export type ApiV1RulesPreviewPreviewRulesEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1RulesPreviewPreviewRulesEndpointError = ApiV1RulesPreviewPreviewRulesEndpointErrors[keyof ApiV1RulesPreviewPreviewRulesEndpointErrors];
+
+export type ApiV1RulesPreviewPreviewRulesEndpointResponses = {
+    /**
+     * Document created, URL follows
+     */
+    201: RulePreviewResponse;
+};
+
+export type ApiV1RulesPreviewPreviewRulesEndpointResponse = ApiV1RulesPreviewPreviewRulesEndpointResponses[keyof ApiV1RulesPreviewPreviewRulesEndpointResponses];
+
+export type ApiV1RulesApplyApplyRulesEndpointData = {
+    body: ApplyRulesRequest;
+    path?: never;
+    query?: never;
+    url: '/api/finance/v1/rules/apply';
+};
+
+export type ApiV1RulesApplyApplyRulesEndpointErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | {
+            [key: string]: unknown;
+        } | Array<unknown>;
+    };
+};
+
+export type ApiV1RulesApplyApplyRulesEndpointError = ApiV1RulesApplyApplyRulesEndpointErrors[keyof ApiV1RulesApplyApplyRulesEndpointErrors];
+
+export type ApiV1RulesApplyApplyRulesEndpointResponses = {
+    /**
+     * Document created, URL follows
+     */
+    201: ApplyRulesResponse;
+};
+
+export type ApiV1RulesApplyApplyRulesEndpointResponse = ApiV1RulesApplyApplyRulesEndpointResponses[keyof ApiV1RulesApplyApplyRulesEndpointResponses];
 
 export type ApiV1HealthHealthCheckData = {
     body?: never;

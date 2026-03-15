@@ -4,6 +4,7 @@ import type { TransactionResponse } from 'src/api'
 import BudgetAssignmentCell from './BudgetAssignmentCell.vue'
 import TransactionBreakdownDialog from './breakdown/TransactionBreakdownDialog.vue'
 import TransactionTypeDialog from './actions/TransactionTypeDialog.vue'
+import RuleCreationDialog from './rules/RuleCreationDialog.vue'
 
 interface Props {
   transactions: TransactionResponse[]
@@ -15,6 +16,8 @@ interface Props {
     descending: boolean
   }
   loading?: boolean
+  month: number
+  year: number
 }
 
 interface Emits {
@@ -39,6 +42,7 @@ watch(
 
 const breakdownDialogVisible = ref(false)
 const typeDialogVisible = ref(false)
+const ruleDialogVisible = ref(false)
 const selectedTransaction = ref<TransactionResponse | null>(null)
 
 const columns = [
@@ -134,6 +138,15 @@ function onBreakdownSaved() {
 function onTypeSaved() {
   emit('refresh')
 }
+
+function openRuleDialog(transaction: TransactionResponse) {
+  selectedTransaction.value = transaction
+  ruleDialogVisible.value = true
+}
+
+function onRuleSaved() {
+  emit('refresh')
+}
 </script>
 
 <template>
@@ -220,6 +233,10 @@ function onTypeSaved() {
               <q-btn flat dense icon="label" color="accent" size="sm" @click="openTypeDialog(row)">
                 <q-tooltip>Mark transaction type</q-tooltip>
               </q-btn>
+
+              <q-btn flat dense icon="rule" color="info" size="sm" @click="openRuleDialog(row)">
+                <q-tooltip>Create rule from transaction</q-tooltip>
+              </q-btn>
             </q-btn-group>
           </q-td>
         </template>
@@ -237,6 +254,14 @@ function onTypeSaved() {
       v-model:visible="typeDialogVisible"
       :transaction="selectedTransaction"
       @saved="onTypeSaved"
+    />
+
+    <rule-creation-dialog
+      v-model:visible="ruleDialogVisible"
+      :transaction="selectedTransaction"
+      :month="month"
+      :year="year"
+      @saved="onRuleSaved"
     />
   </q-card>
 </template>

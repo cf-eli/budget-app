@@ -21,6 +21,7 @@ from litestar.types import ASGIApp, Middleware, Receive, Scope, Send
 from finance_api.config import settings
 from finance_api.controllers.budget import budget_router
 from finance_api.controllers.health import health_router
+from finance_api.controllers.rule import rules_router
 from finance_api.controllers.transaction import transactions_router
 from finance_api.controllers.user import user_router
 from finance_api.crud.user import ensure_user
@@ -169,6 +170,7 @@ def get_routes() -> list[Router]:
         user_router,
         budget_router,
         transactions_router,
+        rules_router,
         health_router,
     ]
 

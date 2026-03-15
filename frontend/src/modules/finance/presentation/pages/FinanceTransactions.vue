@@ -3,12 +3,14 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { apiV1TransactionsGetTransactions, type TransactionResponse } from 'src/api'
 import TransactionTable from 'src/modules/finance/presentation/components/TransactionTable.vue'
 import MonthYearSelector from 'src/modules/finance/presentation/components/MonthYearSelector.vue'
+import RuleApplicationDialog from 'src/modules/finance/presentation/components/rules/RuleApplicationDialog.vue'
 import { useDateSelectionStore } from 'src/modules/finance/presentation/stores/dateSelectionStore'
 
 const dateStore = useDateSelectionStore()
 
 const transactions = ref<TransactionResponse[]>([])
 const loading = ref(false)
+const applyRulesDialogVisible = ref(false)
 
 const selectedMonthYear = computed({
   get: () => ({
@@ -73,6 +75,10 @@ function handleRefresh() {
   fetchTransactions()
 }
 
+function onRulesApplied() {
+  fetchTransactions()
+}
+
 function handleMonthYearChange() {
   // Reset to first page when changing month/year
   pagination.value.page = 1
@@ -97,15 +103,32 @@ onMounted(() => {
   <q-page class="transactions-page q-pa-lg">
     <div class="row items-center justify-between q-mb-md">
       <div class="text-h5 text-white">Transactions</div>
-      <month-year-selector v-model="selectedMonthYear" @update:model-value="handleMonthYearChange" />
+      <div class="row items-center q-gutter-md">
+        <q-btn
+          color="primary"
+          icon="auto_fix_high"
+          label="Apply Rules"
+          @click="applyRulesDialogVisible = true"
+        />
+        <month-year-selector v-model="selectedMonthYear" @update:model-value="handleMonthYearChange" />
+      </div>
     </div>
 
     <transaction-table
       :transactions="transactions"
       :pagination="pagination"
       :loading="loading"
+      :month="dateStore.selectedMonth"
+      :year="dateStore.selectedYear"
       @update:pagination="handlePaginationUpdate"
       @refresh="handleRefresh"
+    />
+
+    <rule-application-dialog
+      v-model:visible="applyRulesDialogVisible"
+      :month="dateStore.selectedMonth"
+      :year="dateStore.selectedYear"
+      @applied="onRulesApplied"
     />
   </q-page>
 </template>

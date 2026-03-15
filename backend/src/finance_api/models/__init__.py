@@ -5,6 +5,7 @@ from .budget import Budget, Expense, Fund, FundMaster, Income
 from .db import Base, get_session
 from .organization import SimpleFinOrganization
 from .transaction import SimpleFinTransaction, TransactionLineItem
+from .transaction_rule import TransactionRule
 from .user import User
 
 __all__ = [
@@ -18,6 +19,7 @@ __all__ = [
     "SimpleFinOrganization",
     "SimpleFinTransaction",
     "TransactionLineItem",
+    "TransactionRule",
     "User",
     "get_session",
 ]

@@ -16,4 +16,8 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('src/modules/finance/presentation/pages/FinanceBudgets.vue'),
     // children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
   },
+  {
+    path: 'rules',
+    component: () => import('src/modules/finance/presentation/pages/FinanceRules.vue'),
+  },
 ]

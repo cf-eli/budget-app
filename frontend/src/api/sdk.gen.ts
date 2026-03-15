@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ApiV1BudgetsAllGetAllBudgetsData, ApiV1BudgetsAllGetAllBudgetsErrors, ApiV1BudgetsAllGetAllBudgetsResponses, ApiV1BudgetsBudgetIdDeleteBudgetData, ApiV1BudgetsBudgetIdDeleteBudgetErrors, ApiV1BudgetsBudgetIdDeleteBudgetResponses, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousData, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses, ApiV1BudgetsCreateCreateBudgetData, ApiV1BudgetsCreateCreateBudgetErrors, ApiV1BudgetsCreateCreateBudgetResponses, ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointData, ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointErrors, ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointResponses, ApiV1BudgetsFundsFundIdCalculateCalculateFundData, ApiV1BudgetsFundsFundIdCalculateCalculateFundErrors, ApiV1BudgetsFundsFundIdCalculateCalculateFundResponses, ApiV1BudgetsFundsFundIdCombineCombineFundToMasterData, ApiV1BudgetsFundsFundIdCombineCombineFundToMasterErrors, ApiV1BudgetsFundsFundIdCombineCombineFundToMasterResponses, ApiV1BudgetsFundsFundIdUnlinkUnlinkFundData, ApiV1BudgetsFundsFundIdUnlinkUnlinkFundErrors, ApiV1BudgetsFundsFundIdUnlinkUnlinkFundResponses, ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointData, ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointErrors, ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointResponses, ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointData, ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointErrors, ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointResponses, ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointData, ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointErrors, ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointResponses, ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointData, ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointErrors, ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointResponses, ApiV1BudgetsNamesGetBudgetsNamesData, ApiV1BudgetsNamesGetBudgetsNamesErrors, ApiV1BudgetsNamesGetBudgetsNamesResponses, ApiV1HealthHealthCheckData, ApiV1HealthHealthCheckResponses, ApiV1TransactionsGetTransactionsData, ApiV1TransactionsGetTransactionsErrors, ApiV1TransactionsGetTransactionsResponses, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointData, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointData, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownData, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownErrors, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownResponses, ApiV1TransactionsTransactionIdBreakdownGetBreakdownData, ApiV1TransactionsTransactionIdBreakdownGetBreakdownErrors, ApiV1TransactionsTransactionIdBreakdownGetBreakdownResponses, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointData, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointErrors, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponses, ApiV1TransactionsUpdateUpdateTransactionsData, ApiV1TransactionsUpdateUpdateTransactionsResponses, ApiV1UserTokenUpdateAccessUrlEndpointData, ApiV1UserTokenUpdateAccessUrlEndpointErrors, ApiV1UserTokenUpdateAccessUrlEndpointResponses } from './types.gen';
+import type { ApiV1BudgetsAllGetAllBudgetsData, ApiV1BudgetsAllGetAllBudgetsErrors, ApiV1BudgetsAllGetAllBudgetsResponses, ApiV1BudgetsBudgetIdDeleteBudgetData, ApiV1BudgetsBudgetIdDeleteBudgetErrors, ApiV1BudgetsBudgetIdDeleteBudgetResponses, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetData, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetErrors, ApiV1BudgetsBudgetIdTransactionsTransactionIdAddTransactionToBudgetResponses, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousData, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousErrors, ApiV1BudgetsCopyFromPreviousCopyBudgetsFromPreviousResponses, ApiV1BudgetsCreateCreateBudgetData, ApiV1BudgetsCreateCreateBudgetErrors, ApiV1BudgetsCreateCreateBudgetResponses, ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointData, ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointErrors, ApiV1BudgetsFundsApplyIncrementsApplyFundIncrementsEndpointResponses, ApiV1BudgetsFundsFundIdCalculateCalculateFundData, ApiV1BudgetsFundsFundIdCalculateCalculateFundErrors, ApiV1BudgetsFundsFundIdCalculateCalculateFundResponses, ApiV1BudgetsFundsFundIdCombineCombineFundToMasterData, ApiV1BudgetsFundsFundIdCombineCombineFundToMasterErrors, ApiV1BudgetsFundsFundIdCombineCombineFundToMasterResponses, ApiV1BudgetsFundsFundIdUnlinkUnlinkFundData, ApiV1BudgetsFundsFundIdUnlinkUnlinkFundErrors, ApiV1BudgetsFundsFundIdUnlinkUnlinkFundResponses, ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointData, ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointErrors, ApiV1BudgetsFundsMastersMasterIdAddMonthAddMonthToMasterEndpointResponses, ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointData, ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointErrors, ApiV1BudgetsFundsMastersMasterIdDetailsGetMasterFundDetailsEndpointResponses, ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointData, ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointErrors, ApiV1BudgetsFundsMastersMasterIdDiscontinueDiscontinueMasterEndpointResponses, ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointData, ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointErrors, ApiV1BudgetsFundsOrphanedMastersGetOrphanedMastersEndpointResponses, ApiV1BudgetsNamesGetBudgetsNamesData, ApiV1BudgetsNamesGetBudgetsNamesErrors, ApiV1BudgetsNamesGetBudgetsNamesResponses, ApiV1HealthHealthCheckData, ApiV1HealthHealthCheckResponses, ApiV1RulesApplyApplyRulesEndpointData, ApiV1RulesApplyApplyRulesEndpointErrors, ApiV1RulesApplyApplyRulesEndpointResponses, ApiV1RulesCreateRuleEndpointData, ApiV1RulesCreateRuleEndpointErrors, ApiV1RulesCreateRuleEndpointResponses, ApiV1RulesGetRulesEndpointData, ApiV1RulesGetRulesEndpointErrors, ApiV1RulesGetRulesEndpointResponses, ApiV1RulesPreviewPreviewRulesEndpointData, ApiV1RulesPreviewPreviewRulesEndpointErrors, ApiV1RulesPreviewPreviewRulesEndpointResponses, ApiV1RulesReorderReorderRulesEndpointData, ApiV1RulesReorderReorderRulesEndpointErrors, ApiV1RulesReorderReorderRulesEndpointResponses, ApiV1RulesRuleIdDeleteRuleEndpointData, ApiV1RulesRuleIdDeleteRuleEndpointErrors, ApiV1RulesRuleIdDeleteRuleEndpointResponses, ApiV1RulesRuleIdGetRuleEndpointData, ApiV1RulesRuleIdGetRuleEndpointErrors, ApiV1RulesRuleIdGetRuleEndpointResponses, ApiV1RulesRuleIdUpdateRuleEndpointData, ApiV1RulesRuleIdUpdateRuleEndpointErrors, ApiV1RulesRuleIdUpdateRuleEndpointResponses, ApiV1TransactionsGetTransactionsData, ApiV1TransactionsGetTransactionsErrors, ApiV1TransactionsGetTransactionsResponses, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointData, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointErrors, ApiV1TransactionsLineItemsLineItemIdDeleteLineItemEndpointResponses, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointData, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointErrors, ApiV1TransactionsLineItemsLineItemIdUpdateLineItemEndpointResponses, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownData, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownErrors, ApiV1TransactionsTransactionIdBreakdownCreateBreakdownResponses, ApiV1TransactionsTransactionIdBreakdownGetBreakdownData, ApiV1TransactionsTransactionIdBreakdownGetBreakdownErrors, ApiV1TransactionsTransactionIdBreakdownGetBreakdownResponses, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointData, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointErrors, ApiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpointResponses, ApiV1TransactionsUpdateUpdateTransactionsData, ApiV1TransactionsUpdateUpdateTransactionsResponses, ApiV1UserTokenUpdateAccessUrlEndpointData, ApiV1UserTokenUpdateAccessUrlEndpointErrors, ApiV1UserTokenUpdateAccessUrlEndpointResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -450,6 +450,170 @@ export const apiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpoint = <Th
             }
         ],
         url: '/api/finance/v1/transactions/{transaction_id}/type',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * GetRulesEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/rules
+ */
+export const apiV1RulesGetRulesEndpoint = <ThrowOnError extends boolean = false>(options?: Options<ApiV1RulesGetRulesEndpointData, ThrowOnError>) => {
+    return (options?.client ?? client).get<ApiV1RulesGetRulesEndpointResponses, ApiV1RulesGetRulesEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/rules',
+        ...options
+    });
+};
+
+/**
+ * CreateRuleEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/rules
+ */
+export const apiV1RulesCreateRuleEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1RulesCreateRuleEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApiV1RulesCreateRuleEndpointResponses, ApiV1RulesCreateRuleEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/rules',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * DeleteRuleEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/rules/{rule_id}
+ */
+export const apiV1RulesRuleIdDeleteRuleEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1RulesRuleIdDeleteRuleEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).delete<ApiV1RulesRuleIdDeleteRuleEndpointResponses, ApiV1RulesRuleIdDeleteRuleEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/rules/{rule_id}',
+        ...options
+    });
+};
+
+/**
+ * GetRuleEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/rules/{rule_id}
+ */
+export const apiV1RulesRuleIdGetRuleEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1RulesRuleIdGetRuleEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).get<ApiV1RulesRuleIdGetRuleEndpointResponses, ApiV1RulesRuleIdGetRuleEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/rules/{rule_id}',
+        ...options
+    });
+};
+
+/**
+ * UpdateRuleEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/rules/{rule_id}
+ */
+export const apiV1RulesRuleIdUpdateRuleEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1RulesRuleIdUpdateRuleEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).put<ApiV1RulesRuleIdUpdateRuleEndpointResponses, ApiV1RulesRuleIdUpdateRuleEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/rules/{rule_id}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * ReorderRulesEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/rules/reorder
+ */
+export const apiV1RulesReorderReorderRulesEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1RulesReorderReorderRulesEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).patch<ApiV1RulesReorderReorderRulesEndpointResponses, ApiV1RulesReorderReorderRulesEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/rules/reorder',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * PreviewRulesEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/rules/preview
+ */
+export const apiV1RulesPreviewPreviewRulesEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1RulesPreviewPreviewRulesEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApiV1RulesPreviewPreviewRulesEndpointResponses, ApiV1RulesPreviewPreviewRulesEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/rules/preview',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * ApplyRulesEndpoint
+ *
+ * Auto-generated gateway endpoint for http://localhost:8082/api/v1/rules/apply
+ */
+export const apiV1RulesApplyApplyRulesEndpoint = <ThrowOnError extends boolean = false>(options: Options<ApiV1RulesApplyApplyRulesEndpointData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApiV1RulesApplyApplyRulesEndpointResponses, ApiV1RulesApplyApplyRulesEndpointErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/finance/v1/rules/apply',
         ...options,
         headers: {
             'Content-Type': 'application/json',
