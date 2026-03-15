@@ -77,7 +77,7 @@ function handleRefresh() {
             icon="delete"
             color="negative"
             size="sm"
-            @click="handleDelete(fund.id, fund.name, () => emit('deleted'))"
+            @click="handleDelete(fund.id, fund.name, () => emit('deleted'))($event)"
           >
             <q-tooltip>Delete fund (click twice to confirm)</q-tooltip>
           </q-btn>

@@ -1,10 +1,35 @@
 """Budget deletion operations."""
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from finance_api.models.budget import Budget
+from finance_api.models.budget import Budget, Expense, Fund, Income
 from finance_api.models.db import get_session
+from finance_api.models.transaction import (
+    SimpleFinTransaction,
+    TransactionLineItem,
+)
+
+
+async def _delete_child_rows(
+    budget_ids: list[int],
+    sess: AsyncSession,
+) -> None:
+    """Delete child type rows and unlink transactions for budget IDs."""
+    # Nullify transaction/line-item references to these budgets
+    await sess.execute(
+        update(SimpleFinTransaction)
+        .where(SimpleFinTransaction.budget_id.in_(budget_ids))
+        .values(budget_id=None)
+    )
+    await sess.execute(
+        update(TransactionLineItem)
+        .where(TransactionLineItem.budget_id.in_(budget_ids))
+        .values(budget_id=None)
+    )
+    # Delete child type rows (fund/income/expense)
+    for model in (Fund, Income, Expense):
+        await sess.execute(delete(model).where(model.id.in_(budget_ids)))
 
 
 async def delete_budget_by_id(
@@ -45,7 +70,8 @@ async def delete_budget_by_id(
             msg = f"Budget {budget_id} not found or doesn't belong to user"
             raise ValueError(msg)
 
-        # Delete the budget
+        # Delete child type rows first, then the budget
+        await _delete_child_rows([budget_id], sess)
         delete_query = (
             delete(Budget)
             .where(Budget.id == budget_id)
@@ -99,8 +125,10 @@ async def delete_budgets(
             raise ValueError(msg)
 
         deleted_count = len(budgets)
+        budget_ids = [b.id for b in budgets]
 
-        # Delete all budgets for the month/year
+        # Delete child type rows first, then the budgets
+        await _delete_child_rows(budget_ids, sess)
         delete_query = (
             delete(Budget)
             .where(Budget.user_id == user_id)

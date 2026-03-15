@@ -35,7 +35,7 @@ const formatCurrency = (value: number | null | undefined) =>
             size="sm"
             icon="delete"
             color="negative"
-            @click="handleDelete(expense.id, expense.name, () => emit('deleted'))"
+            @click="handleDelete(expense.id, expense.name, () => emit('deleted'))($event)"
           >
             <q-tooltip>Delete budget (click twice to confirm)</q-tooltip>
           </q-btn>
