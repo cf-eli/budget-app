@@ -21,6 +21,9 @@ const emit = defineEmits<Emits>()
 const {
   ruleName,
   targetBudgetId,
+  targetTransactionType,
+  targetExcludeFromBudget,
+  transactionTypeOptions,
   conditions,
   loading,
   canSave,
@@ -67,8 +70,26 @@ const {
           map-options
           dense
           outlined
-          label="Assign to Budget"
+          clearable
+          label="Assign to Budget (optional)"
           class="q-mb-md dialog-select"
+        />
+
+        <q-select
+          v-model="targetTransactionType"
+          :options="transactionTypeOptions"
+          emit-value
+          map-options
+          dense
+          outlined
+          label="Mark as Transaction Type (optional)"
+          class="q-mb-sm dialog-select"
+        />
+        <q-checkbox
+          v-if="targetTransactionType"
+          v-model="targetExcludeFromBudget"
+          label="Exclude from budget"
+          class="q-mb-md"
         />
 
         <div class="text-subtitle2 q-mb-sm">Conditions (all must match):</div>

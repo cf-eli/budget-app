@@ -13,6 +13,8 @@ export type UpdateRuleRequest = {
     conditions?: Array<RuleCondition> | null;
     priority?: number | null;
     is_active?: boolean | null;
+    target_transaction_type?: string | null;
+    target_exclude_from_budget?: boolean | null;
 };
 
 /**
@@ -138,11 +140,13 @@ export type TokenRequest = {
 export type RuleResponse = {
     id: number;
     name: string;
-    target_budget_id: number;
+    target_budget_id?: number | null;
     target_budget_name?: string | null;
     conditions: Array<RuleCondition>;
     priority: number;
     is_active: boolean;
+    target_transaction_type?: string | null;
+    target_exclude_from_budget?: boolean;
     created_at: string;
     updated_at: string;
 };
@@ -170,10 +174,12 @@ export type RulePreviewItem = {
     org_name?: string | null;
     rule_name: string;
     rule_id: number;
-    target_budget_id: number;
+    target_budget_id?: number | null;
     target_budget_name?: string | null;
     current_budget_id?: number | null;
     current_budget_name?: string | null;
+    target_transaction_type?: string | null;
+    target_exclude_from_budget?: boolean;
     selected?: boolean;
 };
 
@@ -411,10 +417,12 @@ export type DiscontinueMasterRequest = {
  */
 export type CreateRuleRequest = {
     name: string;
-    target_budget_id: number;
+    target_budget_id?: number | null;
     conditions: Array<RuleCondition>;
     priority?: number;
     is_active?: boolean;
+    target_transaction_type?: string | null;
+    target_exclude_from_budget?: boolean;
 };
 
 /**
@@ -1485,9 +1493,9 @@ export type ApiV1RulesPreviewPreviewRulesEndpointError = ApiV1RulesPreviewPrevie
 
 export type ApiV1RulesPreviewPreviewRulesEndpointResponses = {
     /**
-     * Document created, URL follows
+     * Request fulfilled, document follows
      */
-    201: RulePreviewResponse;
+    200: RulePreviewResponse;
 };
 
 export type ApiV1RulesPreviewPreviewRulesEndpointResponse = ApiV1RulesPreviewPreviewRulesEndpointResponses[keyof ApiV1RulesPreviewPreviewRulesEndpointResponses];
@@ -1516,9 +1524,9 @@ export type ApiV1RulesApplyApplyRulesEndpointError = ApiV1RulesApplyApplyRulesEn
 
 export type ApiV1RulesApplyApplyRulesEndpointResponses = {
     /**
-     * Document created, URL follows
+     * Request fulfilled, document follows
      */
-    201: ApplyRulesResponse;
+    200: ApplyRulesResponse;
 };
 
 export type ApiV1RulesApplyApplyRulesEndpointResponse = ApiV1RulesApplyApplyRulesEndpointResponses[keyof ApiV1RulesApplyApplyRulesEndpointResponses];

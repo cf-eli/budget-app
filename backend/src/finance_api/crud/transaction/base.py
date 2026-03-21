@@ -6,7 +6,9 @@ from logging import getLogger
 from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
+from finance_api.models.account import SimpleFinAccount
 from finance_api.models.db import get_session
 from finance_api.models.transaction import SimpleFinTransaction
 from finance_api.schemas.schema import Transaction
@@ -105,8 +107,20 @@ async def mark_transaction_type(
         transaction.exclude_from_budget = exclude_from_budget
 
         await sess.commit()
-        await sess.refresh(transaction)
-        return transaction
+
+        # Re-fetch with relationships to avoid DetachedInstanceError
+        stmt = (
+            select(SimpleFinTransaction)
+            .where(SimpleFinTransaction.id == transaction_id)
+            .options(
+                selectinload(SimpleFinTransaction.budget),
+                selectinload(SimpleFinTransaction.account).selectinload(
+                    SimpleFinAccount.org,
+                ),
+            )
+        )
+        result = await sess.execute(stmt)
+        return result.scalar_one()
 
 
 async def remove_stale_pending_transactions(

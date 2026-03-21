@@ -40,6 +40,8 @@ def _rule_to_response(rule: TransactionRule) -> RuleResponse:
         conditions=conditions,
         priority=rule.priority,
         is_active=rule.is_active,
+        target_transaction_type=rule.target_transaction_type,
+        target_exclude_from_budget=rule.target_exclude_from_budget,
         created_at=rule.created_at,
         updated_at=rule.updated_at,
     )

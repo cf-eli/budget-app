@@ -118,14 +118,16 @@ async def update_transactions() -> MessageResponse:
 
                 # Save transactions
                 await trans_crud.save_transactions(
-                    account.id, account.transactions,
+                    account.id,
+                    account.transactions,
                 )
 
                 # Remove pending transactions no longer in the sync
                 # (some banks create new transactions when pending posts)
                 synced_ids = {t.id for t in account.transactions}
                 await trans_crud.remove_stale_pending_transactions(
-                    account.id, synced_ids,
+                    account.id,
+                    synced_ids,
                 )
 
         # Auto-apply rules for users who have it enabled

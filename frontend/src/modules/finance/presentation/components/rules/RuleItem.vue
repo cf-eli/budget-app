@@ -33,6 +33,23 @@ const fieldLabels: Record<string, string> = {
   org_name: 'Organization',
 }
 
+const typeLabels: Record<string, string> = {
+  transfer: 'Transfer',
+  credit_payment: 'Credit Payment',
+  loan_payment: 'Loan Payment',
+}
+
+const actionSummary = computed(() => {
+  const parts: string[] = []
+  if (props.rule.target_budget_name) {
+    parts.push(`Budget: ${props.rule.target_budget_name}`)
+  }
+  if (props.rule.target_transaction_type) {
+    parts.push(`Mark as: ${typeLabels[props.rule.target_transaction_type] || props.rule.target_transaction_type}`)
+  }
+  return parts.join(' | ') || 'No action configured'
+})
+
 const conditionsSummary = computed(() => {
   return props.rule.conditions
     .map((c) => {
@@ -59,7 +76,7 @@ const conditionsSummary = computed(() => {
         <q-tooltip v-if="conditionsSummary.length > 60">{{ conditionsSummary }}</q-tooltip>
       </q-item-label>
       <q-item-label caption class="text-primary">
-        Assign to: {{ rule.target_budget_name || 'Unknown Budget' }}
+        {{ actionSummary }}
       </q-item-label>
     </q-item-section>
 

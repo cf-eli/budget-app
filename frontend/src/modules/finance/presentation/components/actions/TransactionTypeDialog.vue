@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { TransactionResponse, TransactionTypeEnum } from 'src/api'
-import { apiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpoint } from 'src/api'
+import type { TransactionResponse } from 'src/api'
+import { useTransactionTypeMarking } from '../../composables/useTransactionTypeMarking'
 
 interface Props {
   transaction: TransactionResponse | null
@@ -15,49 +14,13 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
-const loading = ref(false)
 
-const transactionTypeOptions: { label: string; value: TransactionTypeEnum; description: string }[] =
-  [
-    { label: 'Transfer', value: 'transfer', description: 'Money moved between accounts' },
-    { label: 'Credit Payment', value: 'credit_payment', description: 'Credit card payment' },
-    { label: 'Loan Payment', value: 'loan_payment', description: 'Loan or mortgage payment' },
-  ]
-const excludeFromBudget = ref(true)
-const selectedType = ref<TransactionTypeEnum | null>(null)
-
-async function saveType() {
-  if (!props.transaction || !selectedType.value) {
-    return
-  }
-
-  loading.value = true
-  try {
-    await apiV1TransactionsTransactionIdTypeMarkTransactionTypeEndpoint({
-      path: {
-        transaction_id: props.transaction.id,
-      },
-      body: {
-        transaction_type: selectedType.value,
-        exclude_from_budget: excludeFromBudget.value,
-      },
-    })
-
-    emit('saved')
-    emit('update:visible', false)
-  } catch (error) {
-    console.error('Error marking transaction type:', error)
-    alert('Failed to mark transaction type. Please try again.')
-  } finally {
-    loading.value = false
-  }
-}
-
-function cancel() {
-  emit('update:visible', false)
-  selectedType.value = null
-  excludeFromBudget.value = true
-}
+const { loading, excludeFromBudget, selectedType, createRule, transactionTypeOptions, saveType, cancel } =
+  useTransactionTypeMarking({
+    getTransaction: () => props.transaction,
+    onSaved: () => emit('saved'),
+    onClose: () => emit('update:visible', false),
+  })
 </script>
 
 <template>
@@ -74,7 +37,7 @@ function cancel() {
         <div class="q-mb-md q-pa-md dialog-info-section">
           <div class="text-subtitle1">{{ transaction.description }}</div>
           <div class="text-subtitle2 text-grey-7">
-            {{ transaction.payee }} • ${{ Math.abs(transaction.amount).toFixed(2) }}
+            {{ transaction.payee }} &bull; ${{ Math.abs(transaction.amount).toFixed(2) }}
           </div>
         </div>
 
@@ -105,13 +68,23 @@ function cancel() {
 
         <!-- Exclude from Budget Option -->
         <div class="q-mt-md">
-          <q-checkbox
-            v-model="excludeFromBudget"
-            label="Exclude from budget calculations"
-            class="dialog-checkbox"
-          />
+          <q-checkbox v-model="excludeFromBudget" label="Exclude from budget calculations" class="dialog-checkbox" />
           <div class="text-caption text-grey-7 q-pl-lg">
             This transaction will be hidden from the transaction list and not counted in budgets.
+          </div>
+        </div>
+
+        <!-- Create Rule Option -->
+        <div class="q-mt-md">
+          <q-checkbox
+            v-model="createRule"
+            label="Apply to future matching transactions"
+            class="dialog-checkbox"
+            :disable="!selectedType"
+          />
+          <div class="text-caption text-grey-7 q-pl-lg">
+            Automatically mark future transactions from
+            "{{ transaction.payee || transaction.description }}" the same way.
           </div>
         </div>
       </q-card-section>

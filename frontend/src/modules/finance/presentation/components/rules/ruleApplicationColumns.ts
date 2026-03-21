@@ -37,4 +37,20 @@ export const ruleApplicationColumns = [
     style: 'max-width: 150px',
     classes: 'cell-ellipsis',
   },
+  {
+    name: 'type',
+    label: 'Mark As',
+    field: 'target_transaction_type',
+    align: 'left' as const,
+    style: 'max-width: 120px',
+    format: (val: string | null) => {
+      if (!val) return ''
+      const labels: Record<string, string> = {
+        transfer: 'Transfer',
+        credit_payment: 'Credit Payment',
+        loan_payment: 'Loan Payment',
+      }
+      return labels[val] || val
+    },
+  },
 ]

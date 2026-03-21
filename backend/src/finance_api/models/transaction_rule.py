@@ -51,10 +51,25 @@ class TransactionRule(Base):
         server_default="true",
     )
 
-    # Target budget to assign matching transactions to
-    target_budget_id: Mapped[int] = mapped_column(
+    # Target budget to assign matching transactions to (optional)
+    target_budget_id: Mapped[int | None] = mapped_column(
         ForeignKey("budget.id", ondelete="CASCADE"),
+        nullable=True,
+    )
+
+    # Target transaction type to mark matching transactions as
+    target_transaction_type: Mapped[str | None] = mapped_column(
+        String,
+        nullable=True,
+        default=None,
+    )  # Values: 'transfer', 'credit_payment', 'loan_payment', None
+
+    # Whether to exclude matching transactions from budget calculations
+    target_exclude_from_budget: Mapped[bool] = mapped_column(
+        Boolean,
         nullable=False,
+        default=False,
+        server_default="false",
     )
 
     # Conditions stored as JSON array of condition objects

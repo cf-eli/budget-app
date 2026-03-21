@@ -3,7 +3,6 @@
 from finance_api.crud.rule.application import (
     apply_rules_to_transactions,
     auto_apply_rules_for_user,
-    preview_rule_application,
 )
 from finance_api.crud.rule.base import (
     create_rule,
@@ -13,6 +12,7 @@ from finance_api.crud.rule.base import (
     reorder_rules,
     update_rule,
 )
+from finance_api.crud.rule.preview import preview_rule_application
 
 __all__ = [
     "apply_rules_to_transactions",

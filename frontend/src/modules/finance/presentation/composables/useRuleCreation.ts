@@ -20,11 +20,31 @@ export function useRuleCreation(options: UseRuleCreationOptions) {
 
   const ruleName = ref('')
   const targetBudgetId = ref<number | null>(null)
+  const targetTransactionType = ref<string | null>(null)
+  const targetExcludeFromBudget = ref(false)
   const conditions = ref<RuleCondition[]>([])
   const loading = ref(false)
 
+  const transactionTypeOptions = [
+    { label: 'None', value: null },
+    { label: 'Transfer', value: 'transfer' },
+    { label: 'Credit Card Payment', value: 'credit_payment' },
+    { label: 'Loan Payment', value: 'loan_payment' },
+  ]
+
   const canSave = computed(() => {
-    return ruleName.value.trim() && targetBudgetId.value && conditions.value.length > 0
+    const hasName = !!ruleName.value.trim()
+    const hasConditions = conditions.value.length > 0
+    const hasAction = !!targetBudgetId.value || !!targetTransactionType.value
+    return hasName && hasConditions && hasAction
+  })
+
+  watch(targetTransactionType, (newType) => {
+    if (newType) {
+      targetExcludeFromBudget.value = true
+    } else {
+      targetExcludeFromBudget.value = false
+    }
   })
 
   watch(options.getVisible, async (visible) => {
@@ -70,11 +90,13 @@ export function useRuleCreation(options: UseRuleCreationOptions) {
   function resetForm() {
     ruleName.value = ''
     targetBudgetId.value = null
+    targetTransactionType.value = null
+    targetExcludeFromBudget.value = false
     conditions.value = []
   }
 
   async function saveRule() {
-    if (!canSave.value || !targetBudgetId.value) return
+    if (!canSave.value) return
     loading.value = true
     try {
       await rulesStore.createRule({
@@ -83,6 +105,8 @@ export function useRuleCreation(options: UseRuleCreationOptions) {
         conditions: conditions.value,
         priority: 0,
         is_active: true,
+        target_transaction_type: targetTransactionType.value,
+        target_exclude_from_budget: targetExcludeFromBudget.value,
       })
       $q.notify({ type: 'positive', message: 'Rule created successfully' })
       options.onSaved()
@@ -102,6 +126,9 @@ export function useRuleCreation(options: UseRuleCreationOptions) {
   return {
     ruleName,
     targetBudgetId,
+    targetTransactionType,
+    targetExcludeFromBudget,
+    transactionTypeOptions,
     conditions,
     loading,
     canSave,

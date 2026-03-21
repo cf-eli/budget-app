@@ -20,12 +20,12 @@ async def _delete_child_rows(
     await sess.execute(
         update(SimpleFinTransaction)
         .where(SimpleFinTransaction.budget_id.in_(budget_ids))
-        .values(budget_id=None)
+        .values(budget_id=None),
     )
     await sess.execute(
         update(TransactionLineItem)
         .where(TransactionLineItem.budget_id.in_(budget_ids))
-        .values(budget_id=None)
+        .values(budget_id=None),
     )
     # Delete child type rows (fund/income/expense)
     for model in (Fund, Income, Expense):

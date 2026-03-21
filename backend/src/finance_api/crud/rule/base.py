@@ -27,6 +27,8 @@ async def create_rule(
             conditions=conditions_json,
             priority=data.priority,
             is_active=data.is_active,
+            target_transaction_type=data.target_transaction_type,
+            target_exclude_from_budget=data.target_exclude_from_budget,
         )
         sess.add(rule)
         await sess.commit()
@@ -99,6 +101,14 @@ async def update_rule(
             update_values["priority"] = data.priority
         if data.is_active is not None:
             update_values["is_active"] = data.is_active
+        if data.target_transaction_type is not None:
+            update_values["target_transaction_type"] = (
+                data.target_transaction_type or None
+            )
+        if data.target_exclude_from_budget is not None:
+            update_values["target_exclude_from_budget"] = (
+                data.target_exclude_from_budget
+            )
 
         if update_values:
             await sess.execute(

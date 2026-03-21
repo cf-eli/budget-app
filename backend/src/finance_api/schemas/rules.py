@@ -3,7 +3,7 @@
 from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class RuleFieldEnum(str, Enum):
@@ -41,10 +41,20 @@ class CreateRuleRequest(BaseModel):
     """Request schema for creating a new rule."""
 
     name: str
-    target_budget_id: int
+    target_budget_id: int | None = None
     conditions: list[RuleCondition] = Field(min_length=1)
     priority: int = 0
     is_active: bool = True
+    target_transaction_type: str | None = None
+    target_exclude_from_budget: bool = False
+
+    @model_validator(mode="after")
+    def validate_at_least_one_action(self) -> "CreateRuleRequest":
+        """Ensure at least one action is configured (budget or type marking)."""
+        if not self.target_budget_id and not self.target_transaction_type:
+            msg = "At least one action required: budget or type"
+            raise ValueError(msg)
+        return self
 
 
 class UpdateRuleRequest(BaseModel):
@@ -55,6 +65,8 @@ class UpdateRuleRequest(BaseModel):
     conditions: list[RuleCondition] | None = None
     priority: int | None = None
     is_active: bool | None = None
+    target_transaction_type: str | None = None
+    target_exclude_from_budget: bool | None = None
 
 
 class RuleResponse(BaseModel):
@@ -62,11 +74,13 @@ class RuleResponse(BaseModel):
 
     id: int
     name: str
-    target_budget_id: int
+    target_budget_id: int | None
     target_budget_name: str | None
     conditions: list[RuleCondition]
     priority: int
     is_active: bool
+    target_transaction_type: str | None = None
+    target_exclude_from_budget: bool = False
     created_at: datetime
     updated_at: datetime
 
@@ -91,10 +105,12 @@ class RulePreviewItem(BaseModel):
     org_name: str | None
     rule_name: str
     rule_id: int
-    target_budget_id: int
+    target_budget_id: int | None
     target_budget_name: str | None
     current_budget_id: int | None
     current_budget_name: str | None
+    target_transaction_type: str | None = None
+    target_exclude_from_budget: bool = False
     selected: bool = True  # For UI checkbox state
 
 
